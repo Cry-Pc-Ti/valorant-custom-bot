@@ -8,9 +8,7 @@ import { compositionMessage } from '../event/embedMessage';
 export const autoCompositionCommands = {
   data: new SlashCommandBuilder()
     .setName('composition')
-    .setDescription(
-      '指定された各クラスの人数にともない、自動的に構成を作成します\n(各クラスの合計人数が5人になるようにしてください)'
-    )
+    .setDescription('ランダムに構成を作成します')
     .addNumberOption((option) =>
       option
         .setName('duelist')
@@ -92,7 +90,7 @@ export const autoCompositionCommands = {
         sentinel: [],
       };
 
-      // 人数指定がない場合はエージェント全体からランダムに選択
+      // 人数指定がない場合、エージェント全体からランダムに選択
       if (!duelistNum && !initiatorNum && !controllerNum && !sentinelNum) {
         // 各ロールの合計を5人とし、それぞれの人数を0人~5人の中から決定
         const total = 5;
@@ -100,11 +98,31 @@ export const autoCompositionCommands = {
         initiatorNum = Math.floor(Math.random() * (total - duelistNum + 1));
         controllerNum = Math.floor(Math.random() * (total - duelistNum - initiatorNum + 1));
         sentinelNum = total - duelistNum - initiatorNum - controllerNum;
+
+        // 各クラスの合計が5人でない場合、不足分をランダムに選択
+      } else if (duelistNum + initiatorNum + controllerNum + sentinelNum < 5) {
+        const total = 5;
+
+        // 不足分を計算
+        const shortage = total - duelistNum - initiatorNum - controllerNum - sentinelNum;
+
+        // 不足分をランダムに選択
+        if (shortage > 0) {
+          const shortageArray = Array.from({ length: shortage }, () =>
+            Math.floor(Math.random() * 4)
+          );
+          shortageArray.forEach((role) => {
+            if (role === 0) duelistNum!++;
+            if (role === 1) initiatorNum!++;
+            if (role === 2) controllerNum!++;
+            if (role === 3) sentinelNum!++;
+          });
+        }
       }
 
       // 各クラスの合計が5人でない場合はエラーを返却
       if (duelistNum + initiatorNum + controllerNum + sentinelNum !== 5) {
-        await interaction.editReply('各クラスの合計人数が5人になるようにしてください');
+        await interaction.editReply('各クラスの合計人数が5人になるように設定してください');
         return;
       }
 
