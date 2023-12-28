@@ -40,7 +40,7 @@ export const createCompositionImage = async (composition: CompositionData) => {
       create: {
         width: newWidth,
         height: newHeight,
-        channels: 4, // RGB
+        channels: 4,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       },
     })
