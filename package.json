@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "test": "ts-node src/event/test.ts"
+    "test": "ts-node src/test.ts"
   },
   "keywords": [],
   "author": "",
