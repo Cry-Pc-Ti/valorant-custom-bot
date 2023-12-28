@@ -2,8 +2,10 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from '../modules/discordModule';
 import { valorantAgents } from '../data/valorantAgents';
 import { AgentData } from '../types/valorantAgentData';
+import { pickMessage } from '../event/embedMessage';
 
 export const randomPickCommands = {
+  // コマンドの設定
   data: new SlashCommandBuilder()
     .setName('pick')
     .setDescription('エージェントをランダムに選択します (ロール指定可))')
@@ -12,40 +14,42 @@ export const randomPickCommands = {
         .setName('role')
         .setDescription('エージェントのロールを指定してください')
         .addChoices(
-          { name: 'デュエリスト', value: 'duelist' },
-          { name: 'イニシエーター', value: 'initiator' },
-          { name: 'コントローラー', value: 'controller' },
-          { name: 'センチネル', value: 'sentinel' }
+          { name: 'Duelist', value: 'duelist' },
+          { name: 'Initiator', value: 'initiator' },
+          { name: 'Controller', value: 'controller' },
+          { name: 'Sentinel', value: 'sentinel' }
         )
     )
     .toJSON(),
 
+  // コマンドの実行
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
 
     try {
       const { options } = interaction;
 
-      const agentRole: string | null = options.getString('class');
+      // エージェントロールを取得
+      const agentRole: string | null = options.getString('role');
+
+      // ランダムに選択されたエージェントのデータを格納する変数
+      let randomAgent: AgentData;
 
       // エージェントロールが指定されていない場合はランダムに選択
       if (!agentRole) {
-        const randomAgent: AgentData =
-          valorantAgents[Math.floor(Math.random() * valorantAgents.length)];
-
-        await interaction.editReply(`今回のエージェントは${randomAgent.name}です`);
+        randomAgent = valorantAgents[Math.floor(Math.random() * valorantAgents.length)];
 
         // エージェントロールが指定されている場合はそのロールのエージェントからランダムに選択
       } else {
         const filteredAgents: AgentData[] = valorantAgents.filter(
           (agent) => agent.role === agentRole
         );
-
-        const randomAgent: AgentData =
-          filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
-
-        await interaction.editReply(`今回のエージェントは${randomAgent.name}です`);
+        randomAgent = filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
       }
+
+      // メッセージを作成・送信
+      const embedMessage = pickMessage(randomAgent);
+      await interaction.editReply(embedMessage);
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました');
       console.error(error);

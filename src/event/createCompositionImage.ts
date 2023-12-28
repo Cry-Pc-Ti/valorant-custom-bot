@@ -19,15 +19,6 @@ export const createCompositionImage = async (composition: CompositionData) => {
     fs.unlinkSync('img/composition.png');
   }
 
-  // // 連結する画像のパス
-  // const imagePaths: string[] = [
-  //   'img/agents/Jett_icon.png',
-  //   'img/agents/Phoenix_icon.png',
-  //   'img/agents/Sage_icon.png',
-  //   'img/agents/Sova_icon.png',
-  //   'img/agents/Viper_icon.png',
-  // ];
-
   // 画像を読み込む
   const images = imagePaths.map((path) => sharp(path));
 
