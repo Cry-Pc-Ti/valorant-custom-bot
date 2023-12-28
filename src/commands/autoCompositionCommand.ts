@@ -1,10 +1,5 @@
 // モジュールをインポート
-import {
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
-  EmbedBuilder,
-  AttachmentBuilder,
-} from '../modules/discordModule';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from '../modules/discordModule';
 import { selectAgentsByRole } from '../event/selectAgentsByRole';
 import { CompositionData } from '../types/valorantAgentData';
 import { createCompositionImage } from '../event/createCompositionImage';
@@ -89,12 +84,6 @@ export const autoCompositionCommands = {
       let sentinelNum: number | null = options.getNumber('sentinel');
       if (!sentinelNum) sentinelNum = 0;
 
-      // 各クラスの合計が5人でない場合はエラーを返却
-      if (duelistNum + initiatorNum + controllerNum + sentinelNum !== 5) {
-        await interaction.editReply('各クラスの合計人数が5人になるようにしてください');
-        return;
-      }
-
       // 構成を格納するオブジェクト
       const composition: CompositionData = {
         duelist: [],
@@ -102,6 +91,22 @@ export const autoCompositionCommands = {
         controller: [],
         sentinel: [],
       };
+
+      // 人数指定がない場合はエージェント全体からランダムに選択
+      if (!duelistNum && !initiatorNum && !controllerNum && !sentinelNum) {
+        // 各ロールの合計を5人とし、それぞれの人数を0人~5人の中から決定
+        const total = 5;
+        duelistNum = Math.floor(Math.random() * (total + 1));
+        initiatorNum = Math.floor(Math.random() * (total - duelistNum + 1));
+        controllerNum = Math.floor(Math.random() * (total - duelistNum - initiatorNum + 1));
+        sentinelNum = total - duelistNum - initiatorNum - controllerNum;
+      }
+
+      // 各クラスの合計が5人でない場合はエラーを返却
+      if (duelistNum + initiatorNum + controllerNum + sentinelNum !== 5) {
+        await interaction.editReply('各クラスの合計人数が5人になるようにしてください');
+        return;
+      }
 
       // 各クラスのエージェントを指定された人数分ランダムに選択 (重複なし)
       if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition);

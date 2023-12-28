@@ -1,11 +1,36 @@
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
-import { CompositionData } from '../types/valorantAgentData';
+import { AgentData, CompositionData } from '../types/valorantAgentData';
+
+export const pickMessage = (agent: AgentData) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('Random Agent')
+    .setDescription(`今回のエージェントは${agent.name}です`)
+    .setThumbnail(`attachment://${agent.id}_icon.png`)
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
+
+  const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`img/valorant_logo.png`);
+
+  return { embeds: [embed], files: [thumbnailAttachment, fotterAttachment] };
+};
 
 export const compositionMessage = (composition: CompositionData) => {
   const embed = new EmbedBuilder()
+    .setColor('#fd4556')
     .setTitle('Random Composition')
+    .setDescription('今回の構成はこちらです')
     .setImage('attachment://composition.png')
-    .setColor('#fd4556');
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
 
   if (composition.duelist.length) {
     embed.addFields({
@@ -35,10 +60,11 @@ export const compositionMessage = (composition: CompositionData) => {
     });
   }
 
-  const attachment = new AttachmentBuilder('img/composition.png');
+  const compositionAttachment = new AttachmentBuilder('img/composition.png');
+  const fotterAttachment = new AttachmentBuilder(`img/valorant_logo.png`);
 
   return {
     embeds: [embed],
-    files: [attachment],
+    files: [compositionAttachment, fotterAttachment],
   };
 };
