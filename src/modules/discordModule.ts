@@ -8,6 +8,8 @@ import {
   SlashCommandBuilder,
   EmbedBuilder,
   AttachmentBuilder,
+  AutocompleteInteraction,
+  ApplicationCommandOptionChoiceData,
 } from 'discord.js';
 import dotenv from 'dotenv';
 
@@ -33,4 +35,6 @@ export {
   SlashCommandBuilder,
   EmbedBuilder,
   AttachmentBuilder,
+  AutocompleteInteraction,
+  ApplicationCommandOptionChoiceData,
 };

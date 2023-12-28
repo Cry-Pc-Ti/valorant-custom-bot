@@ -8,8 +8,9 @@ import {
   discord,
   token,
 } from '../src/modules/discordModule';
-import { randomPickCommands } from './commands/randomPickCommands';
-import { autoCompositionCommands } from './commands/autoCompositionCommand';
+import { agentPickCommand } from './commands/agentPickCommand';
+import { autoCompositionCommand } from './commands/autoCompositionCommand';
+import { mapSelectCommand } from './commands/mapSelectCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -19,7 +20,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     console.log('サーバーにコマンドを登録中...');
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-      body: [randomPickCommands.data, autoCompositionCommands.data],
+      body: [agentPickCommand.data, autoCompositionCommand.data, mapSelectCommand.data],
     });
 
     console.log('コマンドの登録が完了しました');
@@ -35,14 +36,24 @@ discord.on('ready', () => {
 
 // インタラクションが発生した時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  // if (interaction.isAutocomplete()) {
+  //   if (interaction.commandName === autoCompositionCommand.data.name) {
+  //     await autoCompositionCommand.autocomplete(interaction);
+  //   }
+  // }
 
-  if (interaction.commandName === randomPickCommands.data.name) {
-    randomPickCommands.execute(interaction);
-  }
+  if (interaction.isChatInputCommand()) {
+    if (interaction.commandName === agentPickCommand.data.name) {
+      agentPickCommand.execute(interaction);
+    }
 
-  if (interaction.commandName === autoCompositionCommands.data.name) {
-    autoCompositionCommands.execute(interaction);
+    if (interaction.commandName === autoCompositionCommand.data.name) {
+      autoCompositionCommand.execute(interaction);
+    }
+
+    if (interaction.commandName === mapSelectCommand.data.name) {
+      mapSelectCommand.execute(interaction);
+    }
   }
 });
 

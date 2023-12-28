@@ -1,4 +1,3 @@
-//  モジュールをインポート
 import { AgentData } from '../types/valorantAgentData';
 
 export const valorantAgents: AgentData[] = [

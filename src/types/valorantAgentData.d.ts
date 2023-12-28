@@ -10,3 +10,8 @@ export interface CompositionData {
   controller: AgentData[];
   sentinel: AgentData[];
 }
+
+export interface MapData {
+  name: string;
+  id: string;
+}
