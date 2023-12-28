@@ -5,9 +5,10 @@ import {
   EmbedBuilder,
   AttachmentBuilder,
 } from '../modules/discordModule';
-import { pickRandomAgents } from '../event/pickRandomAgents';
+import { selectAgentsByRole } from '../event/selectAgentsByRole';
 import { CompositionData } from '../types/valorantAgentData';
-import { createAgentsImage } from '../event/createAgentsImage';
+import { createCompositionImage } from '../event/createCompositionImage';
+import { compositionMessage } from '../event/embedMessage';
 
 export const autoCompositionCommands = {
   data: new SlashCommandBuilder()
@@ -75,6 +76,7 @@ export const autoCompositionCommands = {
     try {
       const { options } = interaction;
 
+      // 各ロールの人数を取得
       let duelistNum: number | null = options.getNumber('duelist');
       if (!duelistNum) duelistNum = 0;
 
@@ -102,26 +104,21 @@ export const autoCompositionCommands = {
       };
 
       // 各クラスのエージェントを指定された人数分ランダムに選択 (重複なし)
-      if (duelistNum) pickRandomAgents('duelist', duelistNum, composition);
-      if (initiatorNum) pickRandomAgents('initiator', initiatorNum, composition);
-      if (controllerNum) pickRandomAgents('controller', controllerNum, composition);
-      if (sentinelNum) pickRandomAgents('sentinel', sentinelNum, composition);
+      if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition);
+      if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition);
+      if (controllerNum) selectAgentsByRole('controller', controllerNum, composition);
+      if (sentinelNum) selectAgentsByRole('sentinel', sentinelNum, composition);
 
       console.log(composition);
 
       // 画像を作成
-      const imagePath = await createAgentsImage(composition);
+      await createCompositionImage(composition);
 
-      const embed = new EmbedBuilder()
-        .setTitle('Composition')
-        .setImage('attachment://composition.png');
-      const attachment = new AttachmentBuilder('./img/composition.png');
+      // メッセージを作成
+      const embedMessage = compositionMessage(composition);
 
       // 構成を表示
-      await interaction.editReply({
-        files: [attachment],
-        embeds: [embed],
-      });
+      await interaction.editReply(embedMessage);
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました');
       console.error(error);
