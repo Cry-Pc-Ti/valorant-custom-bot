@@ -1,11 +1,17 @@
 // モジュールをインポート
-import { SlashCommandBuilder, ChatInputCommandInteraction } from '../modules/discordModule';
-import { selectAgentsByRole } from '../event/selectAgentsByRole';
+import {
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+  AutocompleteInteraction,
+  ApplicationCommandOptionChoiceData,
+} from '../modules/discordModule';
+import { selectAgentsByRole } from '../events/selectAgentsByRole';
 import { CompositionData } from '../types/valorantAgentData';
-import { createCompositionImage } from '../event/createCompositionImage';
-import { compositionMessage } from '../event/embedMessage';
+import { createCompositionImage } from '../events/createCompositionImage';
+import { compositionMessage } from '../events/embedMessage';
+import { valorantAgents } from '../data/valorantAgents';
 
-export const autoCompositionCommands = {
+export const autoCompositionCommand = {
   data: new SlashCommandBuilder()
     .setName('composition')
     .setDescription('ランダムに構成を作成します')
@@ -62,6 +68,27 @@ export const autoCompositionCommands = {
         )
     )
     .toJSON(),
+
+  // // オートコンプリートの設定
+  // autocomplete: async (interaction: AutocompleteInteraction) => {
+  //   const forcsedOption = interaction.options.getFocused(true);
+
+  //   // オートコンプリートの候補を格納する配列
+  //   const autocompleteChoices: ApplicationCommandOptionChoiceData[] = [];
+
+  //   if (forcsedOption.name === 'ban') {
+  //     // ValorantAgentsからnameとidを取得
+  //     for (const agent of valorantAgents) {
+  //       autocompleteChoices.push({
+  //         name: agent.name,
+  //         value: agent.id,
+  //       });
+  //     }
+  //   }
+
+  //   // オートコンプリートの候補を登録
+  //   await interaction.respond(autocompleteChoices);
+  // },
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();

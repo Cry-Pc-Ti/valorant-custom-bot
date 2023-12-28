@@ -2,13 +2,13 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from '../modules/discordModule';
 import { valorantAgents } from '../data/valorantAgents';
 import { AgentData } from '../types/valorantAgentData';
-import { pickMessage } from '../event/embedMessage';
+import { agentMessage } from '../events/embedMessage';
 
-export const randomPickCommands = {
+export const agentPickCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
-    .setName('pick')
-    .setDescription('エージェントをランダムに選択します (ロール指定可))')
+    .setName('agent')
+    .setDescription('エージェントをランダムに選択します (ロール指定可)')
     .addStringOption((option) =>
       option
         .setName('role')
@@ -48,7 +48,7 @@ export const randomPickCommands = {
       }
 
       // メッセージを作成・送信
-      const embedMessage = pickMessage(randomAgent);
+      const embedMessage = agentMessage(randomAgent);
       await interaction.editReply(embedMessage);
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました');
