@@ -4,8 +4,8 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/main.ts"
+    "start": "ts-node src/main.ts",
+    "test": "ts-node src/event/test.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +16,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@types/sharp": "^0.32.0",
     "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "fs": "^0.0.1-security",
+    "sharp": "^0.33.1"
   }
 }

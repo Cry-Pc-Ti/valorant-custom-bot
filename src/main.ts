@@ -8,7 +8,8 @@ import {
   discord,
   token,
 } from '../src/modules/discordModule';
-import { pickCommands } from '../src/commands/pickCommands';
+import { randomPickCommands } from './commands/randomPickCommands';
+import { autoCompositionCommands } from './commands/autoCompositionCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -18,7 +19,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     console.log('サーバーにコマンドを登録中...');
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-      body: [pickCommands.data],
+      body: [randomPickCommands.data, autoCompositionCommands.data],
     });
 
     console.log('コマンドの登録が完了しました');
@@ -32,11 +33,16 @@ discord.on('ready', () => {
   console.log(`ログインしました : ${discord.user?.tag}`);
 });
 
+// インタラクションが発生した時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === pickCommands.data.name) {
-    pickCommands.execute(interaction);
+  if (interaction.commandName === randomPickCommands.data.name) {
+    randomPickCommands.execute(interaction);
+  }
+
+  if (interaction.commandName === autoCompositionCommands.data.name) {
+    autoCompositionCommands.execute(interaction);
   }
 });
 
