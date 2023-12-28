@@ -34,7 +34,7 @@ discord.on('ready', () => {
   console.log(`ログインしました : ${discord.user?.tag}`);
 });
 
-// インタラクションが発生した時に実行
+// インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   // if (interaction.isAutocomplete()) {
   //   if (interaction.commandName === autoCompositionCommand.data.name) {
