@@ -6,6 +6,8 @@ import {
   REST,
   Routes,
   SlashCommandBuilder,
+  EmbedBuilder,
+  AttachmentBuilder,
 } from 'discord.js';
 import dotenv from 'dotenv';
 
@@ -29,4 +31,6 @@ export {
   Interaction,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  EmbedBuilder,
+  AttachmentBuilder,
 };
