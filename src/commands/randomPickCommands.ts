@@ -35,11 +35,11 @@ export const randomPickCommands = {
       // ランダムに選択されたエージェントのデータを格納する変数
       let randomAgent: AgentData;
 
-      // エージェントロールが指定されていない場合はランダムに選択
+      // ロールが指定されていない場合はランダムに選択
       if (!agentRole) {
         randomAgent = valorantAgents[Math.floor(Math.random() * valorantAgents.length)];
 
-        // エージェントロールが指定されている場合はそのロールのエージェントからランダムに選択
+        // ロールが指定されている場合は、そのロールのエージェントからランダムに選択
       } else {
         const filteredAgents: AgentData[] = valorantAgents.filter(
           (agent) => agent.role === agentRole

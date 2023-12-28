@@ -5,123 +5,123 @@ export const valorantAgents: AgentData[] = [
   // Duelist
   {
     name: 'ジェット',
-    id: 'Jett',
+    id: 'jett',
     role: 'duelist',
   },
   {
     name: 'フェニックス',
-    id: 'Phoenix',
+    id: 'phoenix',
     role: 'duelist',
   },
   {
     name: 'ネオン',
-    id: 'Neon',
+    id: 'neon',
     role: 'duelist',
   },
   {
     name: 'ヨル',
-    id: 'Yoru',
+    id: 'yoru',
     role: 'duelist',
   },
   {
     name: 'レイズ',
-    id: 'Raze',
+    id: 'raze',
     role: 'duelist',
   },
   {
     name: 'レイナ',
-    id: 'Reyna',
+    id: 'reyna',
     role: 'duelist',
   },
   {
     name: 'アイソ',
-    id: 'Iso',
+    id: 'iso',
     role: 'duelist',
   },
 
   // Initiator
   {
     name: 'ソーヴァ',
-    id: 'Sova',
+    id: 'sova',
     role: 'initiator',
   },
   {
     name: 'KAY/O',
-    id: 'KAYO',
+    id: 'kayo',
     role: 'initiator',
   },
   {
     name: 'スカイ',
-    id: 'Skye',
+    id: 'skye',
     role: 'initiator',
   },
   {
     name: 'フェイド',
-    id: 'Fade',
+    id: 'fade',
     role: 'initiator',
   },
   {
     name: 'ブリーチ',
-    id: 'Breach',
+    id: 'breach',
     role: 'initiator',
   },
   {
     name: 'ゲッコー',
-    id: 'Gekko',
+    id: 'gekko',
     role: 'initiator',
   },
 
   // Controller
   {
     name: 'ブリムストーン',
-    id: 'Brimstone',
+    id: 'brimstone',
     role: 'controller',
   },
   {
     name: 'アストラ',
-    id: 'Astra',
+    id: 'astra',
     role: 'controller',
   },
   {
     name: 'ヴァイパー',
-    id: 'Viper',
+    id: 'viper',
     role: 'controller',
   },
   {
     name: 'オーメン',
-    id: 'Omen',
+    id: 'omen',
     role: 'controller',
   },
   {
     name: 'ハーバー',
-    id: 'Harbor',
+    id: 'harbor',
     role: 'controller',
   },
 
   // Sentinel
   {
     name: 'セージ',
-    id: 'Sage',
+    id: 'sage',
     role: 'sentinel',
   },
   {
     name: 'キルジョイ',
-    id: 'Killjoy',
+    id: 'killjoy',
     role: 'sentinel',
   },
   {
     name: 'サイファー',
-    id: 'Cypher',
+    id: 'cypher',
     role: 'sentinel',
   },
   {
     name: 'チェンバー',
-    id: 'Chamber',
+    id: 'chamber',
     role: 'sentinel',
   },
   {
     name: 'デッドロック',
-    id: 'Deadlock',
+    id: 'deadlock',
     role: 'sentinel',
   },
 ];
