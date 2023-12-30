@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
-import { AgentData, CompositionData, MapData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData, memberAllocationData } from '../types/valorantAgentData';
 
 const agentWebURL = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -111,4 +111,34 @@ export const mapMessage = (map: MapData) => {
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
   return { embeds: [embed], files: [imageAttachment, fotterAttachment] };
+};
+
+export const memberAllocationMessage = (memberAllocation: memberAllocationData) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('メンバー振り分け')
+    .setDescription('今回のチームはこちらです。')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
+
+    const attack: string[] = [];
+    const defense: string[] = [];
+
+    for (const member of memberAllocation.attack) {
+      attack.push(`${member.name} <@${member.id}>`);
+    }
+    for (const member of memberAllocation.defense) {
+      defense.push(`${member.name} <@${member.id}>`);
+    }
+    embed.addFields({
+      name:  'アタッカーサイド',
+      value: attack.join(`\n`),
+    },{
+      name:  'ディフェンダーサイド',
+      value: defense.join(`\n`),
+    });
+  return { embeds: [embed], files: [] };
 };

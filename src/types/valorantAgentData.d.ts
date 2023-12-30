@@ -15,3 +15,13 @@ export interface MapData {
   name: string;
   id: string;
 }
+
+export interface memberData {
+  name: string | undefined;
+  id: string | undefined;
+}
+
+export interface memberAllocationData {
+  attack: memberData[];
+  defense: memberData[];
+}
