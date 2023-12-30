@@ -11,6 +11,7 @@ import {
 import { agentPickCommand } from './commands/agentPickCommand';
 import { autoCompositionCommand } from './commands/autoCompositionCommand';
 import { mapSelectCommand } from './commands/mapSelectCommand';
+import { memberAllocationCommand } from './commands/memberAllocationCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -20,7 +21,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     console.log('サーバーにコマンドを登録中...');
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-      body: [agentPickCommand.data, autoCompositionCommand.data, mapSelectCommand.data],
+      body: [agentPickCommand.data, autoCompositionCommand.data, mapSelectCommand.data,memberAllocationCommand.data],
     });
 
     console.log('コマンドの登録が完了しました');
@@ -53,6 +54,10 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
     if (interaction.commandName === mapSelectCommand.data.name) {
       mapSelectCommand.execute(interaction);
+    }
+
+    if (interaction.commandName === memberAllocationCommand.data.name) {
+      memberAllocationCommand.execute(interaction);
     }
   }
 });
