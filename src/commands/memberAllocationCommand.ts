@@ -1,7 +1,7 @@
 import { valorantMaps } from "../data/valorantMaps";
 import { mapMessage, memberAllocationMessage } from "../events/embedMessage";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "../modules/discordModule";
-import { MapData, memberAllocationData, memberData } from "../types/valorantAgentData";
+import { MapData, MemberAllocationData, MemberData,  } from "../types/valorantAgentData";
 
 export const memberAllocationCommand = {
   // コマンドの設定
@@ -56,7 +56,7 @@ export const memberAllocationCommand = {
         try {
             const { options } = interaction;
 
-            const memberAllocation:memberAllocationData = {
+            const memberAllocation:MemberAllocationData = {
               attack: [],
               defense: [],
           }
@@ -65,7 +65,7 @@ export const memberAllocationCommand = {
               if(options.getUser('メンバー' + String(i)) !== null){
                 const randomIndex = Math.floor(Math.random() * 2);
                 //メンバー情報を作成
-                let member:memberData = {
+                let member:MemberData = {
                   name: options.getUser('メンバー' + String(i))?.username,
                   id: options.getUser('メンバー' + String(i))?.id
                 }
@@ -78,7 +78,7 @@ export const memberAllocationCommand = {
                 }
               }
             }
-            // メッセージを作成・送信
+          // メッセージを作成・送信
           const embedMessage = memberAllocationMessage(memberAllocation);
           await interaction.editReply(embedMessage);
 

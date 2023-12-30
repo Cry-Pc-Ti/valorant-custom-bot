@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
-import { AgentData, CompositionData, MapData, memberAllocationData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
 
 const agentWebURL = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -113,7 +113,7 @@ export const mapMessage = (map: MapData) => {
   return { embeds: [embed], files: [imageAttachment, fotterAttachment] };
 };
 
-export const memberAllocationMessage = (memberAllocation: memberAllocationData) => {
+export const memberAllocationMessage = (memberAllocation: MemberAllocationData) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('メンバー振り分け')
