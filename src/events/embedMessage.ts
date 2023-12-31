@@ -113,6 +113,7 @@ export const mapMessage = (map: MapData) => {
   return { embeds: [embed], files: [imageAttachment, fotterAttachment] };
 };
 
+//「/member」コマンドのメッセージを作成
 export const memberAllocationMessage = (memberAllocation: MemberAllocationData) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
@@ -123,22 +124,38 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
       text: 'VALORANT',
       iconURL: 'attachment://valorant_logo.png',
     });
-
-    const attack: string[] = [];
-    const defense: string[] = [];
-
-    for (const member of memberAllocation.attack) {
-      attack.push(`${member.name} <@${member.id}>`);
+    
+    if(memberAllocation.attack.length){
+      const attack: string[] = [];
+      for (const member of memberAllocation.attack) {
+        attack.push(`${member.name} <@${member.id}>`);
+      }
+      embed.addFields({
+        name:  'アタッカーサイド',
+        value: attack.join(`\n`),
+      })
     }
-    for (const member of memberAllocation.defense) {
-      defense.push(`${member.name} <@${member.id}>`);
+    if(memberAllocation.defense.length){
+      const defense: string[] = [];
+      for (const member of memberAllocation.defense) {
+        defense.push(`${member.name} <@${member.id}>`);
+      }
+      embed.addFields({
+        name:  'ディフェンダーサイド',
+        value: defense.join(`\n`),
+      })
     }
-    embed.addFields({
-      name:  'アタッカーサイド',
-      value: attack.join(`\n`),
-    },{
-      name:  'ディフェンダーサイド',
-      value: defense.join(`\n`),
-    });
-  return { embeds: [embed], files: [] };
+    const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+
+  return { embeds: [embed], files: [fotterAttachment] };
 };
+
+export const diceMessage = (randomIndex: Number) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('ダイス')
+    .setFields({ name: 'ウィングマン的にはこの数字がいいにょ', value: String(randomIndex)})
+    .setTimestamp()
+
+    return { embeds: [embed], files: [] };
+}
