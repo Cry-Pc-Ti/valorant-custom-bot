@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
-import { AgentData, CompositionData, MapData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -118,3 +118,50 @@ export const mapMessage = (
 
   return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
 };
+
+//「/member」コマンドのメッセージを作成
+export const memberAllocationMessage = (memberAllocation: MemberAllocationData) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('メンバー振り分け')
+    .setDescription('今回のチームはこちらです。')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
+    
+    if(memberAllocation.attack.length){
+      const attack: string[] = [];
+      for (const member of memberAllocation.attack) {
+        attack.push(`${member.name} <@${member.id}>`);
+      }
+      embed.addFields({
+        name:  'アタッカーサイド',
+        value: attack.join(`\n`),
+      })
+    }
+    if(memberAllocation.defense.length){
+      const defense: string[] = [];
+      for (const member of memberAllocation.defense) {
+        defense.push(`${member.name} <@${member.id}>`);
+      }
+      embed.addFields({
+        name:  'ディフェンダーサイド',
+        value: defense.join(`\n`),
+      })
+    }
+    const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+
+  return { embeds: [embed], files: [fotterAttachment] };
+};
+
+export const diceMessage = (randomIndex: Number) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('ダイス')
+    .setFields({ name: 'ウィングマン的にはこの数字がいいにょ', value: String(randomIndex)})
+    .setTimestamp()
+
+    return { embeds: [embed], files: [] };
+}
