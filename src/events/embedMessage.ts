@@ -2,10 +2,12 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
 import { AgentData, CompositionData, MapData } from '../types/valorantAgentData';
 
-const agentWebURL = 'https://playvalorant.com/ja-jp/agents/';
+const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
-export const agentMessage = (agent: AgentData) => {
-  const embed = new EmbedBuilder()
+export const agentMessage = (
+  agent: AgentData
+): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
+  const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Agent')
     .setDescription(`今回のエージェントは[${agent.name}](${agentWebURL}${agent.id})です`)
@@ -23,11 +25,13 @@ export const agentMessage = (agent: AgentData) => {
   const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
-  return { embeds: [embed], files: [thumbnailAttachment, fotterAttachment] };
+  return { embeds: [embedMessage], files: [thumbnailAttachment, fotterAttachment] };
 };
 
-export const compositionMessage = (composition: CompositionData) => {
-  const embed = new EmbedBuilder()
+export const compositionMessage = (
+  composition: CompositionData
+): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
+  const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
@@ -44,7 +48,7 @@ export const compositionMessage = (composition: CompositionData) => {
     for (const agent of composition.duelist) {
       duelists.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embed.addFields({
+    embedMessage.addFields({
       name: 'Duelist',
       value: duelists.join(', '),
     });
@@ -56,7 +60,7 @@ export const compositionMessage = (composition: CompositionData) => {
     for (const agent of composition.initiator) {
       initiators.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embed.addFields({
+    embedMessage.addFields({
       name: 'Initiator',
       value: initiators.join(', '),
     });
@@ -68,7 +72,7 @@ export const compositionMessage = (composition: CompositionData) => {
     for (const agent of composition.controller) {
       controllers.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embed.addFields({
+    embedMessage.addFields({
       name: 'Controller',
       value: controllers.join(', '),
     });
@@ -80,7 +84,7 @@ export const compositionMessage = (composition: CompositionData) => {
     for (const agent of composition.sentinel) {
       sentinels.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embed.addFields({
+    embedMessage.addFields({
       name: 'Sentinel',
       value: sentinels.join(', '),
     });
@@ -90,13 +94,15 @@ export const compositionMessage = (composition: CompositionData) => {
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
   return {
-    embeds: [embed],
+    embeds: [embedMessage],
     files: [compositionAttachment, fotterAttachment],
   };
 };
 
-export const mapMessage = (map: MapData) => {
-  const embed = new EmbedBuilder()
+export const mapMessage = (
+  map: MapData
+): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
+  const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Map')
     .setDescription(`今回のマップは${map.name}です`)
@@ -110,5 +116,5 @@ export const mapMessage = (map: MapData) => {
   const imageAttachment = new AttachmentBuilder(`img/maps/${map.id}.png`);
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
-  return { embeds: [embed], files: [imageAttachment, fotterAttachment] };
+  return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
 };

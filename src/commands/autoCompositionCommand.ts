@@ -2,14 +2,13 @@
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
-  AutocompleteInteraction,
-  ApplicationCommandOptionChoiceData,
+  EmbedBuilder,
+  AttachmentBuilder,
 } from '../modules/discordModule';
 import { selectAgentsByRole } from '../events/selectAgentsByRole';
 import { CompositionData } from '../types/valorantAgentData';
 import { createCompositionImage } from '../events/createCompositionImage';
 import { compositionMessage } from '../events/embedMessage';
-import { valorantAgents } from '../data/valorantAgents';
 
 export const autoCompositionCommand = {
   data: new SlashCommandBuilder()
@@ -68,27 +67,6 @@ export const autoCompositionCommand = {
         )
     )
     .toJSON(),
-
-  // // オートコンプリートの設定
-  // autocomplete: async (interaction: AutocompleteInteraction) => {
-  //   const forcsedOption = interaction.options.getFocused(true);
-
-  //   // オートコンプリートの候補を格納する配列
-  //   const autocompleteChoices: ApplicationCommandOptionChoiceData[] = [];
-
-  //   if (forcsedOption.name === 'ban') {
-  //     // ValorantAgentsからnameとidを取得
-  //     for (const agent of valorantAgents) {
-  //       autocompleteChoices.push({
-  //         name: agent.name,
-  //         value: agent.id,
-  //       });
-  //     }
-  //   }
-
-  //   // オートコンプリートの候補を登録
-  //   await interaction.respond(autocompleteChoices);
-  // },
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
@@ -153,7 +131,7 @@ export const autoCompositionCommand = {
         return;
       }
 
-      // 各クラスのエージェントを指定された人数分ランダムに選択 (重複なし)
+      // 各クラスのエージェントを指定された人数分ランダムに選択
       if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition);
       if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition);
       if (controllerNum) selectAgentsByRole('controller', controllerNum, composition);
@@ -161,17 +139,26 @@ export const autoCompositionCommand = {
 
       console.log(composition);
 
+      // compositionの各配列が空の場合はエラーを返却
+      if (Object.values(composition).every((role) => role.length === 0)) {
+        await interaction.editReply(
+          '構成作成中にエラーが発生しました\n開発者にお問い合わせください'
+        );
+        return;
+      }
+
       // 画像を作成
       await createCompositionImage(composition);
 
       // メッセージを作成
-      const embedMessage = compositionMessage(composition);
+      const embedMessage: { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } =
+        compositionMessage(composition);
 
-      // 構成を表示
+      // メッセージを送信
       await interaction.editReply(embedMessage);
-    } catch (error) {
-      await interaction.editReply('処理中にエラーが発生しました');
-      console.error(error);
+    } catch (error: unknown) {
+      await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+      console.error(`autoCompositionCommandでエラーが発生しました : ${error}`);
     }
   },
 };

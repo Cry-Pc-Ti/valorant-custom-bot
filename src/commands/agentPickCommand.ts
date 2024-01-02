@@ -1,5 +1,10 @@
 // モジュールをインポート
-import { SlashCommandBuilder, ChatInputCommandInteraction } from '../modules/discordModule';
+import {
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  AttachmentBuilder,
+} from '../modules/discordModule';
 import { valorantAgents } from '../data/valorantAgents';
 import { AgentData } from '../types/valorantAgentData';
 import { agentMessage } from '../events/embedMessage';
@@ -35,7 +40,7 @@ export const agentPickCommand = {
       // ランダムに選択されたエージェントのデータを格納する変数
       let randomAgent: AgentData;
 
-      // ロールが指定されていない場合はランダムに選択
+      // ロールが指定されていない場合は、エージェント全体からランダムに選択
       if (!agentRole) {
         randomAgent = valorantAgents[Math.floor(Math.random() * valorantAgents.length)];
 
@@ -47,12 +52,15 @@ export const agentPickCommand = {
         randomAgent = filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
       }
 
-      // メッセージを作成・送信
-      const embedMessage = agentMessage(randomAgent);
+      // メッセージを作成
+      const embedMessage: { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } =
+        agentMessage(randomAgent);
+
+      // メッセージを送信
       await interaction.editReply(embedMessage);
-    } catch (error) {
-      await interaction.editReply('処理中にエラーが発生しました');
-      console.error(error);
+    } catch (error: unknown) {
+      await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+      console.error(`agentPickCommandでエラーが発生しました : ${error}`);
     }
   },
 };

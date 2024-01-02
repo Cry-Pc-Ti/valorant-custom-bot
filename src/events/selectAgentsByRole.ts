@@ -7,19 +7,29 @@ export const selectAgentsByRole = (
   agentNum: number,
   composition: CompositionData
 ): CompositionData => {
-  const randomAgents: AgentData[] = [];
-  let filterAgents: AgentData[] = valorantAgents.filter((agent) => agent.role === agentRole);
+  try {
+    const randomAgents: AgentData[] = [];
+    let filterAgents: AgentData[] = valorantAgents.filter((agent) => agent.role === agentRole);
 
-  for (let i = 0; i < agentNum; i++) {
-    const randomIndex = Math.floor(Math.random() * filterAgents.length);
-    const randomAgent: AgentData = filterAgents[randomIndex];
+    for (let i = 0; i < agentNum; i++) {
+      // filterAgentsからランダムにエージェントを選択
+      const randomIndex = Math.floor(Math.random() * filterAgents.length);
 
-    // 選択したエージェントをfilterAgentsから削除
-    filterAgents = filterAgents.filter((_, index) => index !== randomIndex);
+      // 選択したエージェントを格納
+      const randomAgent: AgentData = filterAgents[randomIndex];
 
-    randomAgents.push(randomAgent);
+      // 選択したエージェントをfilterAgentsから削除
+      filterAgents = filterAgents.filter((_, index) => index !== randomIndex);
+
+      // 選択したエージェントをrandomAgentsに格納
+      randomAgents.push(randomAgent);
+    }
+
+    // compositionにエージェントを格納
+    composition[agentRole as keyof CompositionData] = randomAgents;
+    return composition;
+  } catch (error: unknown) {
+    console.error(`selectAgentsByRoleでエラーが発生しました : ${error}`);
+    return composition;
   }
-
-  composition[agentRole as keyof CompositionData] = randomAgents;
-  return composition;
 };

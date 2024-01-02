@@ -34,25 +34,22 @@ discord.on('ready', () => {
   console.log(`ログインしました : ${discord.user?.tag}`);
 });
 
+// コマンド名とそれに対応するコマンドオブジェクトをマップに格納
+const commands = {
+  [agentPickCommand.data.name]: agentPickCommand,
+  [autoCompositionCommand.data.name]: autoCompositionCommand,
+  [mapSelectCommand.data.name]: mapSelectCommand,
+};
+
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
-  // if (interaction.isAutocomplete()) {
-  //   if (interaction.commandName === autoCompositionCommand.data.name) {
-  //     await autoCompositionCommand.autocomplete(interaction);
-  //   }
-  // }
-
   if (interaction.isChatInputCommand()) {
-    if (interaction.commandName === agentPickCommand.data.name) {
-      agentPickCommand.execute(interaction);
-    }
+    // マップからコマンドを取得
+    const command = commands[interaction.commandName];
 
-    if (interaction.commandName === autoCompositionCommand.data.name) {
-      autoCompositionCommand.execute(interaction);
-    }
-
-    if (interaction.commandName === mapSelectCommand.data.name) {
-      mapSelectCommand.execute(interaction);
+    // コマンドが存在すれば実行
+    if (command) {
+      command.execute(interaction);
     }
   }
 });
