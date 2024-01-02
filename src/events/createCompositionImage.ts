@@ -1,6 +1,6 @@
 import sharp, { OverlayOptions } from 'sharp';
-import fs from 'fs';
 import { CompositionData } from '../types/valorantAgentData';
+import fs from 'fs';
 
 // 5枚のエージェントの画像を連結し、1枚の画像にまとめる
 export const createCompositionImage = async (composition: CompositionData) => {
@@ -20,23 +20,26 @@ export const createCompositionImage = async (composition: CompositionData) => {
   }
 
   // 画像を読み込む
-  const images = imagePaths.map((path) => sharp(path));
+  const images: sharp.Sharp[] = imagePaths.map((path) => sharp(path));
 
   try {
     // 画像のメタデータを取得
-    const metadataList = await Promise.all(images.map((image) => image.metadata()));
+    const metadataList: sharp.Metadata[] = await Promise.all(
+      images.map((image) => image.metadata())
+    );
 
     // 画像を連結するための新しい幅と高さを計算
-    const newWidth = metadataList.reduce(
+    const newWidth: number = metadataList.reduce(
       (totalWidth, metadata) => totalWidth + (metadata.width || 0),
       0
     );
-    const newHeight = Math.max(...metadataList.map((metadata) => metadata.height || 0));
+    const newHeight: number = Math.max(...metadataList.map((metadata) => metadata.height || 0));
 
     // 画像を連結する
-    const buffers = await Promise.all(images.map((image) => image.toBuffer()));
+    const buffers: Buffer[] = await Promise.all(images.map((image) => image.toBuffer()));
 
-    const result = await sharp({
+    // 画像を作成
+    await sharp({
       create: {
         width: newWidth,
         height: newHeight,
@@ -56,9 +59,7 @@ export const createCompositionImage = async (composition: CompositionData) => {
         )
       )
       .toFile('img/composition.png');
-
-    console.log('画像が連結されました:', result);
-  } catch (error) {
-    console.error('エラーが発生しました:', error);
+  } catch (error: unknown) {
+    console.error(`画像の連結中にエラーが発生しました : ${error}`);
   }
 };
