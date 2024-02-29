@@ -1,16 +1,4 @@
-import {
-  Client,
-  GatewayIntentBits,
-  Interaction,
-  ChatInputCommandInteraction,
-  REST,
-  Routes,
-  SlashCommandBuilder,
-  EmbedBuilder,
-  AttachmentBuilder,
-  AutocompleteInteraction,
-  ApplicationCommandOptionChoiceData,
-} from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 
 // ENVファイルの読み込み
@@ -23,18 +11,4 @@ const guildId: string = process.env.DISCORD_GUILD_ID!;
 
 const discord = new Client({ intents: GatewayIntentBits.Guilds });
 
-export {
-  discord,
-  token,
-  clientId,
-  guildId,
-  REST,
-  Routes,
-  Interaction,
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-  EmbedBuilder,
-  AttachmentBuilder,
-  AutocompleteInteraction,
-  ApplicationCommandOptionChoiceData,
-};
+export { discord, token, clientId, guildId };
