@@ -1,22 +1,16 @@
 // モジュールをインポート
-import {
-  Interaction,
-  REST,
-  Routes,
-  clientId,
-  guildId,
-  discord,
-  token,
-} from '../src/modules/discordModule';
+import { Interaction, REST, Routes } from 'discord.js';
+import { clientId, guildId, discord, token } from '../src/modules/discordModule';
+
+// コマンドをインポート
 import { agentPickCommand } from './commands/agentPickCommand';
-import { autoCompositionCommand } from './commands/autoCompositionCommand';
+import { makeCompositionCommand } from './commands/makeCompositionCommand';
 import { diceCommand } from './commands/diceCommand';
 import { mapSelectCommand } from './commands/mapSelectCommand';
 import { memberAllocationCommand } from './commands/memberAllocationCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
-
 (async () => {
   try {
     console.log('サーバーにコマンドを登録中...');
@@ -24,28 +18,27 @@ const rest = new REST({ version: '10' }).setToken(token);
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: [
         agentPickCommand.data,
-        autoCompositionCommand.data,
+        makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
         diceCommand.data,
       ],
     });
-
     console.log('コマンドの登録が完了しました');
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(`コマンドの登録中にエラーが発生しました : ${error}`);
   }
 })();
 
 // クライアントオブジェクトが準備完了時に実行
 discord.on('ready', () => {
-  console.log(`ログインしました : ${discord.user?.tag}`);
+  console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
 });
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [agentPickCommand.data.name]: agentPickCommand,
-  [autoCompositionCommand.data.name]: autoCompositionCommand,
+  [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
   [diceCommand.data.name]: diceCommand,

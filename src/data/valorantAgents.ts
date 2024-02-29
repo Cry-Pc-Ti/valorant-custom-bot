@@ -46,7 +46,7 @@ export const valorantAgents: AgentData[] = [
   },
   {
     name: 'KAY/O',
-    id: 'kayo',
+    id: 'kay-o',
     role: 'initiator',
   },
   {

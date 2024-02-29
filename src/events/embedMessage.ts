@@ -1,12 +1,10 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { EmbedBuilder, AttachmentBuilder } from '../modules/discordModule';
+import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
-export const agentMessage = (
-  agent: AgentData
-): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
+// 「/agent」コマンドのメッセージを作成
+export const agentMessage = (agent: AgentData) => {
   const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Agent')
@@ -25,13 +23,15 @@ export const agentMessage = (
   const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
-  return { embeds: [embedMessage], files: [thumbnailAttachment, fotterAttachment] };
+  return {
+    embeds: [embedMessage],
+    files: [thumbnailAttachment, fotterAttachment],
+  };
 };
 
-export const compositionMessage = (
-  composition: CompositionData
-): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
-  const embedMessage = new EmbedBuilder()
+// 「/composition」コマンドのメッセージを作成
+export const compositionMessage = (composition: CompositionData, banAgents: AgentData[]) => {
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
@@ -48,7 +48,7 @@ export const compositionMessage = (
     for (const agent of composition.duelist) {
       duelists.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embedMessage.addFields({
+    embed.addFields({
       name: 'Duelist',
       value: duelists.join(', '),
     });
@@ -60,7 +60,7 @@ export const compositionMessage = (
     for (const agent of composition.initiator) {
       initiators.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embedMessage.addFields({
+    embed.addFields({
       name: 'Initiator',
       value: initiators.join(', '),
     });
@@ -72,7 +72,7 @@ export const compositionMessage = (
     for (const agent of composition.controller) {
       controllers.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embedMessage.addFields({
+    embed.addFields({
       name: 'Controller',
       value: controllers.join(', '),
     });
@@ -84,9 +84,21 @@ export const compositionMessage = (
     for (const agent of composition.sentinel) {
       sentinels.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
-    embedMessage.addFields({
+    embed.addFields({
       name: 'Sentinel',
       value: sentinels.join(', '),
+    });
+  }
+
+  // BANエージェントが選択されている場合、フィールドを追加
+  if (banAgents.length) {
+    const bans: string[] = [];
+    for (const agent of banAgents) {
+      bans.push(agent.name);
+    }
+    embed.addFields({
+      name: 'Ban',
+      value: bans.join(', '),
     });
   }
 
@@ -94,14 +106,14 @@ export const compositionMessage = (
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
   return {
-    embeds: [embedMessage],
+    embeds: [embed],
     files: [compositionAttachment, fotterAttachment],
+    components: [],
   };
 };
 
-export const mapMessage = (
-  map: MapData
-): { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } => {
+// 「/map」コマンドのメッセージを作成
+export const mapMessage = (map: MapData) => {
   const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Map')
@@ -124,44 +136,55 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('メンバー振り分け')
-    .setDescription('今回のチームはこちらです。')
+    .setDescription('今回のチームはこちらです')
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_logo.png',
     });
-    
-    if(memberAllocation.attack.length){
-      const attack: string[] = [];
-      for (const member of memberAllocation.attack) {
-        attack.push(`${member.name} <@${member.id}>`);
-      }
-      embed.addFields({
-        name:  'アタッカーサイド',
-        value: attack.join(`\n`),
-      })
+
+  if (memberAllocation.attack.length) {
+    const attack: string[] = [];
+    for (const member of memberAllocation.attack) {
+      attack.push(`${member.name} <@${member.id}>`);
     }
-    if(memberAllocation.defense.length){
-      const defense: string[] = [];
-      for (const member of memberAllocation.defense) {
-        defense.push(`${member.name} <@${member.id}>`);
-      }
-      embed.addFields({
-        name:  'ディフェンダーサイド',
-        value: defense.join(`\n`),
-      })
+    embed.addFields({
+      name: 'Attacker',
+      value: attack.join(`\n`),
+    });
+  }
+
+  if (memberAllocation.defense.length) {
+    const defense: string[] = [];
+    for (const member of memberAllocation.defense) {
+      defense.push(`${member.name} <@${member.id}>`);
     }
-    const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+    embed.addFields({
+      name: 'Defender',
+      value: defense.join(`\n`),
+    });
+  }
+
+  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
   return { embeds: [embed], files: [fotterAttachment] };
 };
 
-export const diceMessage = (randomIndex: Number) => {
+export const diceMessage = (randomIndex: number) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('ダイス')
-    .setFields({ name: 'ウィングマン的にはこの数字がいいにょ', value: String(randomIndex)})
+    .setTitle('Random Number')
+    .setFields({
+      name: 'ウィングマン的にはこの数字がいいにょ',
+      value: `${randomIndex}`,
+    })
     .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
 
-    return { embeds: [embed], files: [] };
-}
+  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+
+  return { embeds: [embed], files: [fotterAttachment] };
+};

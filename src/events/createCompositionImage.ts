@@ -9,8 +9,10 @@ export const createCompositionImage = async (composition: CompositionData) => {
 
   // 画像のパスを配列に格納
   for (const agentRole in composition) {
-    for (const agent of composition[agentRole as keyof CompositionData]) {
-      imagePaths.push(`img/agents/${agent.id}_icon.png`);
+    if (agentRole !== 'ban') {
+      for (const agent of composition[agentRole as keyof CompositionData]) {
+        imagePaths.push(`img/agents/${agent.id}_icon.png`);
+      }
     }
   }
 
@@ -24,15 +26,10 @@ export const createCompositionImage = async (composition: CompositionData) => {
 
   try {
     // 画像のメタデータを取得
-    const metadataList: sharp.Metadata[] = await Promise.all(
-      images.map((image) => image.metadata())
-    );
+    const metadataList: sharp.Metadata[] = await Promise.all(images.map((image) => image.metadata()));
 
     // 画像を連結するための新しい幅と高さを計算
-    const newWidth: number = metadataList.reduce(
-      (totalWidth, metadata) => totalWidth + (metadata.width || 0),
-      0
-    );
+    const newWidth: number = metadataList.reduce((totalWidth, metadata) => totalWidth + (metadata.width || 0), 0);
     const newHeight: number = Math.max(...metadataList.map((metadata) => metadata.height || 0));
 
     // 画像を連結する
@@ -52,9 +49,7 @@ export const createCompositionImage = async (composition: CompositionData) => {
           (buffer, index): OverlayOptions => ({
             input: buffer,
             top: 0,
-            left: metadataList
-              .slice(0, index)
-              .reduce((width, metadata) => width + (metadata.width || 0), 0),
+            left: metadataList.slice(0, index).reduce((width, metadata) => width + (metadata.width || 0), 0),
           })
         )
       )

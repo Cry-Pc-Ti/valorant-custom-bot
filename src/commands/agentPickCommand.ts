@@ -1,14 +1,10 @@
 // モジュールをインポート
-import {
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
-  EmbedBuilder,
-  AttachmentBuilder,
-} from '../modules/discordModule';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import { valorantAgents } from '../data/valorantAgents';
 import { AgentData } from '../types/valorantAgentData';
 import { agentMessage } from '../events/embedMessage';
 
+// エージェント指定コマンド
 export const agentPickCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
@@ -46,15 +42,15 @@ export const agentPickCommand = {
 
         // ロールが指定されている場合は、そのロールのエージェントからランダムに選択
       } else {
-        const filteredAgents: AgentData[] = valorantAgents.filter(
-          (agent) => agent.role === agentRole
-        );
+        const filteredAgents: AgentData[] = valorantAgents.filter((agent) => agent.role === agentRole);
         randomAgent = filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
       }
 
       // メッセージを作成
-      const embedMessage: { embeds: EmbedBuilder[]; files: AttachmentBuilder[] } =
-        agentMessage(randomAgent);
+      const embedMessage: {
+        embeds: EmbedBuilder[];
+        files: AttachmentBuilder[];
+      } = agentMessage(randomAgent);
 
       // メッセージを送信
       await interaction.editReply(embedMessage);
