@@ -1,5 +1,5 @@
 // モジュールをインポート
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { MapData } from '../types/valorantAgentData';
 import { mapMessage } from '../events/embedMessage';
 import { valorantMaps } from '../data/valorantMaps';
@@ -18,14 +18,11 @@ export const mapSelectCommand = {
       const randomMap: MapData = valorantMaps[Math.floor(Math.random() * valorantMaps.length)];
 
       // メッセージを作成
-      const embedMessage: {
-        embeds: EmbedBuilder[];
-        files: AttachmentBuilder[];
-      } = mapMessage(randomMap);
+      const embed = mapMessage(randomMap);
 
       // メッセージを送信
-      await interaction.editReply(embedMessage);
-    } catch (error: unknown) {
+      await interaction.editReply(embed);
+    } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
       console.error(`mapSelectCommandでエラーが発生しました : ${error}`);
     }

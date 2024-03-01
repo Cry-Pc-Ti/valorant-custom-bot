@@ -10,9 +10,10 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { selectAgentsByRole } from '../events/selectAgentsByRole';
-import { AgentData, CompositionData } from '../types/valorantAgentData';
+import { countAgentsByRole, countBanAgentsByRole } from '../events/countAgentsNum';
 import { createCompositionImage } from '../events/createCompositionImage';
 import { compositionMessage } from '../events/embedMessage';
+import { AgentData, CompositionData } from '../types/valorantAgentData';
 import { valorantAgents } from '../data/valorantAgents';
 
 // 構成作成コマンド
@@ -185,36 +186,25 @@ export const makeCompositionCommand = {
 
         collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
           // BANされたエージェントを取得
-          const banAgentsId: string[] = selectMenuInteraction.values;
+          const banAgentIds: string[] = selectMenuInteraction.values;
 
           // BANされたエージェントをcompositionに格納
-          banAgents = valorantAgents.filter((agent) => banAgentsId.includes(agent.id));
+          banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.id));
 
           // ValorantAgentsからBAN対象とされたエージェントを排除
-          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentsId.includes(agent.id));
+          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.id));
 
           // ValorantAgentsのroleから各ロールの人数を取得
-          const allDuelistNum = valorantAgents.filter((agent) => agent.role === 'duelist').length;
-          const allInitiatorNum = valorantAgents.filter((agent) => agent.role === 'initiator').length;
-          const allControllerNum = valorantAgents.filter((agent) => agent.role === 'controller').length;
-          const allSentinelNum = valorantAgents.filter((agent) => agent.role === 'sentinel').length;
+          const allDuelistNum = countAgentsByRole('duelist');
+          const allInitiatorNum = countAgentsByRole('initiator');
+          const allControllerNum = countAgentsByRole('controller');
+          const allSentinelNum = countAgentsByRole('sentinel');
 
           // BANされたエージェントのロールを取得し、各ロールのBANされたエージェントの人数を取得
-          const banDuelistNum = valorantAgents
-            .filter((agent) => banAgentsId.includes(agent.id))
-            .filter((agent) => agent.role === 'duelist').length;
-
-          const banInitiatorNum = valorantAgents
-            .filter((agent) => banAgentsId.includes(agent.id))
-            .filter((agent) => agent.role === 'initiator').length;
-
-          const banControllerNum = valorantAgents
-            .filter((agent) => banAgentsId.includes(agent.id))
-            .filter((agent) => agent.role === 'controller').length;
-
-          const banSentinelNum = valorantAgents
-            .filter((agent) => banAgentsId.includes(agent.id))
-            .filter((agent) => agent.role === 'sentinel').length;
+          const banDuelistNum = countBanAgentsByRole('duelist', banAgentIds);
+          const banInitiatorNum = countBanAgentsByRole('initiator', banAgentIds);
+          const banControllerNum = countBanAgentsByRole('controller', banAgentIds);
+          const banSentinelNum = countBanAgentsByRole('sentinel', banAgentIds);
 
           // 各ロールの指定可能人数が超えている場合、エラーを返却
           if (duelistNum > 0 && allDuelistNum - banDuelistNum < duelistNum) {
@@ -298,11 +288,12 @@ export const makeCompositionCommand = {
           // 画像を作成
           await createCompositionImage(composition);
 
-          // メッセージを作成
+          // メッセージを作成・送信
           const embed = compositionMessage(composition, banAgents);
-
-          // メッセージを送信
           await interaction.editReply(embed);
+
+          // コレクターを終了
+          collector.stop();
         });
       }
     } catch (error) {

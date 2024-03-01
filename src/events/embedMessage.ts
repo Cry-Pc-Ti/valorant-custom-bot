@@ -133,9 +133,9 @@ export const mapMessage = (map: MapData) => {
 
 //「/member」コマンドのメッセージを作成
 export const memberAllocationMessage = (memberAllocation: MemberAllocationData) => {
-  const embed = new EmbedBuilder()
+  const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('メンバー振り分け')
+    .setTitle('Random Team')
     .setDescription('今回のチームはこちらです')
     .setTimestamp()
     .setFooter({
@@ -144,22 +144,23 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     });
 
   if (memberAllocation.attack.length) {
-    const attack: string[] = [];
+    const attack = [];
     for (const member of memberAllocation.attack) {
-      attack.push(`${member.name} <@${member.id}>`);
+      attack.push(`:white_small_square:<@${member.id}>`);
     }
-    embed.addFields({
+
+    embeds.addFields({
       name: 'Attacker',
       value: attack.join(`\n`),
     });
   }
 
   if (memberAllocation.defense.length) {
-    const defense: string[] = [];
+    const defense = [];
     for (const member of memberAllocation.defense) {
-      defense.push(`${member.name} <@${member.id}>`);
+      defense.push(`:white_small_square:<@${member.id}>`);
     }
-    embed.addFields({
+    embeds.addFields({
       name: 'Defender',
       value: defense.join(`\n`),
     });
@@ -167,11 +168,11 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
 
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
-  return { embeds: [embed], files: [fotterAttachment] };
+  return { embeds, fotterAttachment };
 };
 
 export const diceMessage = (randomIndex: number) => {
-  const embed = new EmbedBuilder()
+  const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Number')
     .setFields({
@@ -186,5 +187,5 @@ export const diceMessage = (randomIndex: number) => {
 
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
-  return { embeds: [embed], files: [fotterAttachment] };
+  return { embeds: [embeds], files: [fotterAttachment] };
 };

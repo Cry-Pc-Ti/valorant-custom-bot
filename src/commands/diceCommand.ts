@@ -14,8 +14,8 @@ export const diceCommand = {
       const randomIndex = await getRandomInt(1, 100);
 
       // メッセージを作成・送信
-      const embedMessage = diceMessage(randomIndex);
-      await interaction.editReply(embedMessage);
+      const embed = diceMessage(randomIndex);
+      await interaction.editReply(embed);
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました');
       console.error(error);
