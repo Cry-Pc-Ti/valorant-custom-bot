@@ -17,9 +17,8 @@ export interface MapData {
 }
 
 export interface MemberData {
-  name: string | undefined;
-  id: string | undefined;
-  avatarURL: ImageURLOptions;
+  name: string;
+  id: string;
 }
 
 export interface MemberAllocationData {

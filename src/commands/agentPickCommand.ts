@@ -1,5 +1,5 @@
 // モジュールをインポート
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { valorantAgents } from '../data/valorantAgents';
 import { AgentData } from '../types/valorantAgentData';
 import { agentMessage } from '../events/embedMessage';
@@ -47,13 +47,10 @@ export const agentPickCommand = {
       }
 
       // メッセージを作成
-      const embedMessage: {
-        embeds: EmbedBuilder[];
-        files: AttachmentBuilder[];
-      } = agentMessage(randomAgent);
+      const embed = agentMessage(randomAgent);
 
       // メッセージを送信
-      await interaction.editReply(embedMessage);
+      await interaction.editReply(embed);
     } catch (error: unknown) {
       await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
       console.error(`agentPickCommandでエラーが発生しました : ${error}`);
