@@ -1,8 +1,5 @@
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   ChatInputCommandInteraction,
   ComponentType,
   SlashCommandBuilder,
@@ -12,7 +9,6 @@ import {
 import { memberAllocationMessage } from '../events/embedMessage';
 import { getRandomInt as generateRandomNumber } from '../events/getRandomInt';
 import { MemberAllocationData as allocationMemberData, MemberData } from '../types/valorantAgentData';
-import { mainVoiceChannelId, subVoiceChannelId } from '../modules/discordModule';
 
 // チーム割り当てコマンド
 export const memberAllocationCommand = {
@@ -38,6 +34,7 @@ export const memberAllocationCommand = {
           .setCustomId('member')
           .setPlaceholder('参加するユーザを選択してください')
           .setMinValues(1)
+          .setMaxValues(membersInVC.length)
           .addOptions(
             membersInVC.map((member) => ({
               label: member.displayName,
@@ -110,80 +107,14 @@ export const memberAllocationCommand = {
             }
           }
 
-          // メッセージを作成
+          // メッセージを作成・送信
           const message = memberAllocationMessage(teamAllocation);
 
-          // ボタンを作成
-          const attackerVCButton = new ButtonBuilder()
-            .setCustomId('attacker')
-            .setLabel('Attacker VC')
-            .setStyle(ButtonStyle.Danger);
-
-          const difenderVCButton = new ButtonBuilder()
-            .setCustomId('difender')
-            .setLabel('Defender VC')
-            .setStyle(ButtonStyle.Primary);
-
-          // ボタンをActionRowに追加
-          const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            attackerVCButton,
-            difenderVCButton
-          );
-
-          // メッセージを送信
           await interaction.editReply({
             embeds: [message.embeds],
             files: [message.fotterAttachment],
-            components: [buttonRow],
+            components: [],
           });
-
-          const buttonCollector = interaction.channel?.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-          });
-
-          if (!buttonCollector) return;
-
-          // ボタンが押された時の処理
-          buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
-            try {
-              // アタッカーのメンバーをメインのボイスチャンネルに移動
-              if (buttonInteraction.customId === 'attacker') {
-                const targetVoiceChannel = await interaction.guild?.channels.fetch(mainVoiceChannelId);
-
-                if (targetVoiceChannel) {
-                  if (targetVoiceChannel.isVoiceBased()) {
-                    for (const member of teamAllocation.attack) {
-                      const targetMember = await interaction.guild?.members.fetch(member.id);
-                      await targetMember?.voice.setChannel(targetVoiceChannel);
-                      continue;
-                    }
-                  }
-                }
-              }
-
-              // ディフェンダーのメンバーをサブのボイスチャンネルに移動
-              if (buttonInteraction.customId === 'difender') {
-                const targetVoiceChannel = await interaction.guild?.channels.fetch(subVoiceChannelId);
-
-                if (targetVoiceChannel) {
-                  if (targetVoiceChannel.isVoiceBased()) {
-                    for (const member of teamAllocation.defense) {
-                      const targetMember = await interaction.guild?.members.fetch(member.id);
-                      await targetMember?.voice.setChannel(targetVoiceChannel);
-                      continue;
-                    }
-                  }
-                }
-              }
-            } catch (error) {
-              console.error(error);
-              await interaction.editReply('ボタンの処理中にエラーが発生しました');
-            }
-
-            buttonInteraction.deferUpdate();
-          });
-
-          selectMenuInteraction.deferUpdate();
         });
       }
     } catch (error) {
