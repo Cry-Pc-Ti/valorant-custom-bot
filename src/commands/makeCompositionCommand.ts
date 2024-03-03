@@ -291,9 +291,6 @@ export const makeCompositionCommand = {
           // メッセージを作成・送信
           const embed = compositionMessage(composition, banAgents);
           await interaction.editReply(embed);
-
-          // コレクターを終了
-          collector.stop();
         });
       }
     } catch (error) {
