@@ -1,5 +1,8 @@
 import {
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   ChatInputCommandInteraction,
   ComponentType,
   SlashCommandBuilder,
@@ -9,6 +12,7 @@ import {
 import { memberAllocationMessage } from '../events/embedMessage';
 import { getRandomInt as generateRandomNumber } from '../events/getRandomInt';
 import { MemberAllocationData as allocationMemberData, MemberData } from '../types/valorantAgentData';
+import { mainVoiceChannelId, subVoiceChannelId } from '../modules/discordModule';
 
 // チーム割り当てコマンド
 export const memberAllocationCommand = {
@@ -114,6 +118,73 @@ export const memberAllocationCommand = {
             embeds: [message.embeds],
             files: [message.fotterAttachment],
             components: [],
+          });
+
+          // ボタンを作成
+          const uniqueId = Date.now();
+          const attackerVCButton = new ButtonBuilder()
+            .setCustomId(`attacker_${uniqueId}`)
+            .setLabel('Attacker VC')
+            .setStyle(ButtonStyle.Danger);
+
+          const difenderVCButton = new ButtonBuilder()
+            .setCustomId(`difender_${uniqueId}`)
+            .setLabel('Defender VC')
+            .setStyle(ButtonStyle.Primary);
+
+          // ボタンをActionRowに追加
+          const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            attackerVCButton,
+            difenderVCButton
+          );
+
+          // ボタンを送信
+          await interaction.followUp({ components: [buttonRow], ephemeral: true });
+
+          const buttonCollector = interaction.channel?.createMessageComponentCollector({
+            componentType: ComponentType.Button,
+          });
+
+          if (!buttonCollector) return;
+
+          // ボタンが押された時の処理
+          buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
+            try {
+              // アタッカーのメンバーをメインのボイスチャンネルに移動
+              if (buttonInteraction.customId === `attacker_${uniqueId}`) {
+                const targetVoiceChannel = await interaction.guild?.channels.fetch(mainVoiceChannelId);
+
+                if (targetVoiceChannel) {
+                  if (targetVoiceChannel.isVoiceBased()) {
+                    for (const member of teamAllocation.attack) {
+                      const targetMember = await interaction.guild?.members.fetch(member.id);
+                      await targetMember?.voice.setChannel(targetVoiceChannel);
+                    }
+                  }
+                }
+              }
+
+              // ディフェンダーのメンバーをサブのボイスチャンネルに移動
+              if (buttonInteraction.customId === `difender_${uniqueId}`) {
+                const targetVoiceChannel = await interaction.guild?.channels.fetch(subVoiceChannelId);
+
+                if (targetVoiceChannel) {
+                  if (targetVoiceChannel.isVoiceBased()) {
+                    for (const member of teamAllocation.defense) {
+                      const targetMember = await interaction.guild?.members.fetch(member.id);
+                      await targetMember?.voice.setChannel(targetVoiceChannel);
+                    }
+                  }
+                }
+              }
+
+              if (!buttonInteraction.replied && !buttonInteraction.deferred) {
+                await buttonInteraction.deferUpdate();
+              }
+            } catch (error) {
+              console.error(error);
+              await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
+            }
           });
         });
       }
