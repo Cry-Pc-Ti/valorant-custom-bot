@@ -150,6 +150,10 @@ export const memberAllocationCommand = {
           // ボタンが押された時の処理
           buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
             try {
+              if (!buttonInteraction.replied && !buttonInteraction.deferred) {
+                await buttonInteraction.deferUpdate();
+              }
+
               // アタッカーのメンバーをメインのボイスチャンネルに移動
               if (buttonInteraction.customId === `attacker_${uniqueId}`) {
                 const targetVoiceChannel = await interaction.guild?.channels.fetch(mainVoiceChannelId);
@@ -176,10 +180,6 @@ export const memberAllocationCommand = {
                     }
                   }
                 }
-              }
-
-              if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-                await buttonInteraction.deferUpdate();
               }
             } catch (error) {
               console.error(error);
