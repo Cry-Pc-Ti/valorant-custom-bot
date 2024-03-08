@@ -38,7 +38,7 @@ export const memberAllocationCommand = {
           .setCustomId('member')
           .setPlaceholder('参加するユーザを選択してください')
           .setMinValues(1)
-          .setMaxValues(membersInVC.length)
+          .setMaxValues(membersInVC.length >= 10 ? 10 : membersInVC.length)
           .addOptions(
             membersInVC.map((member) => ({
               label: member.displayName,
