@@ -96,6 +96,11 @@ export const valorantAgents: AgentData[] = [
     id: 'harbor',
     role: 'controller',
   },
+  {
+    name: 'クローヴ',
+    id: 'clove',
+    role: 'controller',
+  },
 
   // Sentinel
   {
