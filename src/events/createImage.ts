@@ -1,8 +1,7 @@
 import sharp, { OverlayOptions } from 'sharp';
-import { CompositionData } from '../types/valorantAgentData';
 import fs from 'fs';
 
-// 画像を1枚の画像に連結
+// 画像を連結し1枚の画像にまとめる
 export const createImage = async (imagePaths: string[]) => {
 
   // 既存の画像を削除

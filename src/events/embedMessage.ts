@@ -192,13 +192,14 @@ export const diceMessage = (randomIndex: number) => {
 };
 
 //「/chinchiro」コマンドのメッセージを作成
-export const chinchiroMessage = () => {
+export const chinchiroMessage = (chinchiroResultWords:string) => {
+  
   const embeds = new EmbedBuilder()
   .setColor('#fd4556')
   .setTitle('チンチロバトルじゃ！')
   .setFields({
     name: 'ざわ…ざわ…',
-    value: "aa",
+    value: "結果 " + chinchiroResultWords,
   })
   .setImage('attachment://composition.png')
   .setTimestamp()

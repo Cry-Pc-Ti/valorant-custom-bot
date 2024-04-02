@@ -2,9 +2,9 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { getRandomInt } from '../events/getRandomInt';
 import { chinchiroMessage } from '../events/embedMessage';
 import { createImage } from '../events/createImage';
+import { chinchiroResult } from '../events/chinchiroResult';
 
-
-// ちんちろ
+// チンチロリンコマンド
 export const chinchiroCommand = {
   data: new SlashCommandBuilder()
   .setName('chinchiro')
@@ -15,16 +15,18 @@ export const chinchiroCommand = {
     await interaction.deferReply();
 
     try {
-      const randomIndexList = []
+      const randomIndexArray = []
+      const imagePaths = []
       for(let i=0;i<=2;i++){
-        randomIndexList.push(await getRandomInt(1, 6));
+        randomIndexArray.push(await getRandomInt(1, 6));
+        imagePaths.push(`img/dice/${randomIndexArray[i]}.png`);
       }
-      const imagePaths = [`img/dice/${randomIndexList[0]}.png`,`img/dice/${randomIndexList[1]}.png`,`img/dice/${randomIndexList[2]}.png`]
+      
       // サイコロの画像を作成
       await createImage(imagePaths)
 
-      // メッセージを作成・送信
-      const embed = chinchiroMessage()
+      // サイコロを振った結果を出力しメッセージを作成・送信
+      const embed = chinchiroMessage(await chinchiroResult(randomIndexArray))
       await interaction.editReply(embed);
 
     } catch (error) {
