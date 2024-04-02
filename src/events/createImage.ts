@@ -2,19 +2,8 @@ import sharp, { OverlayOptions } from 'sharp';
 import { CompositionData } from '../types/valorantAgentData';
 import fs from 'fs';
 
-// 5枚のエージェントの画像を連結し、1枚の画像にまとめる
-export const createCompositionImage = async (composition: CompositionData) => {
-  // 連結したい画像のファイルパス
-  const imagePaths: string[] = [];
-
-  // 画像のパスを配列に格納
-  for (const agentRole in composition) {
-    if (agentRole !== 'ban') {
-      for (const agent of composition[agentRole as keyof CompositionData]) {
-        imagePaths.push(`img/agents/${agent.id}_icon.png`);
-      }
-    }
-  }
+// 画像を1枚の画像に連結
+export const createImage = async (imagePaths: string[]) => {
 
   // 既存の画像を削除
   if (fs.existsSync('img/composition.png')) {
