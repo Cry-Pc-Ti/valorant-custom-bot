@@ -171,6 +171,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
   return { embeds, fotterAttachment };
 };
 
+//「/dice」コマンドのメッセージを作成
 export const diceMessage = (randomIndex: number) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
@@ -189,3 +190,24 @@ export const diceMessage = (randomIndex: number) => {
 
   return { embeds: [embeds], files: [fotterAttachment] };
 };
+
+//「/chinchiro」コマンドのメッセージを作成
+export const chinchiroMessage = () => {
+  const embeds = new EmbedBuilder()
+  .setColor('#fd4556')
+  .setTitle('チンチロバトルじゃ！')
+  .setFields({
+    name: 'ざわ…ざわ…',
+    value: "aa",
+  })
+  .setImage('attachment://composition.png')
+  .setTimestamp()
+  .setFooter({
+    text: 'VALORANT',
+    iconURL: 'attachment://valorant_logo.png',
+  });
+  const compositionAttachment = new AttachmentBuilder('img/composition.png');
+
+  return { embeds: [embeds], files: [compositionAttachment] };
+
+}
