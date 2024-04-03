@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { selectAgentsByRole } from '../events/selectAgentsByRole';
 import { countAgentsByRole, countBanAgentsByRole } from '../events/countAgentsNum';
-import { createImage } from '../events/createImage';
+import { createImage } from '../events/createConcatImage';
 import { compositionMessage } from '../events/embedMessage';
 import { AgentData, CompositionData } from '../types/valorantAgentData';
 import { valorantAgents } from '../data/valorantAgents';
@@ -296,17 +296,17 @@ export const makeCompositionCommand = {
             return;
           }
 
-        // 連結したい画像のファイルパス
-        const imagePaths: string[] = [];
+          // 連結したい画像のファイルパス
+          const imagePaths: string[] = [];
 
-        // 画像のパスを配列に格納
-        for (const agentRole in composition) {
-          if (agentRole !== 'ban') {
-            for (const agent of composition[agentRole as keyof CompositionData]) {
-              imagePaths.push(`img/agents/${agent.id}_icon.png`);
+          // 画像のパスを配列に格納
+          for (const agentRole in composition) {
+            if (agentRole !== 'ban') {
+              for (const agent of composition[agentRole as keyof CompositionData]) {
+                imagePaths.push(`img/agents/${agent.id}_icon.png`);
+              }
             }
           }
-        }
           // 画像を作成
           await createImage(imagePaths);
 

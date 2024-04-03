@@ -3,10 +3,9 @@ import fs from 'fs';
 
 // 画像を連結し1枚の画像にまとめる
 export const createImage = async (imagePaths: string[]) => {
-
   // 既存の画像を削除
-  if (fs.existsSync('img/composition.png')) {
-    fs.unlinkSync('img/composition.png');
+  if (fs.existsSync('img/concat_image.png')) {
+    fs.unlinkSync('img/concat_image.png');
   }
 
   // 画像を読み込む
@@ -41,8 +40,8 @@ export const createImage = async (imagePaths: string[]) => {
           })
         )
       )
-      .toFile('img/composition.png');
-  } catch (error: unknown) {
+      .toFile('img/concat_image.png');
+  } catch (error) {
     console.error(`画像の連結中にエラーが発生しました : ${error}`);
   }
 };

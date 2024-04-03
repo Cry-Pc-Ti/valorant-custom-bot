@@ -35,7 +35,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
-    .setImage('attachment://composition.png')
+    .setImage('attachment://concat_image.png')
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
@@ -102,12 +102,12 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const compositionAttachment = new AttachmentBuilder('img/composition.png');
+  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
   const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
 
   return {
     embeds: [embed],
-    files: [compositionAttachment, fotterAttachment],
+    files: [concatImageAttachment, fotterAttachment],
     components: [],
   };
 };
@@ -192,23 +192,42 @@ export const diceMessage = (randomIndex: number) => {
 };
 
 //「/chinchiro」コマンドのメッセージを作成
-export const chinchiroMessage = (chinchiroResultWords:string) => {
-  
+export const chinchiroMessage = (result: string) => {
   const embeds = new EmbedBuilder()
-  .setColor('#fd4556')
-  .setTitle('チンチロバトルじゃ！')
-  .setFields({
-    name: 'ざわ…ざわ…',
-    value: "結果 " + chinchiroResultWords,
-  })
-  .setImage('attachment://composition.png')
-  .setTimestamp()
-  .setFooter({
-    text: 'VALORANT',
-    iconURL: 'attachment://valorant_logo.png',
-  });
-  const compositionAttachment = new AttachmentBuilder('img/composition.png');
+    .setColor('#fd4556')
+    .setTitle('チンチロバトルじゃ！')
+    .setFields({
+      name: 'ざわ…ざわ…',
+      value: '結果 ' + result,
+    })
+    .setImage('attachment://concat_image.png')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
 
-  return { embeds: [embeds], files: [compositionAttachment] };
+  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
 
-}
+  return { embeds: [embeds], files: [concatImageAttachment] };
+};
+
+export const chinchiro456Message = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('チンチロバトルじゃ！')
+    .setFields({
+      name: 'ざわ…ざわ…',
+      value: '456賽だっ...!!',
+    })
+    .setImage('attachment://456dice.png')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_logo.png',
+    });
+
+  const ImageAttachment = new AttachmentBuilder('img/dice/456dice.png');
+
+  return { embeds: [embeds], files: [ImageAttachment] };
+};
