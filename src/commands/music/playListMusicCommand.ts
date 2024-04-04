@@ -1,7 +1,8 @@
 import { AudioPlayerStatus, AudioResource, StreamType, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel } from "@discordjs/voice";
 import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import ytdl from "ytdl-core";
 import ytpl from "ytpl";
+import { playMusic } from "../../events/playMusic";
+import { mapMessage, playListInfoMessage } from "../../events/embedMessage";
 
 export const playListCommand = {
     // コマンドの設定
@@ -36,18 +37,18 @@ export const playListCommand = {
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 //playListから音楽情報を取得しResource配列に格納
-                const playListURLResources: AudioResource<null>[] =  playListInfo.items.map((item) => {
-                        // 動画の音源を取得
-                        const stream = ytdl(item.url, {
-                        filter: format => format.audioCodec === 'opus' && format.container === 'webm',
-                        quality: 'highest',
-                        highWaterMark: 32 * 1024 * 1024,
-                        });
-
-                        const resource = createAudioResource(stream, {
-                            inputType: StreamType.WebmOpus
-                        });
-                    return resource
+                const musicInfoList: any[] =  playListInfo.items.map((item) => {
+                    console.log(item)
+                    return{
+                        url: item.url,
+                        title: item.title,
+                        musicImg: item.bestThumbnail.url,
+                        author: {
+                            url: item.author.name,
+                            channelID: item.author.channelID,
+                            name: item.author.name,
+                        }
+                    }
                 });
 
                 // BOTをVCに接続
@@ -56,17 +57,18 @@ export const playListCommand = {
                     guildId: interaction.guildId,
                     adapterCreator: interaction.guild?.voiceAdapterCreator,
                     selfDeaf: true,
+                    selfMute: true
                 });
                 const player = createAudioPlayer();
                 connection.subscribe(player);
 
                 let musicCount = 0;
-                for(const playListURLResource of playListURLResources){
+                for(const musicInfo of musicInfoList){
                     musicCount++;
-                    player.play(playListURLResource);
-                    interaction.editReply(musicCount + "曲目を再生中～♪");
-                    await entersState(player,AudioPlayerStatus.Playing, 10 * 10000);
-                    await entersState(player,AudioPlayerStatus.Idle, 24 * 60 * 60 * 10000);
+                    // メッセージを作成
+                    const embed = playListInfoMessage(musicInfo,musicCount,musicInfoList.length);
+                    interaction.editReply(embed);
+                    await playMusic(player,musicInfo)
                 }
                 // 終了
                 interaction.editReply("再生完了！");
