@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { getRandomInt } from '../events/getRandomInt';
-import { diceMessage } from '../events/embedMessage';
+import { getRandomInt } from '../../events/getRandomInt';
+import { diceMessage } from '../../events/embedMessage';
 
 // ダイスコマンド
 export const diceCommand = {

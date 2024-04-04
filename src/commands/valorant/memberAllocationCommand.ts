@@ -9,10 +9,10 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { memberAllocationMessage } from '../events/embedMessage';
-import { getRandomInt as generateRandomNumber } from '../events/getRandomInt';
-import { MemberAllocationData as allocationMemberData, MemberData } from '../types/valorantAgentData';
-import { mainVoiceChannelId, subVoiceChannelId } from '../modules/discordModule';
+import { memberAllocationMessage } from '../../events/embedMessage';
+import { getRandomInt as generateRandomNumber } from '../../events/getRandomInt';
+import { MemberAllocationData as allocationMemberData, MemberData } from '../../types/valorantAgentData';
+import { mainVoiceChannelId, subVoiceChannelId } from '../../modules/discordModule';
 
 // チーム割り当てコマンド
 export const memberAllocationCommand = {

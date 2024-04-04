@@ -1,8 +1,8 @@
 // モジュールをインポート
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { MapData } from '../types/valorantAgentData';
-import { mapMessage } from '../events/embedMessage';
-import { valorantMaps } from '../data/valorantMaps';
+import { MapData } from '../../types/valorantAgentData';
+import { mapMessage } from '../../events/embedMessage';
+import { valorantMaps } from '../../data/valorantMaps';
 
 // マップ選択コマンド
 export const mapSelectCommand = {

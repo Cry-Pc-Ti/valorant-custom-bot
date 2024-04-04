@@ -43,6 +43,7 @@ export const playListCommand = {
                         quality: 'highest',
                         highWaterMark: 32 * 1024 * 1024,
                         });
+
                         const resource = createAudioResource(stream, {
                             inputType: StreamType.WebmOpus
                         });
@@ -64,9 +65,8 @@ export const playListCommand = {
                     musicCount++;
                     player.play(playListURLResource);
                     interaction.editReply(musicCount + "曲目を再生中～♪");
-                    await entersState(player,AudioPlayerStatus.Playing, 10 * 1000);
-                    await entersState(player,AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
-
+                    await entersState(player,AudioPlayerStatus.Playing, 10 * 10000);
+                    await entersState(player,AudioPlayerStatus.Idle, 24 * 60 * 60 * 10000);
                 }
                 // 終了
                 interaction.editReply("再生完了！");
