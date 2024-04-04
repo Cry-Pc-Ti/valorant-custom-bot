@@ -14,7 +14,7 @@ export const exportChinchiroResult = async (randomIndexArray: number[]) => {
       break;
 
     case isAllIncludes(randomIndexArray, [4, 5, 6]):
-      result = `シゴロ : ${arrayString}サイ`;
+      result = `シゴロ : ${arrayString}`;
       break;
 
     case randomIndexArray[0] === randomIndexArray[1] && randomIndexArray[1] !== randomIndexArray[2]:
