@@ -39,8 +39,9 @@ export const chinchiroCommand = {
         // メッセージを作成・送信
         const embed = chinchiroMessage(result);
         await interaction.editReply(embed);
-      } else if (isCheat) {
+
         // イカサマモード
+      } else if (isCheat) {
         const diceImagePaths: string[] = [];
 
         for (const randomIndex of [4, 5, 6]) {
