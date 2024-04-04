@@ -211,23 +211,3 @@ export const chinchiroMessage = (result: string) => {
 
   return { embeds: [embeds], files: [concatImageAttachment] };
 };
-
-export const chinchiro456Message = () => {
-  const embeds = new EmbedBuilder()
-    .setColor('#fd4556')
-    .setTitle('チンチロバトルじゃ！')
-    .setFields({
-      name: 'ざわ…ざわ…',
-      value: '456賽だっ...!!',
-    })
-    .setImage('attachment://456dice.png')
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
-    });
-
-  const ImageAttachment = new AttachmentBuilder('img/dice/456dice.png');
-
-  return { embeds: [embeds], files: [ImageAttachment] };
-};
