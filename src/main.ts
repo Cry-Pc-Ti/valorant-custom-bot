@@ -3,15 +3,15 @@ import { Interaction, REST, Routes } from 'discord.js';
 import { clientId, guildId, discord, token } from '../src/modules/discordModule';
 
 // コマンドをインポート
-import { agentPickCommand } from './commands/agentPickCommand';
-import { makeCompositionCommand } from './commands/makeCompositionCommand';
-import { diceCommand } from './commands/diceCommand';
-import { mapSelectCommand } from './commands/mapSelectCommand';
-import { memberAllocationCommand } from './commands/memberAllocationCommand';
-import { chinchiroCommand } from './commands/chinchiroCommand';
+import { agentPickCommand } from './commands/valorant/agentPickCommand';
+import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
+import { diceCommand } from './commands/dice/diceCommand';
+import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
+import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
+import { chinchiroCommand } from './commands/dice/chinchiroCommand';
 import { helpComand } from './commands/helpComand';
-import { playMusicCommand } from './commands/playMusicCommand';
-import { playListCommand } from './commands/playListMusicCommand';
+import { playMusicCommand } from './commands/music/playMusicCommand';
+import { playListCommand } from './commands/music/playListMusicCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);

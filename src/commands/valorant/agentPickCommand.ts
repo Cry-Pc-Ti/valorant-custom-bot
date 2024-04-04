@@ -1,8 +1,8 @@
 // モジュールをインポート
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { valorantAgents } from '../data/valorantAgents';
-import { AgentData } from '../types/valorantAgentData';
-import { agentMessage } from '../events/embedMessage';
+import { valorantAgents } from '../../data/valorantAgents';
+import { AgentData } from '../../types/valorantAgentData';
+import { agentMessage } from '../../events/embedMessage';
 
 // エージェント指定コマンド
 export const agentPickCommand = {
