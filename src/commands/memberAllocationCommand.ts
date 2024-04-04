@@ -78,6 +78,7 @@ export const memberAllocationCommand = {
             memberData.push({
               name: user?.user.displayName,
               id: user?.user.id,
+              avatarImg: user?.user.avatarURL()
             });
           }
 

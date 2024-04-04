@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { getRandomInt } from '../events/getRandomInt';
 import { chinchiro456Message, chinchiroMessage } from '../events/embedMessage';
 import { createImage } from '../events/createConcatImage';
-import { exportChinchiroResult } from '../events/chinchiroResult';
+import { exportChinchiroResult } from '../events/exportChinchiroResult';
 
 // チンチロリンコマンド
 export const chinchiroCommand = {
