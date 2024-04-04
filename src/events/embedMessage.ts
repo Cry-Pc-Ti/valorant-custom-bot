@@ -1,5 +1,6 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
+import { MusicInfo } from '../types/musicData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -207,7 +208,22 @@ export const chinchiroMessage = (result: string) => {
       iconURL: 'attachment://valorant_logo.png',
     });
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
+  return { embeds: [embeds], files: [] };
+};
 
-  return { embeds: [embeds], files: [concatImageAttachment] };
+//「/playList」コマンドのメッセージを作成
+// TODO:setAuthorのiconURLを取得してくる（チャンネルのアイコン）
+export const playListInfoMessage = (musicInfo: MusicInfo,musicCount: number,maxMusicCount: number) => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(musicInfo.title)
+    .setURL(musicInfo.url)
+    .setAuthor({ name: musicInfo.author.name, iconURL: musicInfo.musicImg})
+    .setImage(musicInfo.musicImg)
+    .setTimestamp()
+    .setFooter({
+      text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+    });
+
+  return { embeds: [embeds], files: [] };
 };
