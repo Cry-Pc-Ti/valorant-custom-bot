@@ -198,7 +198,7 @@ export const chinchiroMessage = (result: string) => {
     .setTitle('チンチロバトルじゃ！')
     .setFields({
       name: 'ざわ…ざわ…',
-      value: '結果 ' + result,
+      value: `${result}`,
     })
     .setImage('attachment://concat_image.png')
     .setTimestamp()
