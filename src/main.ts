@@ -11,6 +11,7 @@ import { memberAllocationCommand } from './commands/memberAllocationCommand';
 import { chinchiroCommand } from './commands/chinchiroCommand';
 import { helpComand } from './commands/helpComand';
 import { playMusicCommand } from './commands/playMusicCommand';
+import { playListCommand } from './commands/playListMusicCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -27,7 +28,8 @@ const rest = new REST({ version: '10' }).setToken(token);
         diceCommand.data,
         chinchiroCommand.data,
         helpComand.data,
-        playMusicCommand.data
+        playMusicCommand.data,
+        playListCommand.data
       ],
     });
     console.log('コマンドの登録が完了しました');
@@ -50,7 +52,8 @@ const commands = {
   [diceCommand.data.name]: diceCommand,
   [chinchiroCommand.data.name]: chinchiroCommand,
   [helpComand.data.name]: helpComand,
-  [playMusicCommand.data.name]: playMusicCommand
+  [playMusicCommand.data.name]: playMusicCommand,
+  [playListCommand.data.name]: playListCommand
 };
 
 // インタラクションが発生時に実行

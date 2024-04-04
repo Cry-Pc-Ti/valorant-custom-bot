@@ -23,17 +23,17 @@ export const playMusicCommand = {
         .toJSON(),
 
     execute: async (interaction: ChatInputCommandInteraction) => {
-        await interaction.deferReply();
         try {
-            //const url = 'https://www.youtube.com/watch?v=cxM_FmezzFA&list=RDUfApxTRYjz0&index=15';
+            await interaction.deferReply();
+
             const url = interaction.options.getString('url') ?? ""
-            const voiceChannel = interaction.options.getChannel('channel')?.id
-        
-            if (!voiceChannel || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
+            const voiceChannelId = interaction.options.getChannel('channel')?.id
+
+            if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
             if (!ytdl.validateURL(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
             const connection = joinVoiceChannel({
-                channelId: voiceChannel,
+                channelId: voiceChannelId,
                 guildId: interaction.guildId,
                 adapterCreator: interaction.guild?.voiceAdapterCreator,
                 selfDeaf: true,
