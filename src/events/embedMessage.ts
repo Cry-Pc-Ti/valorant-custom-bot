@@ -213,17 +213,24 @@ export const chinchiroMessage = (result: string) => {
 
 //「/playList」コマンドのメッセージを作成
 // TODO:setAuthorのiconURLを取得してくる（チャンネルのアイコン）
-export const playListInfoMessage = (musicInfo: MusicInfo,musicCount: number,maxMusicCount: number) => {
+export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: musicInfo.musicImg})
+    .setAuthor({ name: musicInfo.author.name, iconURL: musicInfo.author.thumbnails})
     .setImage(musicInfo.musicImg)
     .setTimestamp()
-    .setFooter({
-      text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
-    });
+
+    if(!musicCount && !maxMusicCount){
+      embeds.setFooter({
+        text: '音楽情報',
+      });
+    } else {
+      embeds.setFooter({
+        text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+      });
+    }
 
   return { embeds: [embeds], files: [] };
 };
