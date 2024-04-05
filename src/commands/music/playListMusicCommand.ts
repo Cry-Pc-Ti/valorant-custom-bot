@@ -2,7 +2,8 @@ import { AudioPlayerStatus, AudioResource, StreamType, createAudioPlayer, create
 import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import ytpl from "ytpl";
 import { playMusic } from "../../events/playMusic";
-import { mapMessage, playListInfoMessage } from "../../events/embedMessage";
+import {  musicInfoMessage } from "../../events/embedMessage";
+import ytdl from "ytdl-core";
 
 export const playListCommand = {
     // コマンドの設定
@@ -33,13 +34,14 @@ export const playListCommand = {
                 if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
                 if (!ytpl.validateID(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
-                await interaction.deleteReply()
+                interaction.deleteReply()
 
                 //URLからplayListを取得
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 //playListから音楽情報を取得しResource配列に格納
-                const musicInfoList: any[] =  playListInfo.items.map((item) => {
+                const musicInfoList: any[] =  playListInfo.items.map(async (item) => {
+                    const musicDetails = await ytdl.getBasicInfo(item.url)
                     return{
                         url: item.url,
                         title: item.title,
@@ -48,6 +50,7 @@ export const playListCommand = {
                             url: item.author.name,
                             channelID: item.author.channelID,
                             name: item.author.name,
+                            thumbnails: musicDetails.videoDetails.author.thumbnails ? musicDetails.videoDetails.author.thumbnails[0].url : item.bestThumbnail.url,
                         }
                     }
                 });
@@ -64,12 +67,11 @@ export const playListCommand = {
                 connection.subscribe(player);
 
                 let messages:any;
-                let musicCount = 0;
+                let musicCount:number = 0;
                 for(const musicInfo of musicInfoList){
-                    musicCount++;
                     // メッセージを作成
-                    const embed = playListInfoMessage(musicInfo,musicCount,musicInfoList.length);
-                    if(!messages) messages = await interaction.channel?.send(embed);
+                    const embed = await musicInfoMessage(musicInfo,musicCount++,musicInfoList.length);
+                    if(!messages) messages = interaction.channel?.send(embed);
                     else messages.edit(embed);
                     
                     await playMusic(player,musicInfo);

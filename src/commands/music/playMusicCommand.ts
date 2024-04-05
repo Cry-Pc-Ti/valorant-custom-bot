@@ -1,6 +1,9 @@
 import { AudioPlayerStatus, NoSubscriberBehavior, StreamType, VoiceConnectionStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import ytdl from "ytdl-core";
+import { MusicInfo } from "../../types/musicData";
+import { playMusic } from "../../events/playMusic";
+import { musicInfoMessage } from "../../events/embedMessage";
 
 export const playMusicCommand = {
     // コマンドの設定
@@ -32,32 +35,38 @@ export const playMusicCommand = {
             if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
             if (!ytdl.validateURL(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
+            await interaction.deleteReply()
+
+            //BOTをVCに接続
             const connection = joinVoiceChannel({
                 channelId: voiceChannelId,
                 guildId: interaction.guildId,
                 adapterCreator: interaction.guild?.voiceAdapterCreator,
                 selfDeaf: true,
             });
-
-            // BOTをVCに接続
             const player = createAudioPlayer();
             connection.subscribe(player);
 
-            // 動画の音源を取得
-            const stream = ytdl(ytdl.getURLVideoID(url), {
-            filter: format => format.audioCodec === 'opus' && format.container === 'webm',
-            quality: 'highest',
-            highWaterMark: 32 * 1024 * 1024,
-            });
-            const resource = createAudioResource(stream, {
-                inputType: StreamType.WebmOpus
-            });
+            // 音楽データを取得・作成
+            const musicDetails = await ytdl.getBasicInfo(url)
+            const musicInfo: MusicInfo = {
+                url:  musicDetails.videoDetails.video_url,
+                title: musicDetails.videoDetails.title,
+                musicImg: musicDetails.videoDetails.thumbnails[0].url,
+                author: {
+                    url: musicDetails.videoDetails.author.channel_url,
+                    channelID: musicDetails.videoDetails.author.id,
+                    name: musicDetails.videoDetails.author.name,
+                    thumbnails: musicDetails.videoDetails.author.thumbnails ? musicDetails.videoDetails.author.thumbnails[0].url : musicDetails.videoDetails.thumbnails[0].url
+                }
+            }
 
+            // メッセージ作成、送信
+            const embed = await musicInfoMessage(musicInfo);
+            interaction.channel?.send(embed);
+            
             // 再生
-            player.play(resource);
-            interaction.editReply("再生中～♪");
-            await entersState(player,AudioPlayerStatus.Playing, 10 * 1000);
-            await entersState(player,AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
+            await playMusic(player,musicInfo);
 
             // 終了
             interaction.editReply("再生完了！");
