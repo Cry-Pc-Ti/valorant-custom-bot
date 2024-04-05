@@ -8,7 +8,7 @@ export const playListCommand = {
     // コマンドの設定
     data: new SlashCommandBuilder()
         .setName('playlist')
-        .setDescription('VCで音楽を流します。')
+        .setDescription('VCでプレイリストから音楽を流します。')
         .addChannelOption((option) =>
         option
             .setName('channel')
@@ -19,7 +19,7 @@ export const playListCommand = {
         .addStringOption((option) =>
         option
             .setName('url')
-            .setDescription('再生したいURLを指定')
+            .setDescription('再生したいプレイリストを指定')
             .setRequired(true)
         )
         .toJSON(),
@@ -33,12 +33,13 @@ export const playListCommand = {
                 if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
                 if (!ytpl.validateID(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
+                await interaction.deleteReply()
+
                 //URLからplayListを取得
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 //playListから音楽情報を取得しResource配列に格納
                 const musicInfoList: any[] =  playListInfo.items.map((item) => {
-                    console.log(item)
                     return{
                         url: item.url,
                         title: item.title,
@@ -62,18 +63,21 @@ export const playListCommand = {
                 const player = createAudioPlayer();
                 connection.subscribe(player);
 
+                let messages:any;
                 let musicCount = 0;
                 for(const musicInfo of musicInfoList){
                     musicCount++;
                     // メッセージを作成
                     const embed = playListInfoMessage(musicInfo,musicCount,musicInfoList.length);
-                    interaction.editReply(embed);
-                    await playMusic(player,musicInfo)
+                    if(!messages) messages = await interaction.channel?.send(embed);
+                    else messages.edit(embed);
+                    
+                    await playMusic(player,musicInfo);
                 }
                 // 終了
-                interaction.editReply("再生完了！");
+                messages.edit("プレイリスト再生完了！")
                 connection.destroy();
-                
+
         } catch (error) {
             console.log(error)
         }
