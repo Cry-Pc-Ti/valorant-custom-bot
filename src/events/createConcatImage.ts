@@ -1,5 +1,5 @@
-import sharp, { OverlayOptions } from 'sharp';
 import fs from 'fs';
+import sharp, { OverlayOptions } from 'sharp';
 
 // 画像を連結し1枚の画像にまとめる
 export const createImage = async (imagePaths: string[]) => {

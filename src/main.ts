@@ -4,14 +4,11 @@ import { clientId, guildId, discord, token } from '../src/modules/discordModule'
 
 // コマンドをインポート
 import { agentPickCommand } from './commands/valorant/agentPickCommand';
-import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
+import { chinchiroCommand } from './commands/dice/chinchiroCommand';
 import { diceCommand } from './commands/dice/diceCommand';
+import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
 import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
 import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
-import { chinchiroCommand } from './commands/dice/chinchiroCommand';
-import { helpComand } from './commands/helpComand';
-import { playMusicCommand } from './commands/music/playMusicCommand';
-import { playListCommand } from './commands/music/playListMusicCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -22,14 +19,11 @@ const rest = new REST({ version: '10' }).setToken(token);
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: [
         agentPickCommand.data,
+        chinchiroCommand.data,
+        diceCommand.data,
         makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
-        diceCommand.data,
-        chinchiroCommand.data,
-        helpComand.data,
-        playMusicCommand.data,
-        playListCommand.data
       ],
     });
     console.log('コマンドの登録が完了しました');
@@ -46,14 +40,11 @@ discord.on('ready', () => {
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [agentPickCommand.data.name]: agentPickCommand,
+  [chinchiroCommand.data.name]: chinchiroCommand,
+  [diceCommand.data.name]: diceCommand,
   [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
-  [diceCommand.data.name]: diceCommand,
-  [chinchiroCommand.data.name]: chinchiroCommand,
-  [helpComand.data.name]: helpComand,
-  [playMusicCommand.data.name]: playMusicCommand,
-  [playListCommand.data.name]: playListCommand
 };
 
 // インタラクションが発生時に実行

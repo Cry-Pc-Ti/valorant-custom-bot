@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { getRandomInt } from '../../events/getRandomInt';
+import { generateRandomNum } from '../../events/generateRandomNum';
 import { diceMessage } from '../../events/embedMessage';
 
 // ダイスコマンド
@@ -11,7 +11,7 @@ export const diceCommand = {
 
     try {
       // 1から100までのランダムな数字を取得
-      const randomIndex = await getRandomInt(1, 100);
+      const randomIndex = await generateRandomNum(1, 100);
 
       // メッセージを作成・送信
       const embed = diceMessage(randomIndex);

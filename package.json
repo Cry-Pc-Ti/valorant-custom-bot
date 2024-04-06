@@ -21,14 +21,11 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.1",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
-    "ffmpeg-static": "^5.2.0",
     "fs": "^0.0.1-security",
-    "sharp": "^0.33.1",
-    "tweetnacl": "^1.0.3",
+    "sharp": "^0.33.3",
     "ytdl-core": "^4.11.5",
     "ytpl": "^2.3.0"
   }
