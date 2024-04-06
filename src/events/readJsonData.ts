@@ -2,7 +2,7 @@ import fs from 'fs';
 import { AgentData, MapData } from '../types/valorantData';
 
 // JSONファイルのパス
-const jsonFilePath = '../data/valorantData.json';
+const jsonFilePath = './static/data/valorantData.json';
 
 // JSONファイルの読み込み
 const fileData = fs.readFileSync(jsonFilePath, 'utf-8');
