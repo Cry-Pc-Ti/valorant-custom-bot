@@ -14,7 +14,7 @@ import { countAgentsByRole, countBanAgentsByRole } from '../../events/countAgent
 import { createImage } from '../../events/createConcatImage';
 import { compositionMessage } from '../../events/embedMessage';
 import { AgentData, CompositionData } from '../../types/valorantData';
-import { valorantAgents } from '../../../static/data/valorantAgents';
+import { valorantAgents } from '../../events/readJsonData';
 
 // 構成作成コマンド
 export const makeCompositionCommand = {
