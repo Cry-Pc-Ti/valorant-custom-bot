@@ -1,8 +1,8 @@
 // モジュールをインポート
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { valorantAgents } from '../../data/valorantAgents';
-import { AgentData } from '../../types/valorantAgentData';
+import { valorantAgents } from '../../events/readJsonData';
 import { agentMessage } from '../../events/embedMessage';
+import { AgentData } from '../../types/valorantData';
 
 // エージェント指定コマンド
 export const agentPickCommand = {
@@ -32,6 +32,8 @@ export const agentPickCommand = {
 
       // エージェントロールを取得
       const agentRole: string | null = options.getString('role');
+
+      // エージェントデータを取得
 
       // ランダムに選択されたエージェントのデータを格納する変数
       let randomAgent: AgentData;

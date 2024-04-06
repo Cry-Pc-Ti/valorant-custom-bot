@@ -34,7 +34,7 @@ export const exportChinchiroResult = async (randomIndexArray: number[]) => {
       break;
 
     default:
-      result = `役なし : ${arrayString}`;
+      result = `目なし : ${arrayString}`;
       break;
   }
 

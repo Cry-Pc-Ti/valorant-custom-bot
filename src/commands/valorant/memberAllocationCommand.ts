@@ -10,8 +10,8 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { memberAllocationMessage } from '../../events/embedMessage';
-import { getRandomInt as generateRandomNumber } from '../../events/getRandomInt';
-import { MemberAllocationData as allocationMemberData, MemberData } from '../../types/valorantAgentData';
+import { generateRandomNum as generateRandomNum } from '../../events/generateRandomNum';
+import { MemberAllocationData, MemberData } from '../../types/memberData';
 import { mainVoiceChannelId, subVoiceChannelId } from '../../modules/discordModule';
 
 // チーム割り当てコマンド
@@ -78,12 +78,12 @@ export const memberAllocationCommand = {
             memberData.push({
               name: user?.user.displayName,
               id: user?.user.id,
-              avatarImg: user?.user.avatarURL()
+              avatarImg: user?.user.avatarURL(),
             });
           }
 
           // チーム分け用のオブジェクトを作成
-          const teamAllocation: allocationMemberData = {
+          const teamAllocation: MemberAllocationData = {
             attack: [],
             defense: [],
           };
@@ -98,7 +98,7 @@ export const memberAllocationCommand = {
           let defenseCount = 0;
 
           for (const member of memberData) {
-            const randomNumber = await generateRandomNumber(0, 1);
+            const randomNumber = await generateRandomNum(0, 1);
 
             if (randomNumber === 0 && attackCount < maxAttackMembers) {
               teamAllocation.attack.push(member);

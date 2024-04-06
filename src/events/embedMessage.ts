@@ -1,5 +1,6 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData } from '../types/valorantData';
+import { MemberAllocationData } from '../types/memberData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 

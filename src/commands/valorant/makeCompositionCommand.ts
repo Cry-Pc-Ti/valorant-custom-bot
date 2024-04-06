@@ -13,8 +13,8 @@ import { selectAgentsByRole } from '../../events/selectAgentsByRole';
 import { countAgentsByRole, countBanAgentsByRole } from '../../events/countAgentsNum';
 import { createImage } from '../../events/createConcatImage';
 import { compositionMessage } from '../../events/embedMessage';
-import { AgentData, CompositionData } from '../../types/valorantAgentData';
-import { valorantAgents } from '../../data/valorantAgents';
+import { AgentData, CompositionData } from '../../types/valorantData';
+import { valorantAgents } from '../../../static/data/valorantAgents';
 
 // 構成作成コマンド
 export const makeCompositionCommand = {

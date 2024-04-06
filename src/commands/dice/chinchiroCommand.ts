@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { getRandomInt } from '../../events/getRandomInt';
+import { generateRandomNum } from '../../events/generateRandomNum';
 import { chinchiro456Message, chinchiroMessage } from '../../events/embedMessage';
 import { createImage } from '../../events/createConcatImage';
 import { exportChinchiroResult } from '../../events/exportChinchiroResult';
@@ -22,7 +22,7 @@ export const chinchiroCommand = {
 
       if (!isCheat) {
         const randomIndexArray: number[] = await Promise.all(
-          Array.from({ length: 3 }, async () => await getRandomInt(1, 6))
+          Array.from({ length: 3 }, async () => await generateRandomNum(1, 6))
         );
         const diceImagePaths: string[] = [];
 
@@ -39,6 +39,8 @@ export const chinchiroCommand = {
         // メッセージを作成・送信
         const embed = chinchiroMessage(result);
         await interaction.editReply(embed);
+
+        // イカサマモード
       } else if (isCheat) {
         // メッセージを作成・送信
         const embed = chinchiro456Message();
