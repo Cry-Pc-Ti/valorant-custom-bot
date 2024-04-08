@@ -27,7 +27,7 @@ export const chinchiroCommand = {
         const diceImagePaths: string[] = [];
 
         for (const randomIndex of randomIndexArray) {
-          diceImagePaths.push(`img/dice/dice_${randomIndex}.png`);
+          diceImagePaths.push(`static/img/dice/dice_${randomIndex}.png`);
         }
 
         // サイコロの画像を作成
