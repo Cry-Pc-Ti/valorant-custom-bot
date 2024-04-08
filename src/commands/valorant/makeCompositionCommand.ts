@@ -150,7 +150,7 @@ export const makeCompositionCommand = {
         for (const agentRole in composition) {
           if (agentRole !== 'ban') {
             for (const agent of composition[agentRole as keyof CompositionData]) {
-              imagePaths.push(`img/agents/${agent.id}_icon.png`);
+              imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
             }
           }
         }
@@ -303,7 +303,7 @@ export const makeCompositionCommand = {
           for (const agentRole in composition) {
             if (agentRole !== 'ban') {
               for (const agent of composition[agentRole as keyof CompositionData]) {
-                imagePaths.push(`img/agents/${agent.id}_icon.png`);
+                imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
               }
             }
           }
@@ -317,7 +317,7 @@ export const makeCompositionCommand = {
       }
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
-      console.error(`autoCompositionCommandでエラーが発生しました : ${error}`);
+      console.error(`makeCompositionCommandでエラーが発生しました : ${error}`);
     }
   },
 };

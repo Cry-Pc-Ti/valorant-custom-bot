@@ -18,11 +18,11 @@ export const agentMessage = (agent: AgentData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embedMessage],
@@ -40,7 +40,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   // デュエリストが選択されている場合、フィールドを追加
@@ -103,8 +103,8 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const concatImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embed],
@@ -123,11 +123,11 @@ export const mapMessage = (map: MapData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const imageAttachment = new AttachmentBuilder(`img/maps/${map.id}.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const imageAttachment = new AttachmentBuilder(`static/img/valorant_maps/${map.id}.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
 };
@@ -141,7 +141,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   if (memberAllocation.attack.length) {
@@ -167,7 +167,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     });
   }
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds, fotterAttachment };
 };
@@ -184,10 +184,10 @@ export const diceMessage = (randomIndex: number) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embeds], files: [fotterAttachment] };
 };
@@ -205,10 +205,10 @@ export const chinchiroMessage = (result: string) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
+  const concatImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
 
   return { embeds: [embeds], files: [concatImageAttachment] };
 };
@@ -225,10 +225,10 @@ export const chinchiro456Message = () => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const ImageAttachment = new AttachmentBuilder('img/dice/456dice.png');
+  const ImageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
 
   return { embeds: [embeds], files: [ImageAttachment] };
 };
