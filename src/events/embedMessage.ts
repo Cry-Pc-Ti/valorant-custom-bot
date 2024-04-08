@@ -182,15 +182,9 @@ export const diceMessage = (randomIndex: number) => {
       name: 'ウィングマン的にはこの数字がいいにょ',
       value: `${randomIndex}`,
     })
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_icon.png',
-    });
+    .setTimestamp();
 
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
-
-  return { embeds: [embeds], files: [fotterAttachment] };
+  return { embeds: [embeds], files: [] };
 };
 
 //「/chinchiro」コマンドのメッセージを作成
@@ -203,26 +197,22 @@ export const chinchiroMessage = (result: string) => {
       value: '結果 ' + result,
     })
     .setImage('attachment://concat_image.png')
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
-    });
+    .setTimestamp();
+
     const ImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
 
     return { embeds: [embeds], files: [ImageAttachment] };
 };
 
 //「/playList」コマンドのメッセージを作成
-// TODO:setAuthorのiconURLを取得してくる（チャンネルのアイコン）
-export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number) => {
+export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: musicInfo.author.thumbnails})
+    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.musicImg})
     .setImage(musicInfo.musicImg)
-    .setTimestamp()
+    .setTimestamp();
 
     if(!musicCount && !maxMusicCount){
       embeds.setFooter({

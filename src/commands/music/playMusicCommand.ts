@@ -35,8 +35,6 @@ export const playMusicCommand = {
             if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
             if (!ytdl.validateURL(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
-            await interaction.deleteReply()
-
             //BOTをVCに接続
             const connection = joinVoiceChannel({
                 channelId: voiceChannelId,
@@ -57,23 +55,24 @@ export const playMusicCommand = {
                     url: musicDetails.videoDetails.author.channel_url,
                     channelID: musicDetails.videoDetails.author.id,
                     name: musicDetails.videoDetails.author.name,
-                    thumbnails: musicDetails.videoDetails.author.thumbnails ? musicDetails.videoDetails.author.thumbnails[0].url : musicDetails.videoDetails.thumbnails[0].url
+                    channelThumbnail: musicDetails.videoDetails.author.thumbnails ? musicDetails.videoDetails.author.thumbnails[0].url : musicDetails.videoDetails.thumbnails[0].url
                 }
             }
 
-            // メッセージ作成、送信
-            const embed = await musicInfoMessage(musicInfo);
-            interaction.channel?.send(embed);
+            // 音楽情報のメッセージ作成、送信
+            const embed = musicInfoMessage(musicInfo);
+            await interaction.editReply(embed);
             
-            // 再生
+            // BOTに音楽を流す
             await playMusic(player,musicInfo);
 
-            // 終了
+            // BOTをdiscordから切断
             interaction.editReply("再生完了！");
             connection.destroy();
 
         } catch (error) {
-            console.log(error)
+            await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+            console.error(`playMusicCommandでエラーが発生しました : ${error}`);
         }
     }
 }
