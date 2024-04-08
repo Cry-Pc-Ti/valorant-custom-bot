@@ -9,7 +9,6 @@ import { diceCommand } from './commands/dice/diceCommand';
 import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
 import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
 import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
-import { playListCommand } from './commands/music/playListMusicCommand';
 import { playMusicCommand } from './commands/music/playMusicCommand';
 
 // サーバーにコマンドを登録
@@ -26,7 +25,6 @@ const rest = new REST({ version: '10' }).setToken(token);
         makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
-        playListCommand.data,
         playMusicCommand.data,
       ],
     });
@@ -49,7 +47,6 @@ const commands = {
   [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
-  [playListCommand.data.name]: playListCommand,
   [playMusicCommand.data.name]: playMusicCommand,
 };
 
