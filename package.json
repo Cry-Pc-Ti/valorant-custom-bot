@@ -25,6 +25,7 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
+    "libsodium-wrappers": "^0.7.13",
     "sharp": "^0.33.3",
     "ytdl-core": "^4.11.5",
     "ytpl": "^2.3.0"
