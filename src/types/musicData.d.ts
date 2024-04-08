@@ -9,11 +9,5 @@ export interface YoutubeChannelInfo {
     url: string;
     channelID: string;
     name: string;
-    thumbnails: string;
+    channelThumbnail?: string;
 }
-//　使うかな
-// export interface  Thumbnails{
-//     url: string;
-//     width: number;
-//     height: number;
-// }

@@ -3,6 +3,8 @@ import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from "d
 import ytpl from "ytpl";
 import { playMusic } from "../../events/playMusic";
 import {  musicInfoMessage } from "../../events/embedMessage";
+import ytdl from "ytdl-core";
+;
 
 export const playListCommand = {
     // コマンドの設定
@@ -33,15 +35,12 @@ export const playListCommand = {
                 if (!voiceChannelId || !interaction.guildId) return interaction.editReply('ボイスチャンネルが見つかりません。');
                 if (!ytpl.validateID(url) || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('こちらの音楽は再生できません。');
 
-                interaction.deleteReply()
-
                 //URLからplayListを取得
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 //playListから音楽情報を取得しResource配列に格納
-                const musicInfoList: any[] =  playListInfo.items.map((item) => {
-                    //const musicDetails = await ytdl.getBasicInfo(item.url)
-                    return{
+                const musicInfoList: any[] = playListInfo.items.map((item) => {
+                    return {
                         url: item.url,
                         title: item.title,
                         musicImg: item.bestThumbnail.url,
@@ -49,7 +48,6 @@ export const playListCommand = {
                             url: item.author.name,
                             channelID: item.author.channelID,
                             name: item.author.name,
-                            //thumbnails: musicDetails.videoDetails.author.thumbnails ? musicDetails.videoDetails.author.thumbnails[0].url : item.bestThumbnail.url,
                         }
                     }
                 });
@@ -60,27 +58,31 @@ export const playListCommand = {
                     guildId: interaction.guildId,
                     adapterCreator: interaction.guild?.voiceAdapterCreator,
                     selfDeaf: true,
-                    selfMute: true
                 });
                 const player = createAudioPlayer();
                 connection.subscribe(player);
 
-                let messages:any;
-                let musicCount:number = 0;
-                for(const musicInfo of musicInfoList){
-                    // メッセージを作成
-                    const embed = await musicInfoMessage(musicInfo,++musicCount,musicInfoList.length);
-                    if(!messages) messages = interaction.channel?.send(embed);
-                    else messages.edit(embed);
-                    
+                // 修正するメッセージのIDを取得
+                const replyMessageId: string = (await interaction.fetchReply()).id;
+
+                // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
+                for(const [index,musicInfo] of musicInfoList.entries()){
+                    // TODO:もっときれいにできないか検討。42行目の処理だとうまくいかなくて、、
+                    // チャンネルアイコンを取得
+                    const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
+                    const embed = musicInfoMessage(musicInfo,index + 1,musicInfoList.length,channelThumbnail ? channelThumbnail[0].url : musicInfo.musicImg);
+                    if(index === 0) await interaction.editReply(embed);
+                    else interaction.channel?.messages.edit(replyMessageId,embed);
                     await playMusic(player,musicInfo);
                 }
-                // 終了
-                messages.edit("プレイリスト再生完了！")
+
+                // BOTをdiscordから切断
+                interaction.channel?.messages.edit(replyMessageId,"プレイリスト再生完了！");
                 connection.destroy();
 
         } catch (error) {
-            console.log(error)
+            await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+            console.error(`playListCommandでエラーが発生しました : ${error}`);
         }
     }
 }
