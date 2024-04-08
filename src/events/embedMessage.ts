@@ -1,6 +1,7 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../types/valorantData';
 import { MemberAllocationData } from '../types/memberData';
+import { MusicInfo } from '../types/musicData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -205,30 +206,33 @@ export const chinchiroMessage = (result: string) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_icon.png',
+      iconURL: 'attachment://valorant_logo.png',
     });
+    const ImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
 
-  const concatImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
-
-  return { embeds: [embeds], files: [concatImageAttachment] };
+    return { embeds: [embeds], files: [ImageAttachment] };
 };
 
-export const chinchiro456Message = () => {
+//「/playList」コマンドのメッセージを作成
+// TODO:setAuthorのiconURLを取得してくる（チャンネルのアイコン）
+export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('チンチロバトルじゃ！')
-    .setFields({
-      name: 'ざわ…ざわ…',
-      value: '456賽だっ...!!',
-    })
-    .setImage('attachment://456dice.png')
+    .setTitle(musicInfo.title)
+    .setURL(musicInfo.url)
+    .setAuthor({ name: musicInfo.author.name, iconURL: musicInfo.author.thumbnails})
+    .setImage(musicInfo.musicImg)
     .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_icon.png',
-    });
 
-  const ImageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
+    if(!musicCount && !maxMusicCount){
+      embeds.setFooter({
+        text: '音楽情報',
+      });
+    } else {
+      embeds.setFooter({
+        text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+      });
+    }
 
-  return { embeds: [embeds], files: [ImageAttachment] };
+  return { embeds: [embeds], files: [] };
 };
