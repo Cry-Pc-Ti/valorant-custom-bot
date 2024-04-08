@@ -210,7 +210,7 @@ export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMus
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.musicImg})
+    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail})
     .setImage(musicInfo.musicImg)
     .setTimestamp();
 
