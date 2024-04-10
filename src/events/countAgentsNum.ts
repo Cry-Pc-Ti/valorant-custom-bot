@@ -1,4 +1,4 @@
-import { valorantAgents } from '../data/valorantAgents';
+import { valorantAgents } from './readJsonData';
 
 export const countAgentsByRole = (role: string) => {
   const roleByAgentsNum = valorantAgents.filter((agent) => agent.role === role).length;
