@@ -205,7 +205,7 @@ export const chinchiroMessage = (result: string) => {
 };
 
 //「/playList」コマンドのメッセージを作成
-export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string) => {
+export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string | null) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
