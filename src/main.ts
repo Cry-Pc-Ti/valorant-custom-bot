@@ -1,6 +1,6 @@
 // モジュールをインポート
 import { Interaction, REST, Routes } from 'discord.js';
-import { clientId, guildId, discord, token } from '../src/modules/discordModule';
+import { clientId, discord, token } from '../src/modules/discordModule';
 
 // コマンドをインポート
 import { agentPickCommand } from './commands/valorant/agentPickCommand';
@@ -16,7 +16,7 @@ const rest = new REST({ version: '10' }).setToken(token);
   try {
     console.log('サーバーにコマンドを登録中...');
 
-    await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+    await rest.put(Routes.applicationCommands(clientId), {
       body: [
         agentPickCommand.data,
         chinchiroCommand.data,
