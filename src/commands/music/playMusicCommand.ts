@@ -46,7 +46,7 @@ export const playMusicCommand = {
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 //playListから音楽情報を取得しResource配列に格納
-                const musicInfoList: any[] = playListInfo.items.map((item) => {
+                const musicInfoList: MusicInfo[] = playListInfo.items.map((item) => {
                     return {
                         url: item.url,
                         title: item.title,
@@ -77,7 +77,7 @@ export const playMusicCommand = {
                     // TODO:もっときれいにできないか検討。42行目の処理だとうまくいかなくて、、
                     // チャンネルアイコンを取得
                     const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-                    const embed = musicInfoMessage(musicInfo,index + 1,musicInfoList.length,channelThumbnail ? channelThumbnail[0].url : musicInfo.musicImg);
+                    const embed = musicInfoMessage(musicInfo,index + 1,musicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null);
                     if(index === 0) await interaction.editReply(embed);
                     else interaction.channel?.messages.edit(replyMessageId,embed);
                     await playMusic(player,musicInfo);
@@ -124,8 +124,12 @@ export const playMusicCommand = {
                 interaction.editReply("再生完了！");
                 connection.destroy();
             }
-        } catch (error) {
-            await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+        } catch (error ) {
+            if(error == 'Error: Status code: 410'){
+                console.error(`playMusicCommandでエラーが発生しました : ${error}`);
+                return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
+            }
+            await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
             console.error(`playMusicCommandでエラーが発生しました : ${error}`);
         }
     }

@@ -1,7 +1,7 @@
 export interface MusicInfo {
     url: string;
     title: string;
-    musicImg:  string;
+    musicImg:  string | null;
     author: YoutubeChannelInfo;
 }
 
