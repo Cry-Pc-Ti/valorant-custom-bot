@@ -1,5 +1,7 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData } from '../types/valorantData';
+import { MemberAllocationData } from '../types/memberData';
+import { MusicInfo } from '../types/musicData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -17,11 +19,11 @@ export const agentMessage = (agent: AgentData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embedMessage],
@@ -39,7 +41,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   // デュエリストが選択されている場合、フィールドを追加
@@ -102,8 +104,8 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const concatImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embed],
@@ -122,11 +124,11 @@ export const mapMessage = (map: MapData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const imageAttachment = new AttachmentBuilder(`img/maps/${map.id}.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const imageAttachment = new AttachmentBuilder(`static/img/valorant_maps/${map.id}.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
 };
@@ -140,7 +142,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   if (memberAllocation.attack.length) {
@@ -166,7 +168,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     });
   }
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds, fotterAttachment };
 };
@@ -180,15 +182,9 @@ export const diceMessage = (randomIndex: number) => {
       name: 'ウィングマン的にはこの数字がいいにょ',
       value: `${randomIndex}`,
     })
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
-    });
+    .setTimestamp();
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
-
-  return { embeds: [embeds], files: [fotterAttachment] };
+  return { embeds: [embeds], files: [] };
 };
 
 //「/chinchiro」コマンドのメッセージを作成
@@ -201,13 +197,32 @@ export const chinchiroMessage = (result: string) => {
       value: `${result}`,
     })
     .setImage('attachment://concat_image.png')
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
-    });
+    .setTimestamp();
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
+    const ImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
 
-  return { embeds: [embeds], files: [concatImageAttachment] };
+    return { embeds: [embeds], files: [ImageAttachment] };
+};
+
+//「/playList」コマンドのメッセージを作成
+export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string) => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(musicInfo.title)
+    .setURL(musicInfo.url)
+    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail})
+    .setImage(musicInfo.musicImg)
+    .setTimestamp();
+
+    if(!musicCount && !maxMusicCount){
+      embeds.setFooter({
+        text: '音楽情報',
+      });
+    } else {
+      embeds.setFooter({
+        text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+      });
+    }
+
+  return { embeds: [embeds], files: [] };
 };
