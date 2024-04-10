@@ -21,7 +21,7 @@ export const playMusicCommand = {
         .addStringOption((option) =>
         option
             .setName('url')
-            .setDescription('再生したいURLを指定')
+            .setDescription('再生したいURLを入力（プレイリストも可）')
             .setRequired(true)
         )
         .toJSON(),
