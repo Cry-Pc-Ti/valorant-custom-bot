@@ -1,5 +1,7 @@
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import fs from 'fs';
+
+registerFont('./static/fonts/Yomogi-Regular.ttf', { family: 'Yomogi' });
 
 const addTextToImage = async (imagePath: string, text: string, outputPath: string): Promise<void> => {
   const image = await loadImage(imagePath);
@@ -8,10 +10,10 @@ const addTextToImage = async (imagePath: string, text: string, outputPath: strin
 
   context.drawImage(image, 0, 0, image.width, image.height);
 
-  context.fillStyle = 'white';
-  context.font = '256px Arial';
+  context.fillStyle = 'black';
+  context.font = '256px Yomogi';
   context.textAlign = 'center';
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
+  context.fillText(text, canvas.width / 2, canvas.height / 3.6);
 
   const outputStream = fs.createWriteStream(outputPath);
   const stream = canvas.createPNGStream();
@@ -24,8 +26,8 @@ const addTextToImage = async (imagePath: string, text: string, outputPath: strin
 };
 
 const main = async () => {
-  const imagePath = './static/img/icon/valorant_icon.png';
-  const text = '1';
+  const imagePath = './static/img/dice/wingman.png';
+  const text = '99';
   const outputPath = 'output_image.png';
 
   await addTextToImage(imagePath, text, outputPath);
