@@ -1,4 +1,4 @@
-import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../types/valorantData';
 import { MemberAllocationData } from '../types/memberData';
 import { MusicInfo } from '../types/musicData';
@@ -205,14 +205,29 @@ export const chinchiroMessage = (result: string) => {
 };
 
 //「/playList」コマンドのメッセージを作成
-export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string | null) => {
+export const musicInfoMessage = (musicInfo: MusicInfo,buttonRow: ActionRowBuilder<ButtonBuilder>,musicCount?: number,maxMusicCount?: number,channelThumbnail?: string | null) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail})
     .setImage(musicInfo.musicImg)
     .setTimestamp();
+
+    if(channelThumbnail){
+      embeds.setAuthor({ 
+        name: musicInfo.author.name, 
+        iconURL: channelThumbnail
+      })
+    }else if(musicInfo.author.channelThumbnail){
+      embeds.setAuthor({ 
+        name: musicInfo.author.name, 
+        iconURL: musicInfo.author.channelThumbnail
+      })
+    }else{
+      embeds.setAuthor({ 
+        name: musicInfo.author.name
+      })
+    }
 
     if(!musicCount && !maxMusicCount){
       embeds.setFooter({
@@ -224,5 +239,5 @@ export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMus
       });
     }
 
-  return { embeds: [embeds], files: [] };
+  return { embeds: [embeds], files: [],components: [buttonRow]};
 };

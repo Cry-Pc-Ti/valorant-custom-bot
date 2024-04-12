@@ -1,4 +1,5 @@
 export interface MusicInfo {
+    songIndex: number;
     url: string;
     title: string;
     musicImg:  string | null;
@@ -9,5 +10,5 @@ export interface YoutubeChannelInfo {
     url: string;
     channelID: string;
     name: string;
-    channelThumbnail?: string;
+    channelThumbnail?: string  | null;
 }
