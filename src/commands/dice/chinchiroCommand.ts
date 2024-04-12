@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { getRandomInt } from '../events/getRandomInt';
-import { chinchiroMessage } from '../events/embedMessage';
-import { createImage } from '../events/createConcatImage';
-import { exportChinchiroResult } from '../events/exportChinchiroResult';
+import { createConcatImage } from '../../events/createConcatImage';
+import { exportChinchiroResult } from '../../events/exportChinchiroResult';
+import { chinchiroMessage } from '../../events/embedMessage';
+import { generateRandomNum } from '../../events/generateRandomNum';
 
 // チンチロリンコマンド
 export const chinchiroCommand = {
@@ -22,16 +22,16 @@ export const chinchiroCommand = {
 
       if (!isCheat) {
         const randomIndexArray: number[] = await Promise.all(
-          Array.from({ length: 3 }, async () => await getRandomInt(1, 6))
+          Array.from({ length: 3 }, async () => await generateRandomNum(1, 6))
         );
         const diceImagePaths: string[] = [];
 
         for (const randomIndex of randomIndexArray) {
-          diceImagePaths.push(`img/dice/dice_${randomIndex}.png`);
+          diceImagePaths.push(`static/img/dice/dice_${randomIndex}.png`);
         }
 
         // サイコロの画像を作成
-        await createImage(diceImagePaths);
+        await createConcatImage(diceImagePaths);
 
         // サイコロを振った結果を出力
         const result = await exportChinchiroResult(randomIndexArray);
@@ -45,11 +45,11 @@ export const chinchiroCommand = {
         const diceImagePaths: string[] = [];
 
         for (const randomIndex of [4, 5, 6]) {
-          diceImagePaths.push(`img/dice/dice_${randomIndex}.png`);
+          diceImagePaths.push(`static/img/dice/dice_${randomIndex}.png`);
         }
 
         // サイコロの画像を作成
-        await createImage(diceImagePaths);
+        await createConcatImage(diceImagePaths);
 
         // メッセージを作成・送信
         const embed = chinchiroMessage('456賽だっ...!');
