@@ -54,7 +54,7 @@ export const playMusicCommand = {
             const stopPlayMusicButton = new ButtonBuilder()
                 .setCustomId(`stopPlayMusicButton_${uniqueId}`)
                 .setStyle(ButtonStyle.Secondary)
-                .setLabel("一時停止")
+                .setLabel("停止")
                 .setEmoji("⏸");
             
             // BOTをVCに接続
@@ -66,6 +66,7 @@ export const playMusicCommand = {
             });
             const player = createAudioPlayer();
             connection.subscribe(player);
+            player.setMaxListeners(2);
 
             if(playListFlag){
                 //プレイリストの場合
@@ -100,7 +101,7 @@ export const playMusicCommand = {
                 // 再生している曲のindexを取得
                 let songIndex: number;
 
-                //「前の曲へ」ボタン
+                // 「前の曲へ」ボタン
                 const prevPlayMusicButton = new ButtonBuilder()
                     .setCustomId(`prevPlayMusicButton_${uniqueId}`)
                     .setStyle(ButtonStyle.Secondary)
@@ -135,12 +136,16 @@ export const playMusicCommand = {
                     // 次の曲へボタン押下時の処理
                     if(buttonInteraction.customId === `nextPlayMusicButton_${uniqueId}`){
                         player.stop();
-                        const nextMusicInfoList: MusicInfo[] = originMusicInfoList.filter((musicInfo)=>{
-                            return musicInfo.songIndex > songIndex
-                        });
+
+                        // 該当の音楽のリストを取得
+                        const nextMusicInfoList: MusicInfo[] = originMusicInfoList.filter(musicInfo => musicInfo.songIndex > songIndex );
+
                         for(const musicInfo of nextMusicInfoList){
+                            player.stop();
                             console.log(musicInfo.songIndex + '曲目')
+                            // 曲のindexを格納
                             songIndex = musicInfo.songIndex
+                            // チャンネルアイコンを取得
                             const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
                             const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null );
                             interaction.channel?.messages.edit(replyMessageId,embed);
@@ -175,13 +180,16 @@ export const playMusicCommand = {
                         }else if(player.state.status === AudioPlayerStatus.Paused){
                             player.unpause();
                             stopPlayMusicButton
-                                .setLabel("一時停止")
+                                .setLabel("停止")
                                 .setEmoji("⏸");
                             interaction.channel?.messages.edit(replyMessageId,{components:[buttonRow]});
                         }
                     }
                     return
                 } catch (error) {
+                    if(error === 'DiscordAPIError[10062]: Unknown interaction'){
+                        return
+                    }
                     console.error(error);
                     await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
                 }
@@ -189,7 +197,6 @@ export const playMusicCommand = {
 
                 // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
                 for(const musicInfo of originMusicInfoList){
-                    // TODO:もっときれいにできないか検討。42行目の処理だとうまくいかなくて、、
                     // チャンネルアイコンを取得
                     songIndex = musicInfo.songIndex;
                     const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
@@ -273,7 +280,7 @@ export const playMusicCommand = {
                 connection.destroy();
             }
         } catch (error ) {
-            if(error == 'Error: Status code: 410'){
+            if(error == 'Error: Status code: 410') {
                 console.error(`playMusicCommandでエラーが発生しました : ${error}`);
                 return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
             }
