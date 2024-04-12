@@ -5,7 +5,7 @@ export const exportChinchiroResult = async (randomIndexArray: number[]) => {
   const arrayString = `${randomIndexArray[0]}, ${randomIndexArray[1]}, ${randomIndexArray[2]}`;
 
   switch (true) {
-    case isAllIncludes(randomIndexArray, [1, 1, 1]):
+    case isAllIncludes(randomIndexArray, [1]):
       result = `ピンゾロ : ${arrayString}`;
       break;
 
@@ -13,7 +13,9 @@ export const exportChinchiroResult = async (randomIndexArray: number[]) => {
       result = `アラシ : ${randomIndexArray[0]}`;
       break;
 
-    case isAllIncludes(randomIndexArray, [4, 5, 6]):
+    case isAllIncludes(randomIndexArray, [4]) &&
+      isAllIncludes(randomIndexArray, [5]) &&
+      isAllIncludes(randomIndexArray, [6]):
       result = `シゴロ : ${arrayString}`;
       break;
 
@@ -34,7 +36,7 @@ export const exportChinchiroResult = async (randomIndexArray: number[]) => {
       break;
 
     default:
-      result = `役なし : ${arrayString}`;
+      result = `目なし : ${arrayString}`;
       break;
   }
 

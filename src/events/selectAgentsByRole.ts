@@ -1,4 +1,4 @@
-import { AgentData, CompositionData } from '../types/valorantAgentData';
+import { AgentData, CompositionData } from '../types/valorantData';
 
 // 各ロールのエージェントを指定された人数分ランダムに選択 (重複なし)
 export const selectAgentsByRole = (

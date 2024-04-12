@@ -1,5 +1,7 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { AgentData, CompositionData, MapData, MemberAllocationData } from '../types/valorantAgentData';
+import { AgentData, CompositionData, MapData } from '../types/valorantData';
+import { MemberAllocationData } from '../types/memberData';
+import { MusicInfo } from '../types/musicData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -17,11 +19,11 @@ export const agentMessage = (agent: AgentData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const thumbnailAttachment = new AttachmentBuilder(`img/agents/${agent.id}_icon.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embedMessage],
@@ -35,11 +37,11 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
-    .setImage('attachment://concat_image.png')
+    .setImage('attachment://generate_image.png')
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   // デュエリストが選択されている場合、フィールドを追加
@@ -102,8 +104,8 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const concatImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
     embeds: [embed],
@@ -122,11 +124,11 @@ export const mapMessage = (map: MapData) => {
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
-  const imageAttachment = new AttachmentBuilder(`img/maps/${map.id}.png`);
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const imageAttachment = new AttachmentBuilder(`static/img/valorant_maps/${map.id}.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
 };
@@ -140,7 +142,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+      iconURL: 'attachment://valorant_icon.png',
     });
 
   if (memberAllocation.attack.length) {
@@ -166,48 +168,65 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     });
   }
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds, fotterAttachment };
 };
 
 //「/dice」コマンドのメッセージを作成
-export const diceMessage = (randomIndex: number) => {
-  const embeds = new EmbedBuilder()
+export const diceMessage = () => {
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Number')
-    .setFields({
-      name: 'ウィングマン的にはこの数字がいいにょ',
-      value: `${randomIndex}`,
-    })
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
-    });
+    .setTitle('わらわが選んだのはこの数字じゃ！')
+    .setImage('attachment://generate_image.png')
+    .setTimestamp();
 
-  const fotterAttachment = new AttachmentBuilder(`img/logo/valorant_logo.png`);
+  const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
 
-  return { embeds: [embeds], files: [fotterAttachment] };
+  return { embeds: [embed], files: [imageAttachment] };
 };
 
 //「/chinchiro」コマンドのメッセージを作成
 export const chinchiroMessage = (result: string) => {
-  const embeds = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('チンチロバトルじゃ！')
     .setFields({
       name: 'ざわ…ざわ…',
       value: `${result}`,
     })
-    .setImage('attachment://concat_image.png')
-    .setTimestamp()
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_logo.png',
+    .setImage('attachment://generate_image.png')
+    .setTimestamp();
+
+  const ImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+
+  return { embeds: [embed], files: [ImageAttachment] };
+};
+
+//「/playList」コマンドのメッセージを作成
+export const musicInfoMessage = (
+  musicInfo: MusicInfo,
+  musicCount?: number,
+  maxMusicCount?: number,
+  channelThumbnail?: string
+) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(musicInfo.title)
+    .setURL(musicInfo.url)
+    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail })
+    .setImage(musicInfo.musicImg)
+    .setTimestamp();
+
+  if (!musicCount && !maxMusicCount) {
+    embed.setFooter({
+      text: '音楽情報',
     });
+  } else {
+    embed.setFooter({
+      text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+    });
+  }
 
-  const concatImageAttachment = new AttachmentBuilder('img/concat_image.png');
-
-  return { embeds: [embeds], files: [concatImageAttachment] };
+  return { embeds: [embed], files: [] };
 };
