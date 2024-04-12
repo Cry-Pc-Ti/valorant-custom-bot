@@ -3,6 +3,7 @@ import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { valorantMaps } from '../../events/readJsonData';
 import { mapMessage } from '../../events/embedMessage';
 import { MapData } from '../../types/valorantData';
+import { generateRandomNum } from '../../events/generateRandomNum';
 
 // マップ選択コマンド
 export const mapSelectCommand = {
@@ -14,8 +15,9 @@ export const mapSelectCommand = {
     await interaction.deferReply();
 
     try {
+
       // マップをランダムに選択
-      const randomMap: MapData = valorantMaps[Math.floor(Math.random() * valorantMaps.length)];
+      const randomMap: MapData = valorantMaps[generateRandomNum(0,valorantMaps.length)];
 
       // メッセージを作成
       const embed = mapMessage(randomMap);
