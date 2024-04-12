@@ -24,6 +24,11 @@ export const playMusicCommand = {
             .setDescription('再生したいURLを入力（プレイリストも可）')
             .setRequired(true)
         )
+        .addBooleanOption((option) =>
+            option
+                .setName('shuffle')
+                .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
+            )
         .toJSON(),
 
     execute: async (interaction: ChatInputCommandInteraction) => {
@@ -32,6 +37,7 @@ export const playMusicCommand = {
 
             const url = interaction.options.getString('url') ?? ""
             const voiceChannelId = interaction.options.getChannel('channel')?.id
+            const shuffleFlag: boolean = interaction.options.getBoolean('shuffle') ?? false;
 
             if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator) return interaction.editReply('ボイスチャンネルが見つかりません。');
 
@@ -67,6 +73,12 @@ export const playMusicCommand = {
                 //URLからplayList情報を取得
                 const playListInfo = await ytpl(url, { pages: 1 });
 
+                // shuffleFlagがtrueの場合配列をシャッフル
+                if(shuffleFlag){
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    playListInfo.items.sort((_a, _b) => 0.5 - Math.random())
+                }
+                
                 //playListからMusicInfo配列に格納
                 const originMusicInfoList: MusicInfo[] = playListInfo.items.map((item, index) => {
                     return {
