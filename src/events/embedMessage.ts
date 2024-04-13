@@ -1,4 +1,4 @@
-import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../types/valorantData';
 import { MemberAllocationData } from '../types/memberData';
 import { MusicInfo } from '../types/musicData';
@@ -212,28 +212,44 @@ export const chinchiroMessage = (result: string) => {
 
 //「/playList」コマンドのメッセージを作成
 export const musicInfoMessage = (
-  musicInfo: MusicInfo,
-  musicCount?: number,
-  maxMusicCount?: number,
-  channelThumbnail?: string
-) => {
-  const embed = new EmbedBuilder()
+    musicInfo: MusicInfo,
+    buttonRow: ActionRowBuilder<ButtonBuilder>,
+    musicCount?: number,
+    maxMusicCount?: number,
+    channelThumbnail?: string | null
+  ) => {
+  const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail })
     .setImage(musicInfo.musicImg)
     .setTimestamp();
 
-  if (!musicCount && !maxMusicCount) {
-    embed.setFooter({
-      text: '音楽情報',
-    });
-  } else {
-    embed.setFooter({
-      text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
-    });
-  }
+    if(channelThumbnail){
+      embeds.setAuthor({ 
+        name: musicInfo.author.name, 
+        iconURL: channelThumbnail
+      })
+    }else if(musicInfo.author.channelThumbnail){
+      embeds.setAuthor({ 
+        name: musicInfo.author.name, 
+        iconURL: musicInfo.author.channelThumbnail
+      })
+    }else{
+      embeds.setAuthor({ 
+        name: musicInfo.author.name
+      })
+    }
 
-  return { embeds: [embed], files: [] };
+    if(!musicCount && !maxMusicCount){
+      embeds.setFooter({
+        text: '音楽情報',
+      });
+    } else {
+      embeds.setFooter({
+        text: '音楽情報・' + musicCount + '/' + maxMusicCount,
+      });
+    }
+
+  return { embeds: [embeds] ,components: [buttonRow]};
 };
