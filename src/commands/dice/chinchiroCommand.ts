@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { createImage } from '../../events/createConcatImage';
+import { createConcatImage } from '../../events/createConcatImage';
 import { exportChinchiroResult } from '../../events/exportChinchiroResult';
 import { chinchiroMessage } from '../../events/embedMessage';
 import { generateRandomNum } from '../../events/generateRandomNum';
@@ -31,7 +31,7 @@ export const chinchiroCommand = {
         }
 
         // サイコロの画像を作成
-        await createImage(diceImagePaths);
+        await createConcatImage(diceImagePaths);
 
         // サイコロを振った結果を出力
         const result = await exportChinchiroResult(randomIndexArray);
@@ -39,8 +39,9 @@ export const chinchiroCommand = {
         // メッセージを作成・送信
         const embed = chinchiroMessage(result);
         await interaction.editReply(embed);
-      } else if (isCheat) {
+
         // イカサマモード
+      } else if (isCheat) {
         const diceImagePaths: string[] = [];
 
         for (const randomIndex of [4, 5, 6]) {
@@ -48,7 +49,7 @@ export const chinchiroCommand = {
         }
 
         // サイコロの画像を作成
-        await createImage(diceImagePaths);
+        await createConcatImage(diceImagePaths);
 
         // メッセージを作成・送信
         const embed = chinchiroMessage('456賽だっ...!');
@@ -60,4 +61,3 @@ export const chinchiroCommand = {
     }
   },
 };
-

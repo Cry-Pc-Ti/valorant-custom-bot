@@ -37,7 +37,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
-    .setImage('attachment://concat_image.png')
+    .setImage('attachment://generate_image.png')
     .setTimestamp()
     .setFooter({
       text: 'VALORANT',
@@ -104,7 +104,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
+  const concatImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
@@ -174,55 +174,66 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
 };
 
 //「/dice」コマンドのメッセージを作成
-export const diceMessage = (randomIndex: number) => {
-  const embeds = new EmbedBuilder()
+export const diceMessage = (message: string, number: number) => {
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Number')
-    .setFields({
-      name: 'ウィングマン的にはこの数字がいいにょ',
-      value: `${randomIndex}`,
-    })
-    .setTimestamp();
+    .setAuthor({ name: message, iconURL: 'attachment://gekko_icon.png' })
+    .setDescription(`出た数字は${number}だよ～`)
+    .setThumbnail('attachment://generate_image.png')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_icon.png',
+    });
 
-  return { embeds: [embeds], files: [] };
+  const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
+  const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+
+  return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
 //「/chinchiro」コマンドのメッセージを作成
 export const chinchiroMessage = (result: string) => {
-  const embeds = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('チンチロバトルじゃ！')
     .setFields({
       name: 'ざわ…ざわ…',
-      value: '結果 ' + result,
+      value: `${result}`,
     })
-    .setImage('attachment://concat_image.png')
+    .setImage('attachment://generate_image.png')
     .setTimestamp();
 
-    const ImageAttachment = new AttachmentBuilder('static/img/concat_image.png');
+  const ImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
 
-    return { embeds: [embeds], files: [ImageAttachment] };
+  return { embeds: [embed], files: [ImageAttachment] };
 };
 
 //「/playList」コマンドのメッセージを作成
-export const musicInfoMessage = (musicInfo: MusicInfo,musicCount?: number,maxMusicCount?: number,channelThumbnail?:string) => {
-  const embeds = new EmbedBuilder()
+export const musicInfoMessage = (
+  musicInfo: MusicInfo,
+  musicCount?: number,
+  maxMusicCount?: number,
+  channelThumbnail?: string
+) => {
+  const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
     .setURL(musicInfo.url)
-    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail})
+    .setAuthor({ name: musicInfo.author.name, iconURL: channelThumbnail ?? musicInfo.author.channelThumbnail })
     .setImage(musicInfo.musicImg)
     .setTimestamp();
 
-    if(!musicCount && !maxMusicCount){
-      embeds.setFooter({
-        text: '音楽情報',
-      });
-    } else {
-      embeds.setFooter({
-        text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
-      });
-    }
+  if (!musicCount && !maxMusicCount) {
+    embed.setFooter({
+      text: '音楽情報',
+    });
+  } else {
+    embed.setFooter({
+      text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+    });
+  }
 
-  return { embeds: [embeds], files: [] };
+  return { embeds: [embed], files: [] };
 };

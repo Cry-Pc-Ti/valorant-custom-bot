@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { selectAgentsByRole } from '../../events/selectAgentsByRole';
 import { countAgentsByRole, countBanAgentsByRole } from '../../events/countAgentsNum';
-import { createImage } from '../../events/createConcatImage';
+import { createConcatImage } from '../../events/createConcatImage';
 import { compositionMessage } from '../../events/embedMessage';
 import { AgentData, CompositionData } from '../../types/valorantData';
 import { valorantAgents } from '../../events/readJsonData';
@@ -155,7 +155,7 @@ export const makeCompositionCommand = {
           }
         }
         // 画像を作成
-        await createImage(imagePaths);
+        await createConcatImage(imagePaths);
 
         // メッセージを作成
         const embedMessage: {
@@ -308,7 +308,7 @@ export const makeCompositionCommand = {
             }
           }
           // 画像を作成
-          await createImage(imagePaths);
+          await createConcatImage(imagePaths);
 
           // メッセージを作成・送信
           const embed = compositionMessage(composition, banAgents);
