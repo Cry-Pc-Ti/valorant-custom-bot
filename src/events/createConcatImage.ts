@@ -2,10 +2,10 @@ import fs from 'fs';
 import sharp, { OverlayOptions } from 'sharp';
 
 // 画像を連結し1枚の画像にまとめる
-export const createImage = async (imagePaths: string[]) => {
+export const createConcatImage = async (imagePaths: string[]) => {
   // 既存の画像を削除
-  if (fs.existsSync('static/img/concat_image.png')) {
-    fs.unlinkSync('static/img/concat_image.png');
+  if (fs.existsSync('static/img/generate_image.png')) {
+    fs.unlinkSync('static/img/generate_image.png');
   }
 
   // 画像を読み込む
@@ -40,7 +40,7 @@ export const createImage = async (imagePaths: string[]) => {
           })
         )
       )
-      .toFile('static/img/concat_image.png');
+      .toFile('static/img/generate_image.png');
   } catch (error) {
     console.error(`画像の連結中にエラーが発生しました : ${error}`);
   }
