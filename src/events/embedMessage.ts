@@ -235,7 +235,7 @@ export const musicInfoMessage = (musicInfo: MusicInfo,buttonRow: ActionRowBuilde
       });
     } else {
       embeds.setFooter({
-        text: '音楽情報 ' + String(musicCount) + '/' + String(maxMusicCount),
+        text: '音楽情報・' + musicCount + '/' + maxMusicCount,
       });
     }
 

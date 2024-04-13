@@ -38,7 +38,7 @@ export const playMusicCommand = {
 
     execute: async (interaction: ChatInputCommandInteraction) => {
         await interaction.deferReply();
-        
+
         // 修正するメッセージのIDを取得
         const replyMessageId: string = (await interaction.fetchReply()).id;
 
