@@ -4,8 +4,13 @@ import fs from 'fs';
 // フォントを読み込む
 registerFont('./static/fonts/Yomogi-Regular.ttf', { family: 'Yomogi' });
 
-export const addTextToImage = async (num: number) => {
+export const addTextToImage = async (num: number): Promise<void> => {
   try {
+    // 既存の画像を削除
+    if (fs.existsSync('static/img/generate_image.png')) {
+      fs.unlinkSync('static/img/generate_image.png');
+    }
+
     // 数字によって画像パスを変更
     let imagePath = './static/img/wingman/wingman_';
 
@@ -30,13 +35,21 @@ export const addTextToImage = async (num: number) => {
 
     context.drawImage(image, 0, 0, image.width, image.height);
     context.fillStyle = 'black';
-    context.font = '198px "Yomogi"';
+    context.font = '120px "Yomogi"';
     context.textAlign = 'center';
-    context.fillText(num.toString(), canvas.width / 2, canvas.height / 4.5);
+    context.fillText(num.toString(), canvas.width / 2, canvas.height / 4.3);
 
     const outputStream = fs.createWriteStream('./static/img/generate_image.png');
     const stream = canvas.createPNGStream();
-    stream.pipe(outputStream);
+
+    await new Promise<void>((resolve, reject) => {
+      stream.pipe(outputStream);
+      stream.on('end', () => {
+        outputStream.end();
+        resolve();
+      });
+      stream.on('error', reject);
+    });
   } catch (error) {
     console.error(error);
   }
