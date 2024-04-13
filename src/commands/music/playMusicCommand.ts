@@ -9,32 +9,40 @@ import ytdl from "ytdl-core";
 export const playMusicCommand = {
     // コマンドの設定
     data: new SlashCommandBuilder()
-        .setName('play')
-        .setDescription('VCで音楽を流します。')
-        .addChannelOption((option) =>
-        option
-            .setName('channel')
-            .setDescription('音楽を流すチャンネルを選択')
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildVoice),
+        .setName('music')
+        .setDescription('音楽関連のコマンドです。')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('play')
+                .setDescription('VCで音楽を流します。')
+                .addChannelOption((option) =>
+                    option
+                        .setName('channel')
+                        .setDescription('音楽を流すチャンネルを選択')
+                        .setRequired(true)
+                        .addChannelTypes(ChannelType.GuildVoice),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('url')
+                        .setDescription('再生したいURLを入力（プレイリストも可）')
+                        .setRequired(true)
+                )
+                .addBooleanOption((option) =>
+                    option
+                        .setName('shuffle')
+                        .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
+                )
         )
-        .addStringOption((option) =>
-        option
-            .setName('url')
-            .setDescription('再生したいURLを入力（プレイリストも可）')
-            .setRequired(true)
-        )
-        .addBooleanOption((option) =>
-            option
-                .setName('shuffle')
-                .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
-            )
         .toJSON(),
 
     execute: async (interaction: ChatInputCommandInteraction) => {
-        try {
-            await interaction.deferReply();
+        await interaction.deferReply();
+        
+        // 修正するメッセージのIDを取得
+        const replyMessageId: string = (await interaction.fetchReply()).id;
 
+        try {
             const url = interaction.options.getString('url') ?? ""
             const voiceChannelId = interaction.options.getChannel('channel')?.id
             const shuffleFlag: boolean = interaction.options.getBoolean('shuffle') ?? false;
@@ -45,7 +53,7 @@ export const playMusicCommand = {
             let playListFlag: boolean = false;
             if(!ytdl.validateURL(url) &&  ytpl.validateID(url)) playListFlag = true;
             else if(!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
-            else if(!ytdl.validateURL(url) ||!ytpl.validateID(url)) return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
+            else if(!ytdl.validateURL(url) || !ytpl.validateID(url)) return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
             // DateをuniqueIdとして取得
             const uniqueId = Date.now();
@@ -94,9 +102,6 @@ export const playMusicCommand = {
                         }
                     }
                 });
-
-                // 修正するメッセージのIDを取得
-                const replyMessageId: string = (await interaction.fetchReply()).id;
 
                 // 再生している曲のindexを取得
                 let songIndex: number;
@@ -147,7 +152,7 @@ export const playMusicCommand = {
                             songIndex = musicInfo.songIndex
                             // チャンネルアイコンを取得
                             const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-                            const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null );
+                            const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null);
                             interaction.channel?.messages.edit(replyMessageId,embed);
                             await playMusic(player,musicInfo);
                         }
@@ -187,9 +192,7 @@ export const playMusicCommand = {
                     }
                     return
                 } catch (error) {
-                    if(error === 'DiscordAPIError[10062]: Unknown interaction'){
-                        return
-                    }
+                    if(error === 'DiscordAPIError[10062]: Unknown interaction') return
                     console.error(error);
                     await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
                 }
@@ -197,8 +200,8 @@ export const playMusicCommand = {
 
                 // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
                 for(const musicInfo of originMusicInfoList){
-                    // チャンネルアイコンを取得
                     songIndex = musicInfo.songIndex;
+                    // チャンネルアイコンを取得
                     const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
                     const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null);
                     if(musicInfo.songIndex === 1) await interaction.editReply(embed);
@@ -260,7 +263,7 @@ export const playMusicCommand = {
                             }else if(player.state.status === AudioPlayerStatus.Paused){
                                 player.unpause();
                                 stopPlayMusicButton
-                                    .setLabel("一時停止")
+                                    .setLabel("停止")
                                     .setEmoji("⏸");
                                 interaction.editReply({components:[buttonRow]});
                             }
@@ -279,7 +282,7 @@ export const playMusicCommand = {
                 interaction.editReply("再生完了！");
                 connection.destroy();
             }
-        } catch (error ) {
+        } catch (error) {
             if(error == 'Error: Status code: 410') {
                 console.error(`playMusicCommandでエラーが発生しました : ${error}`);
                 return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
