@@ -174,16 +174,23 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
 };
 
 //「/dice」コマンドのメッセージを作成
-export const diceMessage = () => {
+export const diceMessage = (message: string, number: number) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('わらわが選んだのはこの数字じゃ！')
-    .setImage('attachment://generate_image.png')
-    .setTimestamp();
+    .setAuthor({ name: message, iconURL: 'attachment://gekko_icon.png' })
+    .setDescription(`出た数字は${number}だよ～`)
+    .setThumbnail('attachment://generate_image.png')
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_icon.png',
+    });
 
+  const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
   const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  return { embeds: [embed], files: [imageAttachment] };
+  return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
 //「/chinchiro」コマンドのメッセージを作成

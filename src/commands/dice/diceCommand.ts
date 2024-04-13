@@ -14,11 +14,23 @@ export const diceCommand = {
       // 1から100までのランダムな数字を取得
       const randomNum = await generateRandomNum(1, 100);
 
+      let message = '';
+
+      if (randomNum >= 91 && randomNum <= 100) {
+        message = 'Qué padre！ やったぜウィング！';
+      } else if (randomNum >= 31 && randomNum <= 89) {
+        message = 'やるな！ウィング！';
+      } else if (randomNum >= 11 && randomNum <= 30) {
+        message = 'よくがんばった...！ ウィング！';
+      } else if (randomNum >= 1 && randomNum <= 10) {
+        message = 'それはないぜ... ウィング...';
+      }
+
       // 画像を作成
       await addTextToImage(randomNum);
 
       // メッセージを作成・送信
-      const embed = diceMessage();
+      const embed = diceMessage(message, randomNum);
       await interaction.editReply(embed);
     } catch (error) {
       await interaction.editReply('処理中にエラーが発生しました');
