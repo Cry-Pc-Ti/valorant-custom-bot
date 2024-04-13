@@ -74,7 +74,6 @@ export const playMusicCommand = {
             });
             const player = createAudioPlayer();
             connection.subscribe(player);
-            player.setMaxListeners(2);
 
             if(playListFlag){
                 //プレイリストの場合
@@ -140,14 +139,16 @@ export const playMusicCommand = {
                     }
                     // 次の曲へボタン押下時の処理
                     if(buttonInteraction.customId === `nextPlayMusicButton_${uniqueId}`){
+                        // playerを削除する。
                         player.stop();
+                        // Listenerをすべて削除する。
+                        player.removeAllListeners();
 
                         // 該当の音楽のリストを取得
                         const nextMusicInfoList: MusicInfo[] = originMusicInfoList.filter(musicInfo => musicInfo.songIndex > songIndex );
 
+                        // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
                         for(const musicInfo of nextMusicInfoList){
-                            player.stop();
-                            console.log(musicInfo.songIndex + '曲目')
                             // 曲のindexを格納
                             songIndex = musicInfo.songIndex
                             // チャンネルアイコンを取得
@@ -157,24 +158,28 @@ export const playMusicCommand = {
                             await playMusic(player,musicInfo);
                         }
                     }
-                    // // 前の曲へボタン押下時の処理
-                    // if(buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`){
-                    //     player.stop()
-                    //     const nextMusicInfoList: MusicInfo[] = originMusicInfoList.filter((musicInfo)=>{
-                    //         return musicInfo.songIndex > songIndex-1
-                    //     });
-                    //     console.log(nextMusicInfoList[0])
-                    //     for(const musicInfo of nextMusicInfoList){
-                    //         console.log(songIndex + '曲目')
-                    //         songIndex = musicInfo.songIndex
-                    //         const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-                    //         const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null );
-                    //         interaction.channel?.messages.edit(replyMessageId,embed);
-                    //         await playMusic(player,musicInfo);
-                    //     }
-                    // }
+                    // 前の曲へボタン押下時の処理
+                    if(buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`){
+                        // playerを削除する。
+                        player.stop();
+                        // Listenerをすべて削除する。
+                        player.removeAllListeners();
 
-                    // 再生/一時停止ボタン押下時
+                        // 該当の音楽のリストを取得
+                        const prevMusicInfoList: MusicInfo[] = originMusicInfoList.filter(musicInfo => musicInfo.songIndex >= songIndex - 1);
+
+                        // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
+                        for(const musicInfo of prevMusicInfoList){
+                            // 曲のindexを格納
+                            songIndex = musicInfo.songIndex
+                            // チャンネルアイコンを取得
+                            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
+                            const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null );
+                            interaction.channel?.messages.edit(replyMessageId,embed);
+                            await playMusic(player,musicInfo);
+                        }
+                    }
+                    // 再生/停止ボタン押下時
                     if(buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`){
                         if(player.state.status === AudioPlayerStatus.Playing){
                             player.pause();
@@ -191,10 +196,18 @@ export const playMusicCommand = {
                         }
                     }
                     return
-                } catch (error) {
-                    if(error === 'DiscordAPIError[10062]: Unknown interaction') return
-                    console.error(error);
-                    await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (e: any) {
+                    if(e.status == '401'){
+                        console.error(`playMusicCommandでエラーが発生しました : ${e.messages}`);
+                        return
+                    }else if(e.status == '404'){
+                        console.error(`playMusicCommandでエラーが発生しました : ${e.messages}`);
+                        interaction.channel?.messages.edit(replyMessageId,'ボタンをもう一度押してください');
+                        return
+                    }
+                    console.log(e)
+                    // await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
                 }
                 });
 
@@ -269,9 +282,13 @@ export const playMusicCommand = {
                             }
                         }
                         return
-                    } catch (error) {
-                        console.error(error);
-                        await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } catch (e: any) {
+                        if(e.status == '401'){
+                            console.error(`playMusicCommandでエラーが発生しました : ${e.messages}`);
+                            return
+                        }
+                        // await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
                     }
                 });
 
@@ -282,14 +299,18 @@ export const playMusicCommand = {
                 interaction.editReply("再生完了！");
                 connection.destroy();
             }
-        } catch (error) {
-            if(error == 'Error: Status code: 410') {
-                console.error(`playMusicCommandでエラーが発生しました : ${error}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+            if(e.status == '410') {
+                console.error(`playMusicCommandでエラーが発生しました : ${e}`);
                 return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
             }
+            if(e.status == '401') {
+                console.error(`playMusicCommandでエラーが発生しました : ${e}`);
+            }
             await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
-            console.log(error)
-            console.error(`playMusicCommandでエラーが発生しました : ${error}`);
+            console.log(e)
+            console.error(`playMusicCommandでエラーが発生しました : ${e}`);
         }
     }
 }
