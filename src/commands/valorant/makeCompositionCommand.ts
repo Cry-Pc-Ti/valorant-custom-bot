@@ -9,12 +9,12 @@ import {
   ComponentType,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { selectAgentsByRole } from '../../events/selectAgentsByRole';
-import { countAgentsByRole, countBanAgentsByRole } from '../../events/countAgentsNum';
-import { createConcatImage } from '../../events/createConcatImage';
-import { compositionMessage } from '../../events/embedMessage';
+import { selectAgentsByRole } from '../../events/valorant/selectAgentsByRole';
+import { countAgentsByRole, countBanAgentsByRole } from '../../events/valorant/countAgentsNum';
+import { createConcatImage } from '../../events/common/createConcatImage';
+import { compositionMessage } from '../../events/discord/embedMessage';
 import { AgentData, CompositionData } from '../../types/valorantData';
-import { valorantAgents } from '../../events/readJsonData';
+import { valorantAgents } from '../../events/common/readJsonData';
 
 // 構成作成コマンド
 export const makeCompositionCommand = {
