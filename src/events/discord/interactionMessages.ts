@@ -16,7 +16,7 @@ export const donePlayerInteractionEditMessages = async (
     interaction: ChatInputCommandInteraction,
     messageId: string
 ) => {
-    interaction.channel?.messages.edit(messageId,{embeds:[],components:[]})
+    interaction.channel?.messages.edit(messageId,{embeds:[],components:[],files:[]})
         .catch(() => {
             return;
         });
