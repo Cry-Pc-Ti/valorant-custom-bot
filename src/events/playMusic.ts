@@ -20,5 +20,11 @@ export const playMusic = async (player: AudioPlayer,musicInfo: MusicInfo) => {
     } catch (error) {
         console.error(error)
     }
-
 };
+
+export const deletePlayerInfo = async (player: AudioPlayer) => {
+        // playerを削除する。
+        player.stop();
+        // Listenerをすべて削除する。
+        player.removeAllListeners();
+}
