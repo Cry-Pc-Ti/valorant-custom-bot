@@ -25,7 +25,6 @@ export const botDisconnectCommand = {
             await interaction.editReply('BOTがVCにいません。');
             return
         } catch (error) {
-            console.log(error)
             console.error(`botDisconnectCommandでエラーが発生しました : ${error}`);
         }
     }
