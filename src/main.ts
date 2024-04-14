@@ -10,6 +10,7 @@ import { makeCompositionCommand } from './commands/valorant/makeCompositionComma
 import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
 import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
 import { playMusicCommand } from './commands/music/playMusicCommand';
+import { botDisconnectCommand } from './commands/music/botDisconnectCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -26,6 +27,7 @@ const rest = new REST({ version: '10' }).setToken(token);
         mapSelectCommand.data,
         memberAllocationCommand.data,
         playMusicCommand.data,
+        botDisconnectCommand.data
       ],
     });
     console.log('コマンドの登録が完了しました');
@@ -48,6 +50,7 @@ const commands = {
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
   [playMusicCommand.data.name]: playMusicCommand,
+  [botDisconnectCommand.data.name]: botDisconnectCommand,
 };
 
 // インタラクションが発生時に実行

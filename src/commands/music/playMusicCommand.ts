@@ -5,6 +5,8 @@ import { deletePlayerInfo, playMusic } from "../../events/playMusic";
 import { musicInfoMessage } from "../../events/embedMessage";
 import ytpl from "ytpl";
 import ytdl from "ytdl-core";
+import { clientId } from "../../modules/discordModule";
+import {  donePlayerInteractionEditMessages, interactionEditMessages} from "../../events/interactionMessages";
 
 export const playMusicCommand = {
     // コマンドの設定
@@ -76,18 +78,16 @@ export const playMusicCommand = {
             // 修正するメッセージのIDを取得
             let replyMessageId: string = (await interaction.fetchReply()).id;
 
-            if(playListFlag){
+            if(playListFlag) {
                 //プレイリストの場合
 
                 //URLからplayList情報を取得
                 const playListInfo = await ytpl(url, { pages: 1 });
 
                 // shuffleFlagがtrueの場合配列をシャッフル
-                if(shuffleFlag){
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    playListInfo.items.sort((_a, _b) => 0.5 - Math.random())
-                }
-
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                if(shuffleFlag) playListInfo.items.sort((_a, _b) => 0.5 - Math.random())
+                
                 //playListからMusicInfo配列に格納
                 const originMusicInfoList: MusicInfo[] = playListInfo.items.map((item, index) => {
                     return {
@@ -139,13 +139,19 @@ export const playMusicCommand = {
                         await buttonInteraction.deferUpdate();
                     }
 
-                    // 他メッセージのボタン押されたときに処理を行わない
-                    if(replyMessageId !== buttonInteraction.message.id) return
+                    // BOTがVCにいない場合処理しない
+                    if(!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) return
+
+                    // 他メッセージのボタン押されたときに処理しない
+                    if(replyMessageId !== buttonInteraction.message.id) {
+                        interactionEditMessages(interaction,buttonInteraction.message.id,{embeds:[],components:[]});
+                        return;
+                    } 
 
                     // 次の曲へボタン押下時の処理
                     if(buttonInteraction.customId === `nextPlayMusicButton_${uniqueId}`){
                         // メッセージを削除
-                        if(interaction.channel?.messages.fetch(replyMessageId)) await interaction.channel?.messages.edit(replyMessageId,'');
+                        if(interaction.channel?.messages.fetch(replyMessageId)) await interactionEditMessages(interaction,replyMessageId,'');
 
                         // PlayerとListenerを削除
                         await deletePlayerInfo(player);
@@ -158,36 +164,36 @@ export const playMusicCommand = {
                             stopPlayMusicButton
                                 .setLabel("停止")
                                 .setEmoji("⏸");
-                            interaction.channel?.messages.edit(replyMessageId,{components:[buttonRow]});
+                                interactionEditMessages(interaction,replyMessageId,{components:[buttonRow]});
                         }
 
                         // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
                         for(const musicInfo of nextMusicInfoList){
                             // 曲のindexを格納
-                            songIndex = musicInfo.songIndex
+                            songIndex = musicInfo.songIndex;
                             // チャンネルアイコンを取得
                             const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
                             const embed = musicInfoMessage(musicInfo,buttonRow,musicInfo.songIndex,originMusicInfoList.length,channelThumbnail ? channelThumbnail[0].url : null);
                             interaction.channel?.messages.edit(replyMessageId,embed).catch(()=>{
                                 interaction.channel?.send(embed).then((res) => {
-                                    replyMessageId = res.id
+                                    replyMessageId = res.id;
                                 })
                             })
                             await playMusic(player,musicInfo);
 
                         }
                         // 再生完了した際メッセージを送信
-                        await interaction.channel?.messages.edit(replyMessageId,{embeds:[],components:[]}).catch(() => { return });
-                        interaction.channel?.messages.edit(replyMessageId,'再生完了！').catch(() => {interaction.channel?.send('再生完了！')});
+                        await donePlayerInteractionEditMessages(interaction,replyMessageId);
+
                         // playerを削除する。
                         player.stop();
-                         // BOTをdiscordから切断
+                        // BOTをdiscordから切断
                         connection.destroy();
                     }
                     // 前の曲へボタン押下時の処理
                     if(buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`) {
                         // メッセージを削除
-                        if(interaction.channel?.messages.fetch(replyMessageId)) await interaction.channel?.messages.edit(replyMessageId,'');
+                        if(interaction.channel?.messages.fetch(replyMessageId)) await interactionEditMessages(interaction,replyMessageId,'');
 
                         // PlayerとListenerを削除
                         await deletePlayerInfo(player);
@@ -200,7 +206,7 @@ export const playMusicCommand = {
                             stopPlayMusicButton
                                 .setLabel("停止")
                                 .setEmoji("⏸");
-                            interaction.channel?.messages.edit(replyMessageId,{components:[buttonRow]});
+                            interactionEditMessages(interaction,replyMessageId,{components:[buttonRow]});
                         }
 
                         // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
@@ -215,11 +221,11 @@ export const playMusicCommand = {
                                     replyMessageId = res.id
                                 })
                             })
+
                             await playMusic(player,musicInfo);
                         }
                         // 再生完了した際メッセージを送信
-                        await interaction.channel?.messages.edit(replyMessageId,{embeds:[],components:[]}).catch(() => { return });
-                        interaction.channel?.messages.edit(replyMessageId,'再生完了！').catch(() => {interaction.channel?.send('再生完了！')});
+                        await donePlayerInteractionEditMessages(interaction,replyMessageId);
                         // PlayerとListenerを削除
                         await deletePlayerInfo(player);
                          // BOTをdiscordから切断
@@ -228,20 +234,20 @@ export const playMusicCommand = {
                     // 再生/停止ボタン押下時
                     if(buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`){
                         // メッセージを削除
-                        if(interaction.channel?.messages.fetch(replyMessageId)) await interaction.channel?.messages.edit(replyMessageId,'');
+                        if(interaction.channel?.messages.fetch(replyMessageId)) await interactionEditMessages(interaction,replyMessageId,'');
                         
                         if(player.state.status === AudioPlayerStatus.Playing){
                             player.pause();
                             stopPlayMusicButton
                                 .setLabel("再生")
                                 .setEmoji("▶");
-                            interaction.channel?.messages.edit(replyMessageId,{components:[buttonRow]});
+                            interactionEditMessages(interaction,replyMessageId,{components:[buttonRow]});
                         }else if(player.state.status === AudioPlayerStatus.Paused){
                             player.unpause();
                             stopPlayMusicButton
                                 .setLabel("停止")
                                 .setEmoji("⏸");
-                            interaction.channel?.messages.edit(replyMessageId,{components:[buttonRow]});
+                            interactionEditMessages(interaction,replyMessageId,{components:[buttonRow]});
                         }
                     }
                     return
@@ -251,7 +257,7 @@ export const playMusicCommand = {
                         if(e.status == '400' || e.status == '404'){
                             // 400:DiscordAPIError[40060]: Interaction has already been acknowledged. 
                             // 404:DiscordAPIError[10062]: Unknown interaction 
-                            await interaction.channel?.messages.edit(replyMessageId,'ボタンをもう一度押してください');
+                            await interactionEditMessages(interaction,replyMessageId,'ボタンをもう一度押してください');
                             return 
                         }else if(e.status == '401'){
                             console.log('401' + e);
@@ -280,8 +286,7 @@ export const playMusicCommand = {
                 }
 
                 // 再生完了した際メッセージを送信
-                await interaction.channel?.messages.edit(replyMessageId,{embeds:[],components:[]}).catch(() => { return });
-                interaction.channel?.messages.edit(replyMessageId,'再生完了！').catch(() => {interaction.channel?.send('再生完了！')});
+                await donePlayerInteractionEditMessages(interaction,replyMessageId);
                 // PlayerとListenerを削除
                 await deletePlayerInfo(player);
                 // BOTをdiscordから切断
@@ -351,7 +356,7 @@ export const playMusicCommand = {
                             if(e.status == '400' || e.status == '404'){
                                 // 400:DiscordAPIError[40060]: Interaction has already been acknowledged
                                 // 404:Unknown interaction
-                                await interaction.channel?.messages.edit(replyMessageId,'ボタンをもう一度押してください');
+                                await interaction.editReply('ボタンをもう一度押してください');
                                 return 
                             }else if(e.status == '401'){
                                 console.log('401' + e);
@@ -376,7 +381,6 @@ export const playMusicCommand = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             console.error(`playMusicCommandでエラーが発生しました : ${e}`);
-
             // それぞれのエラー制御
             if(e.status == '400') return await interaction.channel?.send('音楽情報のメッセージ存在しないため再生できません。');
             else if(e.status == '401')  return console.log('401' + e);
