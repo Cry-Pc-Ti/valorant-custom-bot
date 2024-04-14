@@ -3,21 +3,38 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  ChannelType,
   ChatInputCommandInteraction,
   ComponentType,
   SlashCommandBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { memberAllocationMessage } from '../../events/embedMessage';
-import { generateRandomNum as generateRandomNum } from '../../events/generateRandomNum';
+import { memberAllocationMessage } from '../../events/discord/embedMessage';
+import { generateRandomNum as generateRandomNum } from '../../events/common/generateRandomNum';
 import { MemberAllocationData, MemberData } from '../../types/memberData';
-import { mainVoiceChannelId, subVoiceChannelId } from '../../modules/discordModule';
 
 // チーム割り当てコマンド
 export const memberAllocationCommand = {
   // コマンドの設定
-  data: new SlashCommandBuilder().setName('member').setDescription('メンバーをランダムでチーム分けします').toJSON(),
+  data: new SlashCommandBuilder()
+    .setName('member')
+    .setDescription('メンバーをランダムでチーム分けします')
+    .addChannelOption((option) =>
+      option
+        .setName('attacker')
+        .setDescription('アタッカーのボイスチャンネルを指定します')
+        .addChannelTypes(ChannelType.GuildVoice)
+        .setRequired(true)
+    )
+    .addChannelOption((option) =>
+      option
+        .setName('defender')
+        .setDescription('ディフェンダーのボイスチャンネルを指定します')
+        .addChannelTypes(ChannelType.GuildVoice)
+        .setRequired(true)
+    )
+    .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
@@ -33,6 +50,16 @@ export const memberAllocationCommand = {
 
         // メンバーがいる場合は処理を続行
       } else {
+        const { options } = interaction;
+        const attackerChannelId = options.getChannel('attacker')?.id;
+        const defenderChannelId = options.getChannel('defender')?.id;
+
+        // チャンネルが取得できない場合はエラーを返す
+        if (!attackerChannelId || !defenderChannelId) {
+          await interaction.editReply('ボイスチャンネルが取得できませんでした');
+          return;
+        }
+
         // セレクトメニューを作成
         const memberSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
           .setCustomId('member')
@@ -98,7 +125,7 @@ export const memberAllocationCommand = {
           let defenseCount = 0;
 
           for (const member of memberData) {
-            const randomNumber = await generateRandomNum(0, 1);
+            const randomNumber = generateRandomNum(0, 1);
 
             if (randomNumber === 0 && attackCount < maxAttackMembers) {
               teamAllocation.attack.push(member);
@@ -157,7 +184,7 @@ export const memberAllocationCommand = {
 
               // アタッカーのメンバーをメインのボイスチャンネルに移動
               if (buttonInteraction.customId === `attacker_${uniqueId}`) {
-                const targetVoiceChannel = await interaction.guild?.channels.fetch(mainVoiceChannelId);
+                const targetVoiceChannel = await interaction.guild?.channels.fetch(attackerChannelId);
 
                 if (targetVoiceChannel) {
                   if (targetVoiceChannel.isVoiceBased()) {
@@ -171,7 +198,7 @@ export const memberAllocationCommand = {
 
               // ディフェンダーのメンバーをサブのボイスチャンネルに移動
               if (buttonInteraction.customId === `difender_${uniqueId}`) {
-                const targetVoiceChannel = await interaction.guild?.channels.fetch(subVoiceChannelId);
+                const targetVoiceChannel = await interaction.guild?.channels.fetch(defenderChannelId);
 
                 if (targetVoiceChannel) {
                   if (targetVoiceChannel.isVoiceBased()) {

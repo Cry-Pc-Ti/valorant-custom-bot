@@ -1,9 +1,9 @@
 // モジュールをインポート
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { valorantMaps } from '../../events/readJsonData';
-import { mapMessage } from '../../events/embedMessage';
+import { valorantMaps } from '../../events/common/readJsonData';
+import { mapMessage } from '../../events/discord/embedMessage';
 import { MapData } from '../../types/valorantData';
-import { generateRandomNum } from '../../events/generateRandomNum';
+import { generateRandomNum } from '../../events/common/generateRandomNum';
 
 // マップ選択コマンド
 export const mapSelectCommand = {
@@ -15,9 +15,8 @@ export const mapSelectCommand = {
     await interaction.deferReply();
 
     try {
-
       // マップをランダムに選択
-      const randomMap: MapData = valorantMaps[generateRandomNum(0,valorantMaps.length)];
+      const randomMap: MapData = valorantMaps[generateRandomNum(0, valorantMaps.length)];
 
       // メッセージを作成
       const embed = mapMessage(randomMap);
