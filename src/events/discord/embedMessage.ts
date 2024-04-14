@@ -1,7 +1,7 @@
 import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
-import { AgentData, CompositionData, MapData } from '../types/valorantData';
-import { MemberAllocationData } from '../types/memberData';
-import { MusicInfo } from '../types/musicData';
+import { AgentData, CompositionData, MapData } from '../../types/valorantData';
+import { MemberAllocationData } from '../../types/memberData';
+import { MusicInfo } from '../../types/musicData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -203,21 +203,43 @@ export const chinchiroMessage = (result: string) => {
       value: `${result}`,
     })
     .setImage('attachment://generate_image.png')
-    .setTimestamp();
+    .setTimestamp()
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_icon.png',
+    });
 
   const ImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  return { embeds: [embed], files: [ImageAttachment] };
+  return { embeds: [embed], files: [ImageAttachment, fotterAttachment] };
+};
+
+export const chinchiro456Message = (result: string) => {
+  const embed = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('チンチロバトルじゃ！')
+    .setFields({
+      name: 'ざわ…ざわ…',
+      value: `${result}`,
+    })
+    .setImage('attachment://456dice.png')
+    .setTimestamp();
+
+  const ImageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+
+  return { embeds: [embed], files: [ImageAttachment, fotterAttachment] };
 };
 
 //「/playList」コマンドのメッセージを作成
 export const musicInfoMessage = (
-    musicInfo: MusicInfo,
-    buttonRow: ActionRowBuilder<ButtonBuilder>,
-    musicCount?: number,
-    maxMusicCount?: number,
-    channelThumbnail?: string | null
-  ) => {
+  musicInfo: MusicInfo,
+  buttonRow: ActionRowBuilder<ButtonBuilder>,
+  musicCount?: number,
+  maxMusicCount?: number,
+  channelThumbnail?: string | null
+) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(musicInfo.title)
@@ -225,31 +247,35 @@ export const musicInfoMessage = (
     .setImage(musicInfo.musicImg)
     .setTimestamp();
 
-    if(channelThumbnail){
-      embeds.setAuthor({ 
-        name: musicInfo.author.name, 
-        iconURL: channelThumbnail
-      })
-    }else if(musicInfo.author.channelThumbnail){
-      embeds.setAuthor({ 
-        name: musicInfo.author.name, 
-        iconURL: musicInfo.author.channelThumbnail
-      })
-    }else{
-      embeds.setAuthor({ 
-        name: musicInfo.author.name
-      })
-    }
+  if (channelThumbnail) {
+    embeds.setAuthor({
+      name: musicInfo.author.name,
+      iconURL: channelThumbnail,
+    });
+  } else if (musicInfo.author.channelThumbnail) {
+    embeds.setAuthor({
+      name: musicInfo.author.name,
+      iconURL: musicInfo.author.channelThumbnail,
+    });
+  } else {
+    embeds.setAuthor({
+      name: musicInfo.author.name,
+    });
+  }
 
-    if(!musicCount && !maxMusicCount){
-      embeds.setFooter({
-        text: '音楽情報',
-      });
-    } else {
-      embeds.setFooter({
-        text: '音楽情報・' + musicCount + '/' + maxMusicCount,
-      });
-    }
+  if (!musicCount && !maxMusicCount) {
+    embeds.setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    });
+  } else {
+    embeds.setFooter({
+      text: `YouTube Playlist ${musicCount} / ${maxMusicCount}`,
+      iconURL: 'attachment://youtube_icon.png',
+    });
+  }
 
-  return { embeds: [embeds] ,components: [buttonRow]};
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [buttonRow] };
 };

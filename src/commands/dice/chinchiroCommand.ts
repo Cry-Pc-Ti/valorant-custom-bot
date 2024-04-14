@@ -1,15 +1,20 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { createConcatImage } from '../../events/createConcatImage';
-import { exportChinchiroResult } from '../../events/exportChinchiroResult';
-import { chinchiroMessage } from '../../events/embedMessage';
-import { generateRandomNum } from '../../events/generateRandomNum';
+import { createConcatImage } from '../../events/common/createConcatImage';
+import { exportChinchiroResult } from '../../events/dice/exportChinchiroResult';
+import { chinchiroMessage, chinchiro456Message } from '../../events/discord/embedMessage';
+import { generateRandomNum } from '../../events/common/generateRandomNum';
 
 // チンチロリンコマンド
 export const chinchiroCommand = {
   data: new SlashCommandBuilder()
     .setName('chinchiro')
     .setDescription('ざわ…ざわ…')
-    .addBooleanOption((option) => option.setName('cheat').setDescription('魔法の賽を...!!'))
+    .addStringOption((option) =>
+      option
+        .setName('cheat')
+        .setDescription('魔法の賽を...!!')
+        .addChoices({ name: 'この力がほしい...!!', value: 'true' })
+    )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
@@ -18,7 +23,7 @@ export const chinchiroCommand = {
     try {
       const { options } = interaction;
 
-      const isCheat: boolean = options.getBoolean('cheat') ?? false;
+      const isCheat: boolean = options.getString('cheat') ? true : false;
 
       if (!isCheat) {
         const randomIndexArray: number[] = await Promise.all(
@@ -34,7 +39,7 @@ export const chinchiroCommand = {
         await createConcatImage(diceImagePaths);
 
         // サイコロを振った結果を出力
-        const result = await exportChinchiroResult(randomIndexArray);
+        const result = exportChinchiroResult(randomIndexArray);
 
         // メッセージを作成・送信
         const embed = chinchiroMessage(result);
@@ -42,17 +47,11 @@ export const chinchiroCommand = {
 
         // イカサマモード
       } else if (isCheat) {
-        const diceImagePaths: string[] = [];
-
-        for (const randomIndex of [4, 5, 6]) {
-          diceImagePaths.push(`static/img/dice/dice_${randomIndex}.png`);
-        }
-
-        // サイコロの画像を作成
-        await createConcatImage(diceImagePaths);
+        // サイコロを振った結果を出力
+        const result = exportChinchiroResult([1, 2, 3]);
 
         // メッセージを作成・送信
-        const embed = chinchiroMessage('456賽だっ...!');
+        const embed = chinchiro456Message(result);
         await interaction.editReply(embed);
       }
     } catch (error) {
