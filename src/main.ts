@@ -9,8 +9,7 @@ import { diceCommand } from './commands/dice/diceCommand';
 import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
 import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
 import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
-import { playMusicCommand } from './commands/music/playMusicCommand';
-import { botDisconnectCommand } from './commands/music/botDisconnectCommand';
+import { musicCommand } from './commands/music/musicCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -26,8 +25,7 @@ const rest = new REST({ version: '10' }).setToken(token);
         makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
-        playMusicCommand.data,
-        botDisconnectCommand.data
+        musicCommand.data
       ],
     });
     console.log('コマンドの登録が完了しました');
@@ -49,8 +47,7 @@ const commands = {
   [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
-  [playMusicCommand.data.name]: playMusicCommand,
-  [botDisconnectCommand.data.name]: botDisconnectCommand,
+  [musicCommand.data.name]: musicCommand
 };
 
 // インタラクションが発生時に実行
