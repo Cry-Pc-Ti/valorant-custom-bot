@@ -1,7 +1,7 @@
 // モジュールをインポート
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { valorantAgents } from '../../events/readJsonData';
-import { agentMessage } from '../../events/embedMessage';
+import { valorantAgents } from '../../events/common/readJsonData';
+import { agentMessage } from '../../events/discord/embedMessage';
 import { AgentData } from '../../types/valorantData';
 
 // エージェント指定コマンド
