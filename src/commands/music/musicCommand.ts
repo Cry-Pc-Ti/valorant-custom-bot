@@ -94,6 +94,13 @@ export const musicCommand = {
           .setLabel('停止')
           .setEmoji('⏸');
 
+        // 「１曲リピート」ボタン
+        const repeatSingleButton = new ButtonBuilder()
+          .setCustomId(`repeatSingleButton_${uniqueId}`)
+          .setStyle(ButtonStyle.Secondary)
+          .setLabel('リピート')
+          .setEmoji('🔂');
+
         // BOTをVCに接続
         const connection = joinVoiceChannel({
           channelId: voiceChannelId,
@@ -106,6 +113,9 @@ export const musicCommand = {
 
         // 修正するメッセージのIDを取得
         let replyMessageId: string = (await interaction.fetchReply()).id;
+
+        // リピートするかのフラグ
+        let repeatFlg: boolean = false;
 
         if (playListFlag) {
           //プレイリストの場合
@@ -152,6 +162,7 @@ export const musicCommand = {
           // ボタンをActionRowに追加
           const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
             prevPlayMusicButton,
+            repeatSingleButton,
             stopPlayMusicButton,
             nextPlayMusicButton
           );
@@ -193,6 +204,13 @@ export const musicCommand = {
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
                 }
 
+                // ボタンがリピート中ボタンだった時リピートボタンに変更
+                if (repeatFlg) {
+                  repeatFlg = false;
+                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
+                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                }
+
                 // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
                 for (const musicInfo of musicInfoList) {
                   if(musicInfo.songIndex > songIndex){
@@ -212,8 +230,12 @@ export const musicCommand = {
                       replyMessageId = res.id;
                     });
                   });
-                  // 音楽再生
-                  await playMusic(player, musicInfo);
+
+                  // BOTに音楽を流す
+                  do {
+                    // 音楽再生
+                    await playMusic(player, musicInfo);
+                  } while (repeatFlg);
                   }
                 }
                 // 再生完了した際メッセージを送信
@@ -223,6 +245,8 @@ export const musicCommand = {
                 player.stop();
                 // BOTをdiscordから切断
                 connection.destroy();
+
+                return
               }
               // 前の曲へボタン押下時の処理
               if (buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`) {
@@ -236,6 +260,13 @@ export const musicCommand = {
                 // ボタンが再生ボタンだった時停止ボタンに変更
                 if (stopPlayMusicButton.data.label === '再生') {
                   stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
+                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                }
+
+                // ボタンがリピート中ボタンだった時リピートボタンに変更
+                if (repeatFlg) {
+                  repeatFlg = false;
+                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
                 }
 
@@ -258,8 +289,10 @@ export const musicCommand = {
                       replyMessageId = res.id;
                     });
                   });
-                  // 音楽再生
-                  await playMusic(player, musicInfo);
+                  // リピートフラグがtrueの時無限再生
+                  do {
+                    await playMusic(player, musicInfo);
+                  } while (repeatFlg)
                   }
                 }
                 // 再生完了した際メッセージを送信
@@ -268,6 +301,8 @@ export const musicCommand = {
                 await deletePlayerInfo(player);
                 // BOTをdiscordから切断
                 connection.destroy();
+
+                return
               }
               // 再生/停止ボタン押下時
               if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
@@ -279,11 +314,28 @@ export const musicCommand = {
                   player.pause();
                   stopPlayMusicButton.setLabel('再生').setEmoji('▶');
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                  return
                 } else if (player.state.status === AudioPlayerStatus.Paused) {
                   player.unpause();
                   stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                  return
                 }
+              }
+
+              // 1曲リピートボタン押下時
+              if(buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
+                repeatFlg = !repeatFlg;
+                if (interaction.channel?.messages.fetch(replyMessageId))
+                  await interactionEditMessages(interaction, replyMessageId, '');
+                if(repeatFlg) {
+                  repeatSingleButton.setLabel('リピート中').setEmoji('🔂');
+                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                }else{
+                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
+                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
+                }
+                return;
               }
               return;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -322,7 +374,11 @@ export const musicCommand = {
                   replyMessageId = res.id;
                 });
               });
-            await playMusic(player, musicInfo);
+
+            // リピートフラグがtrueの時無限再生
+            do {
+              await playMusic(player, musicInfo);
+            } while (repeatFlg);
           }
 
           // 再生完了した際メッセージを送信
@@ -353,6 +409,7 @@ export const musicCommand = {
 
           // ボタンをActionRowに追加
           const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            repeatSingleButton,
             stopPlayMusicButton
           );
 
@@ -372,6 +429,17 @@ export const musicCommand = {
               if (!buttonInteraction.replied && !buttonInteraction.deferred) {
                 await buttonInteraction.deferUpdate();
               }
+
+              // BOTがVCにいない場合処理しない
+              if (!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) {
+                interactionEditMessages(interaction, buttonInteraction.message.id,'もう一度、再生したい場合はコマンドで再度入力してください。');
+                interactionEditMessages(interaction, buttonInteraction.message.id, {components:[]});
+                return
+              };
+
+              // 他メッセージのボタン押されたときに処理しない
+              if (replyMessageId !== buttonInteraction.message.id) return;
+
               // 再生/一時停止ボタン押下時
               if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
                 // メッセージを削除
@@ -385,6 +453,20 @@ export const musicCommand = {
                   stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
                   interaction.editReply({ components: [buttonRow] });
                 }
+                return
+              }
+              // リピートボタン押下時
+              if(buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
+                repeatFlg = !repeatFlg;
+                await interaction.editReply('');
+                if(repeatFlg) {
+                  repeatSingleButton.setLabel('リピート中').setEmoji('🔂');
+                  interaction.editReply({ components: [buttonRow] });
+                }else{
+                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
+                  interaction.editReply({ components: [buttonRow] });
+                }
+                return
               }
               return;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -405,8 +487,11 @@ export const musicCommand = {
             }
           });
 
-          // BOTに音楽を流す
-          await playMusic(player, musicInfo);
+          // リピートフラグがtrueの時無限再生
+          do {
+            // BOTに音楽を流す
+            await playMusic(player, musicInfo);
+          } while (repeatFlg);
 
           // 再生完了した際メッセージを送信
           const embeds = donePlayerMessage();
