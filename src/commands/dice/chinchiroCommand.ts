@@ -48,7 +48,7 @@ export const chinchiroCommand = {
         // イカサマモード
       } else if (isCheat) {
         // サイコロを振った結果を出力
-        const result = exportChinchiroResult([1, 2, 3]);
+        const result = exportChinchiroResult([4, 5, 6]);
 
         // メッセージを作成・送信
         const embed = chinchiro456Message(result);
