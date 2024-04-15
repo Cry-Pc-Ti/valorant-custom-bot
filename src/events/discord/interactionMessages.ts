@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, MessageEditOptions, MessagePayload } from "discord.js";
+import { donePlayerMessage } from "./embedMessage";
 
 // メッセージを編集する
 export const interactionEditMessages = async (
@@ -12,17 +13,12 @@ export const interactionEditMessages = async (
 }
 
 // メッセージを編集する(音楽再生完了時)
+// TODO:再生した情報を出したい
 export const donePlayerInteractionEditMessages = async (
     interaction: ChatInputCommandInteraction,
     messageId: string
 ) => {
-    interaction.channel?.messages.edit(messageId,{embeds:[],components:[],files:[]})
-        .catch(() => {
-            return;
-        });
-    interaction.channel?.messages.edit(messageId,'再生完了！')
-        .catch(() => {
-            interaction.channel?.send('再生完了！');
-            return
-        });
+    const embeds = donePlayerMessage();
+    interaction.channel?.messages.edit(messageId,embeds)
+        .catch(async () => await interaction.channel?.send(embeds));
 }

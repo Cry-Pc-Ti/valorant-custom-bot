@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { MusicInfo } from '../../types/musicData';
 import { deletePlayerInfo, playMusic } from '../../events/music/playMusic';
-import { musicInfoMessage } from '../../events/discord/embedMessage';
+import { donePlayerMessage, musicInfoMessage } from '../../events/discord/embedMessage';
 import ytpl from 'ytpl';
 import ytdl from 'ytdl-core';
 import { clientId } from '../../modules/discordModule';
@@ -41,6 +41,14 @@ export const musicCommand = {
         )
     )
     .addSubcommand((subcommand) => subcommand.setName('disconnect').setDescription('BOTをVCから切断します。'))
+    // .addSubcommand((subcommand) =>
+    //   subcommand
+    //       .setName('search')
+    //       .setDescription('検索したワードを入力')
+    //       .addStringOption((option) =>
+    //           option.setName('words').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
+    //       )
+    //  )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
@@ -60,7 +68,7 @@ export const musicCommand = {
           console.error(`playMusicCommandでエラーが発生しました : ${error}`);
       }
     }
-    if(interaction.options.getSubcommand() === 'play') {
+    else if(interaction.options.getSubcommand() === 'play') {
       try {
         const url = interaction.options.getString('url') ?? '';
         const voiceChannelId = interaction.options.getChannel('channel')?.id;
@@ -180,7 +188,7 @@ export const musicCommand = {
                 await deletePlayerInfo(player);
 
                 // ボタンが再生ボタンだった時停止ボタンに変更
-                if (stopPlayMusicButton.data.label == '再生') {
+                if (stopPlayMusicButton.data.label === '再生') {
                   stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
                 }
@@ -226,7 +234,7 @@ export const musicCommand = {
                 await deletePlayerInfo(player);
 
                 // ボタンが再生ボタンだった時停止ボタンに変更
-                if (stopPlayMusicButton.data.label == '再生') {
+                if (stopPlayMusicButton.data.label === '再生') {
                   stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
                   interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
                 }
@@ -401,8 +409,8 @@ export const musicCommand = {
           await playMusic(player, musicInfo);
 
           // 再生完了した際メッセージを送信
-          await interaction.editReply({ embeds: [], components: [] });
-          interaction.editReply('再生完了！');
+          const embeds = donePlayerMessage();
+          await interaction.editReply(embeds);
           // PlayerとListenerを削除
           await deletePlayerInfo(player);
           // BOTをdiscordから切断
@@ -421,5 +429,22 @@ export const musicCommand = {
         await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
       }
     }
+    // else if(interaction.options.getSubcommand() === 'search') {
+    //   const words = interaction.options.getString('words') ?? '';
+
+    //   if(!words) return interaction.editReply('wordsが不正です');
+
+    //   const searchPlayListInfo = await YouTube.search(words,{type: "playlist",limit: 5,safeSearch: true});
+
+    //   const musicplayListInfo: PlayListInfo[] = searchPlayListInfo.map((item,index)=>{
+    //       return {
+    //           playListId: index + 1,
+    //           url: item.url,
+    //           thumbnail:item.thumbnail?.url,
+    //           title: item.title
+    //       }
+    //   });
+    //   console.log(musicplayListInfo)
+    // }
   },
 };
