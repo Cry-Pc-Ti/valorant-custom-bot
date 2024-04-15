@@ -16,11 +16,11 @@ export const agentMessage = (agent: AgentData) => {
       name: 'Role',
       value: agent.role.charAt(0).toUpperCase() + agent.role.slice(1),
     })
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
   const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
@@ -38,11 +38,11 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
     .setImage('attachment://generate_image.png')
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
   // デュエリストが選択されている場合、フィールドを追加
   if (composition.duelist.length) {
@@ -121,11 +121,11 @@ export const mapMessage = (map: MapData) => {
     .setTitle('Random Map')
     .setDescription(`今回のマップは${map.name}です`)
     .setImage(`attachment://${map.id}.png`)
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
   const imageAttachment = new AttachmentBuilder(`static/img/valorant_maps/${map.id}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
@@ -139,11 +139,11 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     .setColor('#fd4556')
     .setTitle('Random Team')
     .setDescription('今回のチームはこちらです')
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
   if (memberAllocation.attack.length) {
     const attack = [];
@@ -180,11 +180,11 @@ export const diceMessage = (message: string, number: number) => {
     .setAuthor({ name: message, iconURL: 'attachment://gekko_icon.png' })
     .setDescription(`出た数字は${number}だよ～`)
     .setThumbnail('attachment://generate_image.png')
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
   const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
@@ -197,39 +197,45 @@ export const diceMessage = (message: string, number: number) => {
 export const chinchiroMessage = (result: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('チンチロバトルじゃ！')
+    .setAuthor({ name: 'チンチロバトルじゃ！', iconURL: 'attachment://radianite_box.png' })
     .setFields({
       name: 'ざわ…ざわ…',
       value: `${result}`,
     })
     .setImage('attachment://generate_image.png')
-    .setTimestamp()
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    });
+    })
+    .setTimestamp();
 
-  const ImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const authorAttachment = new AttachmentBuilder('static/img/dice/radianite_box.png');
+  const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  return { embeds: [embed], files: [ImageAttachment, fotterAttachment] };
+  return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
 export const chinchiro456Message = (result: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('チンチロバトルじゃ！')
+    .setAuthor({ name: 'チンチロバトルじゃ！', iconURL: 'attachment://radianite_box.png' })
     .setFields({
       name: 'ざわ…ざわ…',
       value: `${result}`,
     })
     .setImage('attachment://456dice.png')
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_icon.png',
+    })
     .setTimestamp();
 
-  const ImageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
+  const authorAttachment = new AttachmentBuilder('static/img/dice/radianite_box.png');
+  const imageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  return { embeds: [embed], files: [ImageAttachment, fotterAttachment] };
+  return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
 //「/playList」コマンドのメッセージを作成
@@ -291,7 +297,7 @@ export const donePlayerMessage = () => {
     })
     .setTimestamp();
 
-    const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
 
-    return { embeds: [embeds], files: [fotterAttachment], components: [] };
-}
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
