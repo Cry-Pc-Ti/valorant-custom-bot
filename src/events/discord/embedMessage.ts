@@ -279,3 +279,19 @@ export const musicInfoMessage = (
 
   return { embeds: [embeds], files: [fotterAttachment], components: [buttonRow] };
 };
+
+// 再生完了のメッセージを作成
+export const donePlayerMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('再生完了')
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+    const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+    return { embeds: [embeds], files: [fotterAttachment], components: [] };
+}
