@@ -120,17 +120,17 @@ export const mapMessage = (map: MapData) => {
     .setColor('#fd4556')
     .setTitle('Random Map')
     .setDescription(`今回のマップは${map.name}です`)
-    .setImage(`attachment://${map.id}.png`)
+    .setThumbnail(map.displayIcon)
+    .setImage(map.mapThumbnail)
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
     })
     .setTimestamp();
+    
+    const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  const imageAttachment = new AttachmentBuilder(`static/img/valorant_maps/${map.id}.png`);
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
-
-  return { embeds: [embedMessage], files: [imageAttachment, fotterAttachment] };
+    return { embeds: [embedMessage], files: [fotterAttachment] };
 };
 
 //「/member」コマンドのメッセージを作成

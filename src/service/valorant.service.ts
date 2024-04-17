@@ -1,23 +1,24 @@
 import axios from "axios"
-import { AbilitiesData, MapData, RoleData } from "../types/valorantData";
+import { AbilitiesData, RoleData } from "../types/valorantData";
 
 const VALORANT_MAPINFO_URL = 'https://valorant-api.com/v1/maps'
 const VALORANT_AGENTINFO_URL = 'https://valorant-api.com/v1/agents'
 
 // MAP情報を取得
-export const getMapInfo = async () => {
+export const getMapInfo =  async () => {
     const res = await axios.get(VALORANT_MAPINFO_URL + '?language=ja-JP');
 
-    const mapInfo: MapData[] = res.data.data.map((map: { tacticalDescription: string | null; uuid: string; displayName: string; }) => {
-        if(map.tacticalDescription !== null){
-            return{
-                id: map.uuid,
-                name: map.displayName
+    return await res.data.data.map((mapDetail: { tacticalDescription: string | null; uuid: string; displayName: string; displayIcon: string; splash: string; }) => {
+        if(mapDetail.tacticalDescription !== null){
+            return {
+                id: mapDetail.uuid,
+                name: mapDetail.displayName,
+                displayIcon: mapDetail.displayIcon,
+                mapThumbnail: mapDetail.splash
             }
         }
     }).filter((map: { tacticalDescription: string | null; uuid: string; displayName: string; }) => map)
 
-    return mapInfo
 }
 
 // エージェント情報を取得
