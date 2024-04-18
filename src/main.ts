@@ -25,7 +25,7 @@ const rest = new REST({ version: '10' }).setToken(token);
         makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
-        musicCommand.data
+        musicCommand.data,
       ],
     });
     console.log('コマンドの登録が完了しました');
@@ -47,7 +47,7 @@ const commands = {
   [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,
-  [musicCommand.data.name]: musicCommand
+  [musicCommand.data.name]: musicCommand,
 };
 
 // インタラクションが発生時に実行

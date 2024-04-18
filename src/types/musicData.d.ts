@@ -1,21 +1,22 @@
 export interface MusicInfo {
-    songIndex: number;
-    url: string;
-    title: string;
-    musicImg:  string | null;
-    author: YoutubeChannelInfo;
+  songIndex: number;
+  url: string;
+  title: string;
+  musicImg: string | null;
+  author: YoutubeChannelInfo;
+  relatedVideosIDlist: string[];
 }
 
 export interface YoutubeChannelInfo {
-    url: string;
-    channelID: string;
-    name: string;
-    channelThumbnail?: string  | null;
+  url: string;
+  channelID: string;
+  name: string;
+  channelThumbnail?: string | null;
 }
 
 export interface PlayListInfo {
-    playListId: number;
-    url: string;
-    thumbnail: string | undefined;
-    title: string | undefined;
+  playListId: number;
+  url: string;
+  thumbnail: string | undefined;
+  title: string | undefined;
 }
