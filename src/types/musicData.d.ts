@@ -12,3 +12,10 @@ export interface YoutubeChannelInfo {
     name: string;
     channelThumbnail?: string  | null;
 }
+
+export interface PlayListInfo {
+    playListId: number;
+    url: string;
+    thumbnail: string | undefined;
+    title: string | undefined;
+}
