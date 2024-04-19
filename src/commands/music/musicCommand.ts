@@ -222,49 +222,54 @@ export const musicCommand = {
         await playListMusicMainLogic(interaction, connection, player, musicInfoList);
       });
     } else if (interaction.options.getSubcommand() === 'recommend') {
-      const url = interaction.options.getString('url') ?? '';
-      const voiceChannelId = interaction.options.getChannel('channel')?.id;
+      try {
+        const url = interaction.options.getString('url') ?? '';
+        const voiceChannelId = interaction.options.getChannel('channel')?.id;
 
-      if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
-        return interaction.editReply('ボイスチャンネルが見つかりません。');
+        if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
+          return interaction.editReply('ボイスチャンネルが見つかりません。');
 
-      // プレイリストか曲か判別
-      let playListFlag: boolean = false;
-      if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
-      else if (!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
-      else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
-        return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
+        // プレイリストか曲か判別
+        let playListFlag: boolean = false;
+        if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
+        else if (!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
+        else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
+          return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
-      let musicInfo: MusicInfo;
+        let musicInfo: MusicInfo;
 
-      if (playListFlag) {
-        const musicInfoList = await getMusicPlayListInfo(url, true);
-        musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
-      } else {
-        musicInfo = await getSingleMusicInfo(url);
+        if (playListFlag) {
+          const musicInfoList = await getMusicPlayListInfo(url, true);
+          musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
+        } else {
+          musicInfo = await getSingleMusicInfo(url);
+        }
+        const relatedMusicInfoList: MusicInfo[] = [];
+
+        for (let i = 0; i < 10; i++) {
+          const relatedVideosID =
+            musicInfo.relatedVideosIDlist[generateRandomNum(0, musicInfo.relatedVideosIDlist.length - 1)];
+          if (!relatedVideosID || !ytdl.validateID(relatedVideosID)) return;
+          musicInfo = await getSingleMusicInfo(relatedVideosID, i);
+          relatedMusicInfoList.push(musicInfo);
+        }
+        // playerを作成しdisに音をながす
+        const player = createAudioPlayer();
+        // BOTをVCに接続
+        const connection = joinVoiceChannel({
+          channelId: voiceChannelId,
+          guildId: interaction.guildId,
+          adapterCreator: interaction.guild?.voiceAdapterCreator,
+          selfDeaf: true,
+        });
+        connection.subscribe(player);
+
+        // playList再生処理
+        await playListMusicMainLogic(interaction, connection, player, relatedMusicInfoList);
+      } catch (error) {
+        await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+        console.error(error);
       }
-      const relatedMusicInfoList: MusicInfo[] = [];
-
-      for (let i = 0; i < 10; i++) {
-        const relatedVideosID =
-          musicInfo.relatedVideosIDlist[generateRandomNum(0, musicInfo.relatedVideosIDlist.length - 1)];
-        if (!relatedVideosID || !ytdl.validateID(relatedVideosID)) return;
-        musicInfo = await getSingleMusicInfo(relatedVideosID, i);
-        relatedMusicInfoList.push(musicInfo);
-      }
-      // playerを作成しdisに音をながす
-      const player = createAudioPlayer();
-      // BOTをVCに接続
-      const connection = joinVoiceChannel({
-        channelId: voiceChannelId,
-        guildId: interaction.guildId,
-        adapterCreator: interaction.guild?.voiceAdapterCreator,
-        selfDeaf: true,
-      });
-      connection.subscribe(player);
-
-      // playList再生処理
-      await playListMusicMainLogic(interaction, connection, player, relatedMusicInfoList);
     }
   },
 };

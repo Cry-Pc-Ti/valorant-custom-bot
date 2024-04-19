@@ -79,7 +79,6 @@ export const playListMusicMainLogic = async (
       if (!buttonInteraction.replied && !buttonInteraction.deferred) {
         await buttonInteraction.deferUpdate();
       }
-
       // BOTがVCにいない場合処理しない
       if (!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) {
         interactionEditMessages(
