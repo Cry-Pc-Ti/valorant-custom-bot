@@ -29,9 +29,7 @@ export const mainDiceCommand = {
     await interaction.deferReply();
     if (interaction.options.getSubcommand() === 'chinchiro') {
       try {
-        const { options } = interaction;
-
-        const isCheat: boolean = options.getString('cheat') ? true : false;
+        const isCheat: boolean = interaction.options.getString('cheat') ? true : false;
 
         if (!isCheat) {
           const randomIndexArray: number[] = await Promise.all(

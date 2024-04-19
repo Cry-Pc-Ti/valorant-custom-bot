@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
 import { clientId } from '../../modules/discordModule';
-import { deletePlayerInfo, playMusic } from './playMusic';
+import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { musicInfoMessage } from '../discord/embedMessage';
 import { MusicInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
@@ -138,7 +138,7 @@ export const playListMusicMainLogic = async (
             // BOTに音楽を流す
             do {
               // 音楽再生
-              await playMusic(player, musicInfo);
+              await playBackMusic(player, musicInfo);
             } while (repeatFlg);
           }
         }
@@ -195,7 +195,7 @@ export const playListMusicMainLogic = async (
             });
             // リピートフラグがtrueの時無限再生
             do {
-              await playMusic(player, musicInfo);
+              await playBackMusic(player, musicInfo);
             } while (repeatFlg);
           }
         }
@@ -280,7 +280,7 @@ export const playListMusicMainLogic = async (
 
     // リピートフラグがtrueの時無限再生
     do {
-      await playMusic(player, musicInfo);
+      await playBackMusic(player, musicInfo);
     } while (repeatFlg);
   }
   // 再生完了した際メッセージを送信

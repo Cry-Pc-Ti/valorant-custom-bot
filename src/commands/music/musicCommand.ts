@@ -11,12 +11,11 @@ import {
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { clientId } from '../../modules/discordModule';
 import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
-import ytpl from 'ytpl';
-import ytdl from 'ytdl-core';
-import YouTube from 'youtube-sr';
 import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
-import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
+import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
+import ytdl from 'ytdl-core';
+import { isPlayListFlag } from '../../events/music/musicCommon';
 
 export const musicCommand = {
   // コマンドの設定
@@ -79,7 +78,7 @@ export const musicCommand = {
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-
+    // 「disconnect」コマンド
     if (interaction.options.getSubcommand() === 'disconnect') {
       try {
         const botJoinVoiceChannelId = await interaction.guild?.members.fetch(clientId);
@@ -93,6 +92,7 @@ export const musicCommand = {
       } catch (error) {
         console.error(`playMusicCommandでエラーが発生しました : ${error}`);
       }
+      // 「play」コマンド
     } else if (interaction.options.getSubcommand() === 'play') {
       try {
         const url = interaction.options.getString('url') ?? '';
@@ -103,10 +103,8 @@ export const musicCommand = {
           return interaction.editReply('ボイスチャンネルが見つかりません。');
 
         // プレイリストか曲か判別
-        let playListFlag: boolean = false;
-        if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
-        else if (!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
-        else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
+        const playListFlag: { result: boolean; urlError: boolean } = isPlayListFlag(url);
+        if (playListFlag.urlError)
           return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
         // playerを作成しdisに音をながす
@@ -120,14 +118,15 @@ export const musicCommand = {
         });
         connection.subscribe(player);
 
-        if (playListFlag) {
-          // プレイリストの場合
+        // プレイリストの場合
+        if (playListFlag.result) {
           // URLからプレイリスト情報を取得
           const musicInfoList: MusicInfo[] = await getMusicPlayListInfo(url, shuffleFlag);
           // playList再生処理
           await playListMusicMainLogic(interaction, connection, player, musicInfoList);
-        } else {
+
           // 1曲の場合
+        } else {
           // URLから音楽情報を取得
           const musicInfo: MusicInfo = await getSingleMusicInfo(url);
           // shingleSong再生処理
@@ -145,6 +144,7 @@ export const musicCommand = {
 
         await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
       }
+      // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
       const voiceChannelId = interaction.options.getChannel('channel')?.id;
       const words = interaction.options.getString('words');
@@ -152,17 +152,7 @@ export const musicCommand = {
       if (!voiceChannelId) return interaction.editReply('ボイスチャンネルが見つかりません。');
       else if (!words) return interaction.editReply('wordsが不正です');
 
-      const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 20, safeSearch: true });
-
-      // 取得したplaylist情報から必要な情報だけ格納
-      const musicplayListInfo: PlayListInfo[] = searchPlayListInfo.map((item, index) => {
-        return {
-          playListId: index,
-          url: item.url ?? '',
-          thumbnail: item.thumbnail?.url,
-          title: item.title?.substring(0, 100),
-        };
-      });
+      const musicplayListInfo: PlayListInfo[] = await getSearchMusicPlayListInfo(words);
 
       // セレクトメニューを作成
       const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -176,7 +166,7 @@ export const musicCommand = {
             label: musicplayList.title ?? '',
           }))
         );
-      // セレクトメニューを送信
+      // セレクトメニューを作成
       const row: ActionRowBuilder<StringSelectMenuBuilder> =
         new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(playListSelect);
 
@@ -221,6 +211,7 @@ export const musicCommand = {
         // playList再生処理
         await playListMusicMainLogic(interaction, connection, player, musicInfoList);
       });
+      // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
       try {
         const url = interaction.options.getString('url') ?? '';
@@ -230,15 +221,13 @@ export const musicCommand = {
           return interaction.editReply('ボイスチャンネルが見つかりません。');
 
         // プレイリストか曲か判別
-        let playListFlag: boolean = false;
-        if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
-        else if (!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
-        else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
+        const playListFlag: { result: boolean; urlError: boolean } = isPlayListFlag(url);
+        if (playListFlag.urlError)
           return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
         let musicInfo: MusicInfo;
 
-        if (playListFlag) {
+        if (playListFlag.result) {
           const musicInfoList = await getMusicPlayListInfo(url, true);
           musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
         } else {

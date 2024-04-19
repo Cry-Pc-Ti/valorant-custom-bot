@@ -4,12 +4,11 @@ import { clientId, discord, token } from '../src/modules/discordModule';
 
 // コマンドをインポート
 import { agentPickCommand } from './commands/valorant/agentPickCommand';
-import { chinchiroCommand } from './commands/dice/chinchiroCommand';
-import { diceCommand } from './commands/dice/diceCommand';
 import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
 import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
 import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
 import { musicCommand } from './commands/music/musicCommand';
+import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(token);
@@ -20,8 +19,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     await rest.put(Routes.applicationCommands(clientId), {
       body: [
         agentPickCommand.data,
-        chinchiroCommand.data,
-        diceCommand.data,
+        mainDiceCommand.data,
         makeCompositionCommand.data,
         mapSelectCommand.data,
         memberAllocationCommand.data,
@@ -42,8 +40,7 @@ discord.on('ready', () => {
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [agentPickCommand.data.name]: agentPickCommand,
-  [chinchiroCommand.data.name]: chinchiroCommand,
-  [diceCommand.data.name]: diceCommand,
+  [mainDiceCommand.data.name]: mainDiceCommand,
   [makeCompositionCommand.data.name]: makeCompositionCommand,
   [mapSelectCommand.data.name]: mapSelectCommand,
   [memberAllocationCommand.data.name]: memberAllocationCommand,

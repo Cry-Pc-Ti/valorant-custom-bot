@@ -3,7 +3,7 @@ import { MusicInfo } from '../../types/musicData';
 import { AudioPlayer, AudioPlayerStatus, StreamType, createAudioResource, entersState } from '@discordjs/voice';
 
 // 音楽情報をエンコードしdiscordへ流す
-export const playMusic = async (player: AudioPlayer, musicInfo: MusicInfo) => {
+export const playBackMusic = async (player: AudioPlayer, musicInfo: MusicInfo) => {
   try {
     const stream = ytdl(musicInfo.url, {
       filter: (format) => format.audioCodec === 'opus' && format.container === 'webm',
@@ -14,6 +14,7 @@ export const playMusic = async (player: AudioPlayer, musicInfo: MusicInfo) => {
       inputType: StreamType.WebmOpus,
     });
     player.play(resource);
+
     await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
     await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
   } catch (error) {
