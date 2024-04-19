@@ -1,21 +1,22 @@
-import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
+import { createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   ChannelType,
   ChatInputCommandInteraction,
   ComponentType,
   SlashCommandBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
 } from 'discord.js';
-import { MusicInfo } from '../../types/musicData';
-import { deletePlayerInfo, playMusic } from '../../events/music/playMusic';
-import { donePlayerMessage, musicInfoMessage } from '../../events/discord/embedMessage';
+import { MusicInfo, PlayListInfo } from '../../types/musicData';
+import { clientId } from '../../modules/discordModule';
+import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
 import ytpl from 'ytpl';
 import ytdl from 'ytdl-core';
-import { clientId } from '../../modules/discordModule';
-import { donePlayerInteractionEditMessages, interactionEditMessages } from '../../events/discord/interactionMessages';
+import YouTube from 'youtube-sr';
+import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
+import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
+import { generateRandomNum } from '../../events/common/generateRandomNum';
 
 export const musicCommand = {
   // コマンドの設定
@@ -34,41 +35,65 @@ export const musicCommand = {
             .addChannelTypes(ChannelType.GuildVoice)
         )
         .addBooleanOption((option) =>
-          option.setName('shuffle').setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください').setRequired(true)
+          option
+            .setName('shuffle')
+            .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
+            .setRequired(true)
         )
         .addStringOption((option) =>
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
     .addSubcommand((subcommand) => subcommand.setName('disconnect').setDescription('BOTをVCから切断します。'))
-    // .addSubcommand((subcommand) =>
-    //   subcommand
-    //       .setName('search')
-    //       .setDescription('検索したワードを入力')
-    //       .addStringOption((option) =>
-    //           option.setName('words').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
-    //       )
-    //  )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('search')
+        .setDescription('入力されたワードからplayListを検索して再生します')
+        .addChannelOption((option) =>
+          option
+            .setName('channel')
+            .setDescription('音楽を流すチャンネルを選択')
+            .setRequired(true)
+            .addChannelTypes(ChannelType.GuildVoice)
+        )
+        .addStringOption((option) =>
+          option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('recommend')
+        .setDescription('指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
+        .addChannelOption((option) =>
+          option
+            .setName('channel')
+            .setDescription('音楽を流すチャンネルを選択')
+            .setRequired(true)
+            .addChannelTypes(ChannelType.GuildVoice)
+        )
+        .addStringOption((option) =>
+          option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
+        )
+    )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
 
-    if(interaction.options.getSubcommand() === 'disconnect') {
+    if (interaction.options.getSubcommand() === 'disconnect') {
       try {
         const botJoinVoiceChannelId = await interaction.guild?.members.fetch(clientId);
-        if(botJoinVoiceChannelId?.voice.channelId){
-            await botJoinVoiceChannelId?.voice.disconnect();
-            await interaction.editReply('BOTをVCから切断しました。');
-            return
+        if (botJoinVoiceChannelId?.voice.channelId) {
+          await botJoinVoiceChannelId?.voice.disconnect();
+          await interaction.editReply('BOTをVCから切断しました。');
+          return;
         }
         await interaction.editReply('BOTがVCにいません。');
-        return
+        return;
       } catch (error) {
-          console.error(`playMusicCommandでエラーが発生しました : ${error}`);
+        console.error(`playMusicCommandでエラーが発生しました : ${error}`);
       }
-    }
-    else if(interaction.options.getSubcommand() === 'play') {
+    } else if (interaction.options.getSubcommand() === 'play') {
       try {
         const url = interaction.options.getString('url') ?? '';
         const voiceChannelId = interaction.options.getChannel('channel')?.id;
@@ -84,23 +109,8 @@ export const musicCommand = {
         else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
           return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
-        // DateをuniqueIdとして取得
-        const uniqueId = Date.now();
-
-        // 「一時停止」ボタン
-        const stopPlayMusicButton = new ButtonBuilder()
-          .setCustomId(`stopPlayMusicButton_${uniqueId}`)
-          .setStyle(ButtonStyle.Secondary)
-          .setLabel('停止')
-          .setEmoji('⏸');
-
-        // 「１曲リピート」ボタン
-        const repeatSingleButton = new ButtonBuilder()
-          .setCustomId(`repeatSingleButton_${uniqueId}`)
-          .setStyle(ButtonStyle.Secondary)
-          .setLabel('リピート')
-          .setEmoji('🔂');
-
+        // playerを作成しdisに音をながす
+        const player = createAudioPlayer();
         // BOTをVCに接続
         const connection = joinVoiceChannel({
           channelId: voiceChannelId,
@@ -108,398 +118,20 @@ export const musicCommand = {
           adapterCreator: interaction.guild?.voiceAdapterCreator,
           selfDeaf: true,
         });
-        const player = createAudioPlayer();
         connection.subscribe(player);
 
-        // 修正するメッセージのIDを取得
-        let replyMessageId: string = (await interaction.fetchReply()).id;
-
-        // リピートするかのフラグ
-        let repeatFlg: boolean = false;
-
         if (playListFlag) {
-          //プレイリストの場合
-
-          //URLからplayList情報を取得
-          const playListInfo = await ytpl(url, { pages: 1 });
-
-          // shuffleFlagがtrueの場合配列をシャッフル
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          if (shuffleFlag) playListInfo.items.sort((_a, _b) => 0.5 - Math.random());
-
-          //playListからMusicInfo配列に格納
-          const musicInfoList: MusicInfo[] = playListInfo.items.map((item, index) => {
-            return {
-              songIndex: index + 1,
-              url: item.url,
-              title: item.title,
-              musicImg: item.bestThumbnail.url,
-              author: {
-                url: item.author.name,
-                channelID: item.author.channelID,
-                name: item.author.name,
-              },
-            };
-          });
-
-          // 再生している曲のindexを取得
-          let songIndex: number;
-
-          // 「前の曲へ」ボタン
-          const prevPlayMusicButton = new ButtonBuilder()
-            .setCustomId(`prevPlayMusicButton_${uniqueId}`)
-            .setStyle(ButtonStyle.Secondary)
-            .setLabel('前の曲へ')
-            .setEmoji('⏮');
-
-          // 「次の曲へ」ボタン
-          const nextPlayMusicButton = new ButtonBuilder()
-            .setCustomId(`nextPlayMusicButton_${uniqueId}`)
-            .setStyle(ButtonStyle.Secondary)
-            .setLabel('次の曲へ')
-            .setEmoji('⏭');
-
-          // ボタンをActionRowに追加
-          const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            prevPlayMusicButton,
-            repeatSingleButton,
-            stopPlayMusicButton,
-            nextPlayMusicButton
-          );
-
-          const buttonCollector = interaction.channel?.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-          });
-          if (!buttonCollector) return;
-
-          // ボタンが押された時の処理
-          buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
-            try {
-              if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-                await buttonInteraction.deferUpdate();
-              }
-
-              // BOTがVCにいない場合処理しない
-              if (!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) {
-                interactionEditMessages(interaction, buttonInteraction.message.id,'もう一度、再生したい場合はコマンドで再度入力してください。');
-                interactionEditMessages(interaction, buttonInteraction.message.id, {components:[]});
-                return
-              };
-
-              // 他メッセージのボタン押されたときに処理しない
-              if (replyMessageId !== buttonInteraction.message.id) return;
-              
-              // 次の曲へボタン押下時の処理
-              if (buttonInteraction.customId === `nextPlayMusicButton_${uniqueId}`) {
-                // メッセージを削除
-                if (interaction.channel?.messages.fetch(replyMessageId))
-                  await interactionEditMessages(interaction, replyMessageId, '');
-
-                // PlayerとListenerを削除
-                await deletePlayerInfo(player);
-
-                // ボタンが再生ボタンだった時停止ボタンに変更
-                if (stopPlayMusicButton.data.label === '再生') {
-                  stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }
-
-                // ボタンがリピート中ボタンだった時リピートボタンに変更
-                if (repeatFlg) {
-                  repeatFlg = false;
-                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }
-
-                // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
-                for (const musicInfo of musicInfoList) {
-                  if(musicInfo.songIndex > songIndex){
-                  // 曲のindexを格納
-                  songIndex = musicInfo.songIndex;
-                  // チャンネルアイコンを取得
-                  const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-                  const embed = musicInfoMessage(
-                    musicInfo,
-                    buttonRow,
-                    musicInfo.songIndex,
-                    musicInfoList.length,
-                    channelThumbnail ? channelThumbnail[0].url : null
-                  );
-                  interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
-                    interaction.channel?.send(embed).then((res) => {
-                      replyMessageId = res.id;
-                    });
-                  });
-
-                  // BOTに音楽を流す
-                  do {
-                    // 音楽再生
-                    await playMusic(player, musicInfo);
-                  } while (repeatFlg);
-                  }
-                }
-                // 再生完了した際メッセージを送信
-                await donePlayerInteractionEditMessages(interaction, replyMessageId);
-
-                // playerを削除する。
-                player.stop();
-                // BOTをdiscordから切断
-                connection.destroy();
-
-                return
-              }
-              // 前の曲へボタン押下時の処理
-              if (buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`) {
-                // メッセージを削除
-                if (interaction.channel?.messages.fetch(replyMessageId))
-                  await interactionEditMessages(interaction, replyMessageId, '');
-
-                // PlayerとListenerを削除
-                await deletePlayerInfo(player);
-
-                // ボタンが再生ボタンだった時停止ボタンに変更
-                if (stopPlayMusicButton.data.label === '再生') {
-                  stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }
-
-                // ボタンがリピート中ボタンだった時リピートボタンに変更
-                if (repeatFlg) {
-                  repeatFlg = false;
-                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }
-
-                // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
-                for (const musicInfo of musicInfoList) {
-                  if(musicInfo.songIndex >= songIndex - 1){
-                  // 曲のindexを格納
-                  songIndex = musicInfo.songIndex;
-                  // チャンネルアイコンを取得
-                  const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-                  const embed = musicInfoMessage(
-                    musicInfo,
-                    buttonRow,
-                    musicInfo.songIndex,
-                    musicInfoList.length,
-                    channelThumbnail ? channelThumbnail[0].url : null
-                  );
-                  interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
-                    interaction.channel?.send(embed).then((res) => {
-                      replyMessageId = res.id;
-                    });
-                  });
-                  // リピートフラグがtrueの時無限再生
-                  do {
-                    await playMusic(player, musicInfo);
-                  } while (repeatFlg)
-                  }
-                }
-                // 再生完了した際メッセージを送信
-                await donePlayerInteractionEditMessages(interaction, replyMessageId);
-                // PlayerとListenerを削除
-                await deletePlayerInfo(player);
-                // BOTをdiscordから切断
-                connection.destroy();
-
-                return
-              }
-              // 再生/停止ボタン押下時
-              if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
-                // メッセージを削除
-                if (interaction.channel?.messages.fetch(replyMessageId))
-                  await interactionEditMessages(interaction, replyMessageId, '');
-
-                if (player.state.status === AudioPlayerStatus.Playing) {
-                  player.pause();
-                  stopPlayMusicButton.setLabel('再生').setEmoji('▶');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                  return
-                } else if (player.state.status === AudioPlayerStatus.Paused) {
-                  player.unpause();
-                  stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                  return
-                }
-              }
-
-              // 1曲リピートボタン押下時
-              if(buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-                repeatFlg = !repeatFlg;
-                if (interaction.channel?.messages.fetch(replyMessageId))
-                  await interactionEditMessages(interaction, replyMessageId, '');
-                if(repeatFlg) {
-                  repeatSingleButton.setLabel('リピート中').setEmoji('🔂');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }else{
-                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
-                  interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-                }
-                return;
-              }
-              return;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (e: any) {
-              if (replyMessageId === buttonInteraction.message.id) {
-                if (e.status == '400' || e.status == '404') {
-                  // 400:DiscordAPIError[40060]: Interaction has already been acknowledged.
-                  // 404:DiscordAPIError[10062]: Unknown interaction
-                  await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
-                  return;
-                } else if (e.status == '401') {
-                  console.log('401' + e);
-                  return;
-                }
-                //  [code: 'ABORT_ERR']AbortError: The operation was aborted
-              }
-            }
-          });
-
-          // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
-          for (const musicInfo of musicInfoList) {
-            songIndex = musicInfo.songIndex;
-            // チャンネルアイコンを取得
-            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
-            const embed = musicInfoMessage(
-              musicInfo,
-              buttonRow,
-              musicInfo.songIndex,
-              musicInfoList.length,
-              channelThumbnail ? channelThumbnail[0].url : null
-            );
-            if (musicInfo.songIndex === 1) await interaction.editReply(embed);
-            else
-              interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
-                interaction.channel?.send(embed).then((res) => {
-                  replyMessageId = res.id;
-                });
-              });
-
-            // リピートフラグがtrueの時無限再生
-            do {
-              await playMusic(player, musicInfo);
-            } while (repeatFlg);
-          }
-
-          // 再生完了した際メッセージを送信
-          await donePlayerInteractionEditMessages(interaction, replyMessageId);
-          // PlayerとListenerを削除
-          await deletePlayerInfo(player);
-          // BOTをdiscordから切断
-          connection.destroy();
+          // プレイリストの場合
+          // URLからプレイリスト情報を取得
+          const musicInfoList: MusicInfo[] = await getMusicPlayListInfo(url, shuffleFlag);
+          // playList再生処理
+          await playListMusicMainLogic(interaction, connection, player, musicInfoList);
         } else {
-          //一曲の場合
-
-          // 音楽データを取得・作成
-          const musicDetails = await ytdl.getBasicInfo(url);
-          const musicInfo: MusicInfo = {
-            songIndex: 1,
-            url: musicDetails.videoDetails.video_url,
-            title: musicDetails.videoDetails.title,
-            musicImg: musicDetails.videoDetails.thumbnails[3].url,
-            author: {
-              url: musicDetails.videoDetails.author.channel_url,
-              channelID: musicDetails.videoDetails.author.id,
-              name: musicDetails.videoDetails.author.name,
-              channelThumbnail: musicDetails.videoDetails.author.thumbnails
-                ? musicDetails.videoDetails.author.thumbnails[0].url
-                : musicDetails.videoDetails.thumbnails[0].url,
-            },
-          };
-
-          // ボタンをActionRowに追加
-          const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            repeatSingleButton,
-            stopPlayMusicButton
-          );
-
-          const buttonCollector = interaction.channel?.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-          });
-
-          // 音楽情報のメッセージ作成、送信
-          const embed = musicInfoMessage(musicInfo, buttonRow);
-          await interaction.editReply(embed);
-
-          if (!buttonCollector) return;
-
-          // ボタンが押された時の処理
-          buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
-            try {
-              if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-                await buttonInteraction.deferUpdate();
-              }
-
-              // BOTがVCにいない場合処理しない
-              if (!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) {
-                interactionEditMessages(interaction, buttonInteraction.message.id,'もう一度、再生したい場合はコマンドで再度入力してください。');
-                interactionEditMessages(interaction, buttonInteraction.message.id, {components:[]});
-                return
-              };
-
-              // 他メッセージのボタン押されたときに処理しない
-              if (replyMessageId !== buttonInteraction.message.id) return;
-
-              // 再生/一時停止ボタン押下時
-              if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
-                // メッセージを削除
-                await interaction.editReply('');
-                if (player.state.status === AudioPlayerStatus.Playing) {
-                  player.pause();
-                  stopPlayMusicButton.setLabel('再生').setEmoji('▶');
-                  interaction.editReply({ components: [buttonRow] });
-                } else if (player.state.status === AudioPlayerStatus.Paused) {
-                  player.unpause();
-                  stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-                  interaction.editReply({ components: [buttonRow] });
-                }
-                return
-              }
-              // リピートボタン押下時
-              if(buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-                repeatFlg = !repeatFlg;
-                await interaction.editReply('');
-                if(repeatFlg) {
-                  repeatSingleButton.setLabel('リピート中').setEmoji('🔂');
-                  interaction.editReply({ components: [buttonRow] });
-                }else{
-                  repeatSingleButton.setLabel('リピート').setEmoji('🔂');
-                  interaction.editReply({ components: [buttonRow] });
-                }
-                return
-              }
-              return;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (e: any) {
-              console.error(`playMusicCommandでエラーが発生しました : ${e}`);
-              if (replyMessageId === buttonInteraction.message.id) {
-                if (e.status == '400' || e.status == '404') {
-                  // 400:DiscordAPIError[40060]: Interaction has already been acknowledged
-                  // 404:Unknown interaction
-                  await interaction.editReply('ボタンをもう一度押してください');
-                  return;
-                } else if (e.status == '401') {
-                  console.log('401' + e);
-                  return;
-                }
-                //  [code: 'ABORT_ERR']AbortError: The operation was aborted
-              }
-            }
-          });
-
-          // リピートフラグがtrueの時無限再生
-          do {
-            // BOTに音楽を流す
-            await playMusic(player, musicInfo);
-          } while (repeatFlg);
-
-          // 再生完了した際メッセージを送信
-          const embeds = donePlayerMessage();
-          await interaction.editReply(embeds);
-          // PlayerとListenerを削除
-          await deletePlayerInfo(player);
-          // BOTをdiscordから切断
-          connection.destroy();
+          // 1曲の場合
+          // URLから音楽情報を取得
+          const musicInfo: MusicInfo = await getSingleMusicInfo(url);
+          // shingleSong再生処理
+          await singleMusicMainLogic(interaction, connection, player, musicInfo);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
@@ -513,23 +145,131 @@ export const musicCommand = {
 
         await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
       }
+    } else if (interaction.options.getSubcommand() === 'search') {
+      const voiceChannelId = interaction.options.getChannel('channel')?.id;
+      const words = interaction.options.getString('words');
+
+      if (!voiceChannelId) return interaction.editReply('ボイスチャンネルが見つかりません。');
+      else if (!words) return interaction.editReply('wordsが不正です');
+
+      const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 20, safeSearch: true });
+
+      // 取得したplaylist情報から必要な情報だけ格納
+      const musicplayListInfo: PlayListInfo[] = searchPlayListInfo.map((item, index) => {
+        return {
+          playListId: index,
+          url: item.url ?? '',
+          thumbnail: item.thumbnail?.url,
+          title: item.title?.substring(0, 100),
+        };
+      });
+
+      // セレクトメニューを作成
+      const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
+        .setCustomId('playListSelect')
+        .setPlaceholder('再生したいplaylistを選択してください')
+        .setMinValues(1)
+        .setMaxValues(1)
+        .addOptions(
+          musicplayListInfo.map((musicplayList) => ({
+            value: String(musicplayList.playListId),
+            label: musicplayList.title ?? '',
+          }))
+        );
+      // セレクトメニューを送信
+      const row: ActionRowBuilder<StringSelectMenuBuilder> =
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(playListSelect);
+
+      const selectResponse = await interaction.editReply({
+        components: [row],
+      });
+
+      // セレクトメニューで選択された値を取得
+      const collector = selectResponse.createMessageComponentCollector({
+        componentType: ComponentType.StringSelect,
+        filter: (selectMenuInteraction) => selectMenuInteraction.user.id === interaction.user.id,
+      });
+
+      collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
+        if (!interaction.guildId || !interaction.guild?.voiceAdapterCreator) {
+          interaction.editReply('ボイスチャンネルが見つかりません。');
+          return;
+        }
+
+        await interaction.editReply({
+          content: `【${musicplayListInfo[Number(selectMenuInteraction.values)].title}】を再生しております。`,
+          components: [],
+        });
+
+        // playerを作成しdisに音をながす
+        const player = createAudioPlayer();
+        // BOTをVCに接続
+        const connection = joinVoiceChannel({
+          channelId: voiceChannelId,
+          guildId: interaction.guildId,
+          adapterCreator: interaction.guild?.voiceAdapterCreator,
+          selfDeaf: true,
+        });
+        connection.subscribe(player);
+
+        // URLからプレイリスト情報を取得
+        const musicInfoList: MusicInfo[] = await getMusicPlayListInfo(
+          musicplayListInfo[Number(selectMenuInteraction.values)].url,
+          true
+        );
+
+        // playList再生処理
+        await playListMusicMainLogic(interaction, connection, player, musicInfoList);
+      });
+    } else if (interaction.options.getSubcommand() === 'recommend') {
+      try {
+        const url = interaction.options.getString('url') ?? '';
+        const voiceChannelId = interaction.options.getChannel('channel')?.id;
+
+        if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
+          return interaction.editReply('ボイスチャンネルが見つかりません。');
+
+        // プレイリストか曲か判別
+        let playListFlag: boolean = false;
+        if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
+        else if (!ytpl.validateID(url) && ytdl.validateURL(url)) playListFlag = false;
+        else if (!ytdl.validateURL(url) || !ytpl.validateID(url))
+          return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
+
+        let musicInfo: MusicInfo;
+
+        if (playListFlag) {
+          const musicInfoList = await getMusicPlayListInfo(url, true);
+          musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
+        } else {
+          musicInfo = await getSingleMusicInfo(url);
+        }
+        const relatedMusicInfoList: MusicInfo[] = [];
+
+        for (let i = 0; i < 10; i++) {
+          const relatedVideosID =
+            musicInfo.relatedVideosIDlist[generateRandomNum(0, musicInfo.relatedVideosIDlist.length - 1)];
+          if (!relatedVideosID || !ytdl.validateID(relatedVideosID)) return;
+          musicInfo = await getSingleMusicInfo(relatedVideosID, i);
+          relatedMusicInfoList.push(musicInfo);
+        }
+        // playerを作成しdisに音をながす
+        const player = createAudioPlayer();
+        // BOTをVCに接続
+        const connection = joinVoiceChannel({
+          channelId: voiceChannelId,
+          guildId: interaction.guildId,
+          adapterCreator: interaction.guild?.voiceAdapterCreator,
+          selfDeaf: true,
+        });
+        connection.subscribe(player);
+
+        // playList再生処理
+        await playListMusicMainLogic(interaction, connection, player, relatedMusicInfoList);
+      } catch (error) {
+        await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+        console.error(error);
+      }
     }
-    // else if(interaction.options.getSubcommand() === 'search') {
-    //   const words = interaction.options.getString('words') ?? '';
-
-    //   if(!words) return interaction.editReply('wordsが不正です');
-
-    //   const searchPlayListInfo = await YouTube.search(words,{type: "playlist",limit: 5,safeSearch: true});
-
-    //   const musicplayListInfo: PlayListInfo[] = searchPlayListInfo.map((item,index)=>{
-    //       return {
-    //           playListId: index + 1,
-    //           url: item.url,
-    //           thumbnail:item.thumbnail?.url,
-    //           title: item.title
-    //       }
-    //   });
-    //   console.log(musicplayListInfo)
-    // }
   },
 };

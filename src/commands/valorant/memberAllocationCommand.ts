@@ -211,13 +211,16 @@ export const memberAllocationCommand = {
               }
             } catch (error) {
               console.error(error);
-              await interaction.followUp({ content: 'ボタンの処理中にエラーが発生しました', ephemeral: true });
+              await interaction.followUp({
+                content: 'ボタンの処理中にエラーが発生しました。再度ボタンを押してください。',
+                ephemeral: true,
+              });
             }
           });
         });
       }
     } catch (error) {
-      await interaction.editReply('処理中にエラーが発生しました');
+      await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
       console.error(error);
     }
   },

@@ -21,9 +21,8 @@ export const playMusic = async (player: AudioPlayer, musicInfo: MusicInfo) => {
   }
 };
 
-export const deletePlayerInfo = async (player: AudioPlayer) => {
-  // playerを削除する。
+// playerとListenerを削除する
+export const deletePlayerInfo = (player: AudioPlayer) => {
   player.stop();
-  // Listenerをすべて削除する。
   player.removeAllListeners();
 };
