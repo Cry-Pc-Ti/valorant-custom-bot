@@ -16,11 +16,11 @@ export const mapSelectCommand = {
 
     try {
       // valorant-apiからMAP情報を取得
-      const  mapInfo: MapData[] = await getMapInfo();
+      const mapInfo: MapData[] = await getMapInfo();
 
       // マップをランダムに選択
       const randomMap: MapData = mapInfo[generateRandomNum(0, mapInfo.length - 1)];
-      // const randomMap: MapData = valorantMaps[generateRandomNum(0, valorantMaps.length - 1)] 
+      // const randomMap: MapData = valorantMaps[generateRandomNum(0, valorantMaps.length - 1)]
 
       // メッセージを作成
       const embed = mapMessage(randomMap);
@@ -28,8 +28,8 @@ export const mapSelectCommand = {
       // メッセージを送信
       await interaction.editReply(embed);
     } catch (error) {
-      console.log(error)
-      interaction.editReply('再度コマンドを入力してください');
+      console.log(error);
+      interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
       console.error(`mapSelectCommandでエラーが発生しました : ${error}`);
     }
   },

@@ -54,7 +54,7 @@ export const agentPickCommand = {
       // メッセージを送信
       await interaction.editReply(embed);
     } catch (error: unknown) {
-      await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+      await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
       console.error(`agentPickCommandでエラーが発生しました : ${error}`);
     }
   },
