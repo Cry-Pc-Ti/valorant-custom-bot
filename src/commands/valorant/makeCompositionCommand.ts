@@ -316,7 +316,7 @@ export const makeCompositionCommand = {
         });
       }
     } catch (error) {
-      await interaction.editReply('処理中にエラーが発生しました\n開発者にお問い合わせください');
+      await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
       console.error(`makeCompositionCommandでエラーが発生しました : ${error}`);
     }
   },
