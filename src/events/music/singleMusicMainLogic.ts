@@ -10,7 +10,7 @@ import {
 import { interactionEditMessages } from '../discord/interactionMessages';
 import { clientId } from '../../modules/discordModule';
 import { donePlayerMessage, musicInfoMessage } from '../discord/embedMessage';
-import { deletePlayerInfo, playMusic } from './playMusic';
+import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 
 export const singleMusicMainLogic = async (
@@ -129,7 +129,7 @@ export const singleMusicMainLogic = async (
   // リピートフラグがtrueの時無限再生
   do {
     // BOTに音楽を流す
-    await playMusic(player, musicInfo);
+    await playBackMusic(player, musicInfo);
   } while (repeatFlg);
 
   // 再生完了した際メッセージを送信
