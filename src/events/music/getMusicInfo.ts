@@ -1,28 +1,29 @@
 import ytdl from 'ytdl-core';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
-import ytpl from 'ytpl';
 import YouTube from 'youtube-sr';
 
 // URLからプレイリスト情報を取得しデータ加工をして返す
 export const getMusicPlayListInfo = async (url: string, shuffleFlag: boolean) => {
   //URLからplayList情報を取得
-  const playListInfo = await ytpl(url, { pages: 1 });
+  const playListInfo = await YouTube.getPlaylist(url);
 
   // shuffleFlagがtrueの場合配列をシャッフル
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  if (shuffleFlag) playListInfo.items.sort((_a, _b) => 0.5 - Math.random());
+  if (shuffleFlag) playListInfo.videos.sort((_a, _b) => 0.5 - Math.random());
 
   //playListからMusicInfo配列に格納
-  const musicInfoList: MusicInfo[] = playListInfo.items.map((item, index) => {
+  const musicInfoList: MusicInfo[] = playListInfo.videos.map((musicInfo, index) => {
     return {
       songIndex: index + 1,
-      url: item.url,
-      title: item.title,
-      musicImg: item.bestThumbnail.url,
+      id: musicInfo.id ?? musicInfo.url,
+      url: musicInfo.url,
+      title: musicInfo.title ?? 'titleの取得に失敗しました。',
+      musicImg: musicInfo.thumbnail?.url,
       author: {
-        url: item.author.name,
-        channelID: item.author.channelID,
-        name: item.author.name,
+        url: musicInfo.channel?.url,
+        channelID: musicInfo.channel?.id,
+        name: musicInfo.channel?.name ?? 'チャンネル名の取得に失敗しました。',
+        channelThumbnail: musicInfo.channel?.icon.url,
       },
       relatedVideosIDlist: [],
     };
@@ -37,6 +38,7 @@ export const getSingleMusicInfo = async (url: string, index?: number) => {
 
   const musicInfo: MusicInfo = {
     songIndex: index ? index + 1 : 1,
+    id: musicDetails.videoDetails.videoId,
     url: musicDetails.videoDetails.video_url,
     title: musicDetails.videoDetails.title,
     musicImg: musicDetails.videoDetails.thumbnails[3].url,

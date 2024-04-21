@@ -127,10 +127,9 @@ export const mapMessage = (map: MapData) => {
       iconURL: 'attachment://valorant_icon.png',
     })
     .setTimestamp();
-    
-    const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-    return { embeds: [embedMessage], files: [fotterAttachment] };
+  return { embeds: [embedMessage], files: [fotterAttachment] };
 };
 
 //「/member」コマンドのメッセージを作成
@@ -246,13 +245,10 @@ export const musicInfoMessage = (
   maxMusicCount?: number,
   channelThumbnail?: string | null
 ) => {
-  const embeds = new EmbedBuilder()
-    .setColor('#fd4556')
-    .setTitle(musicInfo.title)
-    .setURL(musicInfo.url)
-    .setImage(musicInfo.musicImg)
-    .setTimestamp();
+  const embeds = new EmbedBuilder().setColor('#fd4556').setTitle(musicInfo.title).setTimestamp();
 
+  if (musicInfo.url) embeds.setURL(musicInfo.url);
+  if (musicInfo.musicImg) embeds.setImage(musicInfo.musicImg);
   if (channelThumbnail) {
     embeds.setAuthor({
       name: musicInfo.author.name,

@@ -13,8 +13,6 @@ import { clientId } from '../../modules/discordModule';
 import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
 import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { generateRandomNum } from '../../events/common/generateRandomNum';
-import ytdl from 'ytdl-core';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 
 export const musicCommand = {
@@ -59,21 +57,21 @@ export const musicCommand = {
           option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
         )
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName('recommend')
-        .setDescription('指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
-        .addChannelOption((option) =>
-          option
-            .setName('channel')
-            .setDescription('音楽を流すチャンネルを選択')
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildVoice)
-        )
-        .addStringOption((option) =>
-          option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
-        )
-    )
+    // .addSubcommand((subcommand) =>
+    //   subcommand
+    //     .setName('recommend')
+    //     .setDescription('指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
+    //     .addChannelOption((option) =>
+    //       option
+    //         .setName('channel')
+    //         .setDescription('音楽を流すチャンネルを選択')
+    //         .setRequired(true)
+    //         .addChannelTypes(ChannelType.GuildVoice)
+    //     )
+    //     .addStringOption((option) =>
+    //       option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
+    //     )
+    // )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
@@ -142,7 +140,7 @@ export const musicCommand = {
         else if (e.status == '410')
           return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
 
-        await interaction.editReply('処理中にエラーが発生しました。\n開発者にお問い合わせください。');
+        await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
       }
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
@@ -212,53 +210,54 @@ export const musicCommand = {
         await playListMusicMainLogic(interaction, connection, player, musicInfoList);
       });
       // 「recommend」コマンド
-    } else if (interaction.options.getSubcommand() === 'recommend') {
-      try {
-        const url = interaction.options.getString('url') ?? '';
-        const voiceChannelId = interaction.options.getChannel('channel')?.id;
-
-        if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
-          return interaction.editReply('ボイスチャンネルが見つかりません。');
-
-        // プレイリストか曲か判別
-        const playListFlag: { result: boolean; urlError: boolean } = isPlayListFlag(url);
-        if (playListFlag.urlError)
-          return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
-
-        let musicInfo: MusicInfo;
-
-        if (playListFlag.result) {
-          const musicInfoList = await getMusicPlayListInfo(url, true);
-          musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
-        } else {
-          musicInfo = await getSingleMusicInfo(url);
-        }
-        const relatedMusicInfoList: MusicInfo[] = [];
-
-        for (let i = 0; i < 10; i++) {
-          const relatedVideosID =
-            musicInfo.relatedVideosIDlist[generateRandomNum(0, musicInfo.relatedVideosIDlist.length - 1)];
-          if (!relatedVideosID || !ytdl.validateID(relatedVideosID)) return;
-          musicInfo = await getSingleMusicInfo(relatedVideosID, i);
-          relatedMusicInfoList.push(musicInfo);
-        }
-        // playerを作成しdisに音をながす
-        const player = createAudioPlayer();
-        // BOTをVCに接続
-        const connection = joinVoiceChannel({
-          channelId: voiceChannelId,
-          guildId: interaction.guildId,
-          adapterCreator: interaction.guild?.voiceAdapterCreator,
-          selfDeaf: true,
-        });
-        connection.subscribe(player);
-
-        // playList再生処理
-        await playListMusicMainLogic(interaction, connection, player, relatedMusicInfoList);
-      } catch (error) {
-        await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-        console.error(error);
-      }
     }
+    // else if (interaction.options.getSubcommand() === 'recommend') {
+    //   try {
+    //     const url = interaction.options.getString('url') ?? '';
+    //     const voiceChannelId = interaction.options.getChannel('channel')?.id;
+
+    //     if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
+    //       return interaction.editReply('ボイスチャンネルが見つかりません。');
+
+    // // プレイリストか曲か判別
+    // const playListFlag: { result: boolean; urlError: boolean } = isPlayListFlag(url);
+    // if (playListFlag.urlError)
+    //   return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
+
+    // let musicInfo: MusicInfo;
+
+    // if (playListFlag.result) {
+    //   const musicInfoList = await getMusicPlayListInfo(url, true);
+    //   musicInfo = await getSingleMusicInfo(musicInfoList[generateRandomNum(0, musicInfoList.length - 1)].url);
+    // } else {
+    //   musicInfo = await getSingleMusicInfo(url);
+    // }
+    // const relatedMusicInfoList: MusicInfo[] = [];
+
+    // for (let i = 0; i < 10; i++) {
+    //   const relatedVideosID =
+    //     musicInfo.relatedVideosIDlist[generateRandomNum(0, musicInfo.relatedVideosIDlist.length - 1)];
+    //   if (!relatedVideosID || !ytdl.validateID(relatedVideosID)) return;
+    //   musicInfo = await getSingleMusicInfo(relatedVideosID, i);
+    //   relatedMusicInfoList.push(musicInfo);
+    // }
+    // // playerを作成しdisに音をながす
+    // const player = createAudioPlayer();
+    // // BOTをVCに接続
+    // const connection = joinVoiceChannel({
+    //   channelId: voiceChannelId,
+    //   guildId: interaction.guildId,
+    //   adapterCreator: interaction.guild?.voiceAdapterCreator,
+    //   selfDeaf: true,
+    // });
+    // connection.subscribe(player);
+
+    // playList再生処理
+    //await playListMusicMainLogic(interaction, connection, player, relatedMusicInfoList);
+    // } catch (error) {
+    //   await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+    //   console.error(error);
+    // }
+    // }
   },
 };
