@@ -30,7 +30,6 @@
     "libsodium-wrappers": "^0.7.13",
     "sharp": "^0.33.3",
     "youtube-sr": "^4.3.11",
-    "ytdl-core": "^4.11.5",
-    "ytpl": "^2.3.0"
+    "ytdl-core": "^4.11.5"
   }
 }

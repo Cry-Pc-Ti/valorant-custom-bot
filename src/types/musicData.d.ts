@@ -1,15 +1,16 @@
 export interface MusicInfo {
   songIndex: number;
-  url: string;
+  id: string;
+  url?: string;
   title: string;
-  musicImg: string | null;
+  musicImg?: string;
   author: YoutubeChannelInfo;
   relatedVideosIDlist: string[];
 }
 
 export interface YoutubeChannelInfo {
-  url: string;
-  channelID: string;
+  url?: string;
+  channelID?: string;
   name: string;
   channelThumbnail?: string | null;
 }

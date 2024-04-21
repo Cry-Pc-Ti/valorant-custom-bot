@@ -121,7 +121,7 @@ export const playListMusicMainLogic = async (
             // 曲のindexを格納
             songIndex = musicInfo.songIndex;
             // チャンネルアイコンを取得
-            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
+            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.id)).videoDetails.author.thumbnails;
             const embed = musicInfoMessage(
               musicInfo,
               buttonRow,
@@ -180,7 +180,7 @@ export const playListMusicMainLogic = async (
             // 曲のindexを格納
             songIndex = musicInfo.songIndex;
             // チャンネルアイコンを取得
-            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
+            const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.id)).videoDetails.author.thumbnails;
             const embed = musicInfoMessage(
               musicInfo,
               buttonRow,
@@ -262,7 +262,7 @@ export const playListMusicMainLogic = async (
   for (const musicInfo of musicInfoList) {
     songIndex = musicInfo.songIndex;
     // チャンネルアイコンを取得
-    const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.url)).videoDetails.author.thumbnails;
+    const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.id)).videoDetails.author.thumbnails;
     const embed = musicInfoMessage(
       musicInfo,
       buttonRow,
