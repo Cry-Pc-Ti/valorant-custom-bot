@@ -5,9 +5,9 @@ import { Client, GatewayIntentBits } from 'discord.js';
 dotenv.config();
 
 // Discord Botのトークン
-const token = process.env.DISCORD_TOKEN as string;
-const clientId = process.env.DISCORD_CLIENT_ID as string;
+const TOKEN = process.env.DISCORD_TOKEN as string;
+const CLIENT_ID = process.env.DISCORD_CLIENT_ID as string;
 
 const discord = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 
-export { discord, token, clientId };
+export { discord, TOKEN, CLIENT_ID };

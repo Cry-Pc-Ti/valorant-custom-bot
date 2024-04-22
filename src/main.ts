@@ -1,6 +1,6 @@
 // モジュールをインポート
-import { Interaction, REST, Routes } from 'discord.js';
-import { clientId, discord, token } from '../src/modules/discordModule';
+import { Interaction, REST, Routes, VoiceState } from 'discord.js';
+import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
 import { agentPickCommand } from './commands/valorant/agentPickCommand';
@@ -10,13 +10,22 @@ import { memberAllocationCommand } from './commands/valorant/memberAllocationCom
 import { musicCommand } from './commands/music/musicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 
+// コマンド名とそれに対応するコマンドオブジェクトをマップに格納
+const commands = {
+  [agentPickCommand.data.name]: agentPickCommand,
+  [mainDiceCommand.data.name]: mainDiceCommand,
+  [makeCompositionCommand.data.name]: makeCompositionCommand,
+  [mapSelectCommand.data.name]: mapSelectCommand,
+  [memberAllocationCommand.data.name]: memberAllocationCommand,
+  [musicCommand.data.name]: musicCommand,
+};
+
 // サーバーにコマンドを登録
-const rest = new REST({ version: '10' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
   try {
     console.log('サーバーにコマンドを登録中...');
-
-    await rest.put(Routes.applicationCommands(clientId), {
+    await rest.put(Routes.applicationCommands(CLIENT_ID), {
       body: [
         agentPickCommand.data,
         mainDiceCommand.data,
@@ -37,16 +46,6 @@ discord.on('ready', () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
 });
 
-// コマンド名とそれに対応するコマンドオブジェクトをマップに格納
-const commands = {
-  [agentPickCommand.data.name]: agentPickCommand,
-  [mainDiceCommand.data.name]: mainDiceCommand,
-  [makeCompositionCommand.data.name]: makeCompositionCommand,
-  [mapSelectCommand.data.name]: mapSelectCommand,
-  [memberAllocationCommand.data.name]: memberAllocationCommand,
-  [musicCommand.data.name]: musicCommand,
-};
-
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   if (interaction.isChatInputCommand()) {
@@ -54,10 +53,18 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     const command = commands[interaction.commandName];
 
     // コマンドが存在すれば実行
-    if (command) {
-      command.execute(interaction);
+    if (command) command.execute(interaction);
+  }
+});
+// voiceチャンネルでアクションが発生時に実行
+discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
+  if (oldState.channel?.members.size === 1) {
+    const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
+    if (botJoinVoiceChannelId?.voice.channelId) {
+      botJoinVoiceChannelId?.voice.disconnect();
+      return;
     }
   }
 });
 
-discord.login(token);
+discord.login(TOKEN);
