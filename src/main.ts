@@ -3,20 +3,14 @@ import { Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
-import { agentPickCommand } from './commands/valorant/agentPickCommand';
-import { makeCompositionCommand } from './commands/valorant/makeCompositionCommand';
-import { mapSelectCommand } from './commands/valorant/mapSelectCommand';
-import { memberAllocationCommand } from './commands/valorant/memberAllocationCommand';
 import { musicCommand } from './commands/music/musicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
+import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
-  [agentPickCommand.data.name]: agentPickCommand,
   [mainDiceCommand.data.name]: mainDiceCommand,
-  [makeCompositionCommand.data.name]: makeCompositionCommand,
-  [mapSelectCommand.data.name]: mapSelectCommand,
-  [memberAllocationCommand.data.name]: memberAllocationCommand,
+  [mainValorantCommand.data.name]: mainValorantCommand,
   [musicCommand.data.name]: musicCommand,
 };
 
@@ -26,14 +20,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   try {
     console.log('サーバーにコマンドを登録中...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [
-        agentPickCommand.data,
-        mainDiceCommand.data,
-        makeCompositionCommand.data,
-        mapSelectCommand.data,
-        memberAllocationCommand.data,
-        musicCommand.data,
-      ],
+      body: [mainDiceCommand.data, mainValorantCommand.data, musicCommand.data],
     });
     console.log('コマンドの登録が完了しました');
   } catch (error) {
@@ -48,21 +35,36 @@ discord.on('ready', () => {
 
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
-  if (interaction.isChatInputCommand()) {
-    // マップからコマンドを取得
-    const command = commands[interaction.commandName];
+  try {
+    if (interaction.isChatInputCommand()) {
+      // マップからコマンドを取得
+      const command = commands[interaction.commandName];
 
-    // コマンドが存在すれば実行
-    if (command) command.execute(interaction);
+      // コマンドが存在すれば実行
+      if (command) command.execute(interaction);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.status === 403) {
+      interaction.channel?.send('コマンドの実行に必要な権限がありません。権限を付与してください。');
+      console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
+    }
   }
 });
 // voiceチャンネルでアクションが発生時に実行
 discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
-  if (oldState.channel?.members.size === 1) {
-    const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
-    if (botJoinVoiceChannelId?.voice.channelId) {
-      botJoinVoiceChannelId?.voice.disconnect();
-      return;
+  try {
+    if (oldState.channel?.members.size === 1) {
+      const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
+      if (botJoinVoiceChannelId?.voice.channelId) {
+        botJoinVoiceChannelId?.voice.disconnect();
+        return;
+      }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.status === 403) {
+      console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
     }
   }
 });
