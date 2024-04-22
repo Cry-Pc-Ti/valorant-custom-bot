@@ -8,7 +8,7 @@ import {
   ComponentType,
 } from 'discord.js';
 import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
-import { clientId } from '../../modules/discordModule';
+import { CLIENT_ID } from '../../modules/discordModule';
 import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { musicInfoMessage } from '../discord/embedMessage';
 import { MusicInfo } from '../../types/musicData';
@@ -80,7 +80,7 @@ export const playListMusicMainLogic = async (
         await buttonInteraction.deferUpdate();
       }
       // BOTがVCにいない場合処理しない
-      if (!(await interaction.guild?.members.fetch(clientId))?.voice.channelId) {
+      if (!(await interaction.guild?.members.fetch(CLIENT_ID))?.voice.channelId) {
         interactionEditMessages(
           interaction,
           buttonInteraction.message.id,

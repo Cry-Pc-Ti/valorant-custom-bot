@@ -9,7 +9,7 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
-import { clientId } from '../../modules/discordModule';
+import { CLIENT_ID } from '../../modules/discordModule';
 import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
 import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
@@ -79,7 +79,7 @@ export const musicCommand = {
     // 「disconnect」コマンド
     if (interaction.options.getSubcommand() === 'disconnect') {
       try {
-        const botJoinVoiceChannelId = await interaction.guild?.members.fetch(clientId);
+        const botJoinVoiceChannelId = await interaction.guild?.members.fetch(CLIENT_ID);
         if (botJoinVoiceChannelId?.voice.channelId) {
           await botJoinVoiceChannelId?.voice.disconnect();
           await interaction.editReply('BOTをVCから切断しました。');
@@ -138,9 +138,9 @@ export const musicCommand = {
           return await interaction.channel?.send('音楽情報のメッセージ存在しないため再生できません。');
         else if (e.status == '401') return console.log('401' + e);
         else if (e.status == '410')
-          return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
+          return await interaction.channel?.send('ポリシーに適していないものが含まれるため再生できません。');
 
-        await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+        await await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
       }
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
