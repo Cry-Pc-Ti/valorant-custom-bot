@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { AgentData } from '../../types/valorantData';
 import { valorantAgents } from '../common/readJsonData';
 import { agentMessage } from '../discord/embedMessage';
+import { Logger } from '../common/log';
 
 export const agentCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -28,8 +29,10 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
 
     // メッセージを送信
     await interaction.editReply(embed);
-  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
     console.error(`agentPickCommandでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(error);
   }
 };

@@ -1,6 +1,7 @@
 import ytdl from 'ytdl-core';
 import { MusicInfo } from '../../types/musicData';
 import { AudioPlayer, AudioPlayerStatus, StreamType, createAudioResource, entersState } from '@discordjs/voice';
+import { Logger } from '../common/log';
 
 // 音楽情報をエンコードしdiscordへ流す
 export const playBackMusic = async (player: AudioPlayer, musicInfo: MusicInfo) => {
@@ -20,8 +21,9 @@ export const playBackMusic = async (player: AudioPlayer, musicInfo: MusicInfo) =
 
     await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
     await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
-  } catch (error) {
-    console.error(error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    Logger.LogSystemError(error);
   }
 };
 

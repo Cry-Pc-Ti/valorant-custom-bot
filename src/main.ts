@@ -6,6 +6,7 @@ import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 import { musicCommand } from './commands/music/musicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
+import { Logger } from './events/common/log';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -31,12 +32,16 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 // クライアントオブジェクトが準備完了時に実行
 discord.on('ready', () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
+  Logger.initialize();
 });
 
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
     if (interaction.isChatInputCommand()) {
+      Logger.LogAccessInfo(
+        `${interaction.user.username}(${interaction.user.id})さんが${interaction.commandName} ${interaction.options.getSubcommand()}コマンドを実行しました`
+      );
       // マップからコマンドを取得
       const command = commands[interaction.commandName];
 
@@ -47,8 +52,10 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
   } catch (error: any) {
     if (error.status === 403) {
       interaction.channel?.send('コマンドの実行に必要な権限がありません。権限を付与してください。');
-      console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
+      Logger.LogAccessError(error);
+      return;
     }
+    console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
   }
 });
 // voiceチャンネルでアクションが発生時に実行
@@ -65,7 +72,9 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
   } catch (error: any) {
     if (error.status === 403) {
       console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
+      Logger.LogAccessError(error);
     }
+    console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
   }
 });
 

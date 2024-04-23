@@ -89,18 +89,18 @@ export const mainValorantCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('randomteams')
-        .setDescription('メンバーをランダムでチーム分けします')
+        .setDescription('メンバーをランダムでチーム分けします。')
         .addChannelOption((option) =>
           option
             .setName('attacker')
-            .setDescription('アタッカーのボイスチャンネルを指定します')
+            .setDescription('アタッカーのボイスチャンネルを指定してください')
             .addChannelTypes(ChannelType.GuildVoice)
             .setRequired(true)
         )
         .addChannelOption((option) =>
           option
             .setName('defender')
-            .setDescription('ディフェンダーのボイスチャンネルを指定します')
+            .setDescription('ディフェンダーのボイスチャンネルを指定してください')
             .addChannelTypes(ChannelType.GuildVoice)
             .setRequired(true)
         )
