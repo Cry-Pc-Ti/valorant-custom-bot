@@ -13,6 +13,7 @@ import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { musicInfoMessage } from '../discord/embedMessage';
 import { MusicInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
+import { Logger } from '../common/log';
 
 export const playListMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
@@ -249,11 +250,13 @@ export const playListMusicMainLogic = async (
           // 400:DiscordAPIError[40060]: Interaction has already been acknowledged.
           // 404:DiscordAPIError[10062]: Unknown interaction
           await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
+          Logger.LogSystemError(e.message);
           return;
         } else if (e.status == '401') {
           console.log('401' + e);
           return;
         }
+        Logger.LogSystemError(e);
         //  [code: 'ABORT_ERR']AbortError: The operation was aborted
       }
     }

@@ -14,6 +14,7 @@ import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogi
 import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
 import { isPlayListFlag } from '../../events/music/musicCommon';
+import { Logger } from '../../events/common/log';
 
 export const musicCommand = {
   // コマンドの設定
@@ -87,16 +88,19 @@ export const musicCommand = {
         }
         await interaction.editReply('BOTがVCにいません。');
         return;
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        Logger.LogSystemError(error);
         console.error(`playMusicCommandでエラーが発生しました : ${error}`);
       }
       // 「play」コマンド
     } else if (interaction.options.getSubcommand() === 'play') {
       try {
-        const url = interaction.options.getString('url') ?? '';
+        const url = interaction.options.getString('url');
         const voiceChannelId = interaction.options.getChannel('channel')?.id;
         const shuffleFlag: boolean = interaction.options.getBoolean('shuffle') ?? false;
 
+        if (!url) return interaction.editReply('設定値が不正です。');
         if (!voiceChannelId || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
           return interaction.editReply('ボイスチャンネルが見つかりません。');
 
@@ -132,6 +136,7 @@ export const musicCommand = {
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
+        Logger.LogSystemError(e);
         console.error(`playMusicCommandでエラーが発生しました : ${e}`);
         // それぞれのエラー制御
         if (e.status == '400')
@@ -140,7 +145,7 @@ export const musicCommand = {
         else if (e.status == '410')
           return await interaction.channel?.send('ポリシーに適していないものが含まれるため再生できません。');
 
-        await await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
+        await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
       }
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {

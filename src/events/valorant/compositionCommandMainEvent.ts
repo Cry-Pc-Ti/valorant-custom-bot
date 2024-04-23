@@ -13,6 +13,7 @@ import { createConcatImage } from '../common/createConcatImage';
 import { compositionMessage } from '../discord/embedMessage';
 import { valorantAgents } from '../common/readJsonData';
 import { countAgentsByRole, countBanAgentsByRole } from './countAgentsNum';
+import { Logger } from '../common/log';
 
 export const compositionCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -75,7 +76,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
 
       // すべての値が空の場合はエラーを返却
       if (Object.values(composition).every((role) => role.length === 0)) {
-        await interaction.editReply('構成作成中にエラーが発生しました\n開発者にお問い合わせください');
+        await interaction.editReply('構成作成中にエラーが発生しました。再度コマンドを入力してください。');
         return;
       }
 
@@ -251,8 +252,10 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
         await interaction.editReply(embed);
       });
     }
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
     console.error(`makeCompositionCommandでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(error);
   }
 };

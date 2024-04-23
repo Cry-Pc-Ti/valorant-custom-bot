@@ -3,6 +3,7 @@ import { MapData } from '../../types/valorantData';
 import { getMapInfo } from '../../service/valorant.service';
 import { generateRandomNum } from '../common/generateRandomNum';
 import { mapMessage } from '../discord/embedMessage';
+import { Logger } from '../common/log';
 
 export const mapCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -18,9 +19,10 @@ export const mapCommandMainEvent = async (interaction: ChatInputCommandInteracti
 
     // メッセージを送信
     await interaction.editReply(embed);
-  } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
     console.error(`mapSelectCommandでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(error);
   }
 };

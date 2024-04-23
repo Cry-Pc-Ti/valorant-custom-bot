@@ -1,4 +1,5 @@
 import { AgentData, CompositionData } from '../../types/valorantData';
+import { Logger } from '../common/log';
 
 // 各ロールのエージェントを指定された人数分ランダムに選択 (重複なし)
 export const selectAgentsByRole = (
@@ -28,8 +29,10 @@ export const selectAgentsByRole = (
     // compositionにエージェントを格納
     composition[agentRole as keyof CompositionData] = randomAgents;
     return composition;
-  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error(`selectAgentsByRoleでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(error);
     return composition;
   }
 };

@@ -12,6 +12,7 @@ import { CLIENT_ID } from '../../modules/discordModule';
 import { donePlayerMessage, musicInfoMessage } from '../discord/embedMessage';
 import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
+import { Logger } from '../common/log';
 
 export const singleMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
@@ -106,17 +107,18 @@ export const singleMusicMainLogic = async (
       return;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      console.error(`playMusicCommandでエラーが発生しました : ${e}`);
       if (replyMessageId === buttonInteraction.message.id) {
         if (e.status == '400' || e.status == '404') {
           // 400:DiscordAPIError[40060]: Interaction has already been acknowledged
           // 404:Unknown interaction
+          Logger.LogSystemError(e.message);
           await interaction.editReply('ボタンをもう一度押してください');
           return;
         } else if (e.status == '401') {
           console.log('401' + e);
           return;
         }
+        Logger.LogSystemError(e);
         //  [code: 'ABORT_ERR']AbortError: The operation was aborted
       }
     }
