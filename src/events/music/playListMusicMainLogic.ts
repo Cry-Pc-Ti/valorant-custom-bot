@@ -261,35 +261,41 @@ export const playListMusicMainLogic = async (
       }
     }
   });
-  // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
-  for (const musicInfo of musicInfoList) {
-    songIndex = musicInfo.songIndex;
-    // チャンネルアイコンを取得
-    const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.id)).videoDetails.author.thumbnails;
-    const embed = musicInfoMessage(
-      musicInfo,
-      buttonRow,
-      musicInfo.songIndex,
-      musicInfoList.length,
-      channelThumbnail ? channelThumbnail[0].url : null
-    );
-    if (musicInfo.songIndex === 1) await interaction.editReply(embed);
-    else
-      interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
-        interaction.channel?.send(embed).then((res) => {
-          replyMessageId = res.id;
+  try {
+    // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
+    for (const musicInfo of musicInfoList) {
+      songIndex = musicInfo.songIndex;
+      // チャンネルアイコンを取得
+      const channelThumbnail = (await ytdl.getBasicInfo(musicInfo.id)).videoDetails.author.thumbnails;
+      const embed = musicInfoMessage(
+        musicInfo,
+        buttonRow,
+        musicInfo.songIndex,
+        musicInfoList.length,
+        channelThumbnail ? channelThumbnail[0].url ?? null : null
+      );
+      if (musicInfo.songIndex === 1) await interaction.editReply(embed);
+      else
+        interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
+          interaction.channel?.send(embed).then((res) => {
+            replyMessageId = res.id;
+          });
         });
-      });
 
-    // リピートフラグがtrueの時無限再生
-    do {
-      await playBackMusic(player, musicInfo);
-    } while (repeatFlg);
+      // リピートフラグがtrueの時無限再生
+      do {
+        await playBackMusic(player, musicInfo);
+      } while (repeatFlg);
+    }
+    // 再生完了した際メッセージを送信
+    await donePlayerInteractionEditMessages(interaction, replyMessageId);
+    // PlayerとListenerを削除
+    deletePlayerInfo(player);
+    // BOTをdiscordから切断
+    connection.destroy();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    Logger.LogSystemError(error);
+    await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
-  // 再生完了した際メッセージを送信
-  await donePlayerInteractionEditMessages(interaction, replyMessageId);
-  // PlayerとListenerを削除
-  deletePlayerInfo(player);
-  // BOTをdiscordから切断
-  connection.destroy();
 };
