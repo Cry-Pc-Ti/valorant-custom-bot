@@ -15,5 +15,10 @@ export const disconnectCommandMainEvent = async (interaction: ChatInputCommandIn
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     Logger.LogSystemError(error);
+    await interaction.editReply({
+      embeds: [],
+      files: [],
+      content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
+    });
   }
 };

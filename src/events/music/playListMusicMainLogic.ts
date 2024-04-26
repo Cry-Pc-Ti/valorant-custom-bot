@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerStatus, VoiceConnection } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -17,8 +17,7 @@ import { Logger } from '../common/log';
 
 export const playListMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
-  connection: VoiceConnection,
-  player: AudioPlayer,
+  voiceChannelId: string,
   musicInfoList: MusicInfo[]
 ) => {
   // DateをuniqueIdとして取得
@@ -64,6 +63,20 @@ export const playListMusicMainLogic = async (
   });
 
   if (!buttonCollector) return;
+
+  if (!interaction.guildId || !interaction.guild?.voiceAdapterCreator)
+    return interaction.editReply('ボイスチャンネルが見つかりません。');
+
+  // playerを作成しdisに音をながす
+  const player = createAudioPlayer();
+  // BOTをVCに接続
+  const connection = joinVoiceChannel({
+    channelId: voiceChannelId,
+    guildId: interaction.guildId,
+    adapterCreator: interaction.guild?.voiceAdapterCreator,
+    selfDeaf: true,
+  });
+  connection.subscribe(player);
 
   // 修正するメッセージのIDを取得
   let replyMessageId: string = (await interaction.fetchReply()).id;
@@ -249,7 +262,11 @@ export const playListMusicMainLogic = async (
         if (e.status == '400' || e.status == '404') {
           // 400:DiscordAPIError[40060]: Interaction has already been acknowledged.
           // 404:DiscordAPIError[10062]: Unknown interaction
-          await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
+          await interactionEditMessages(
+            interaction,
+            replyMessageId,
+            `ボタンをもう一度押してください\n(すいません。バグってるので根気よく押してください。動きます。)`
+          );
           Logger.LogSystemError(e.message);
           return;
         } else if (e.status == '401') {
@@ -257,7 +274,12 @@ export const playListMusicMainLogic = async (
           return;
         }
         Logger.LogSystemError(e);
-        //  [code: 'ABORT_ERR']AbortError: The operation was aborted
+        await interactionEditMessages(interaction, replyMessageId, {
+          content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
+          components: [],
+          files: [],
+          embeds: [],
+        });
       }
     }
   });
@@ -294,8 +316,13 @@ export const playListMusicMainLogic = async (
     // BOTをdiscordから切断
     connection.destroy();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    Logger.LogSystemError(error);
+  } catch (e: any) {
+    Logger.LogSystemError(e);
+    // それぞれのエラー制御
+    if (e.status == '400') return await interaction.channel?.send('音楽情報のメッセージ存在しないため再生できません。');
+    else if (e.status == '410')
+      return await interaction.channel?.send('ポリシーに適していないものが含まれるため再生できません。');
+
     await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };
