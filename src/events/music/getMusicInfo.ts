@@ -46,9 +46,7 @@ export const getSingleMusicInfo = async (url: string, index?: number) => {
       url: musicDetails.videoDetails.author.channel_url,
       channelID: musicDetails.videoDetails.author.id,
       name: musicDetails.videoDetails.author.name,
-      channelThumbnail: musicDetails.videoDetails.author.thumbnails
-        ? musicDetails.videoDetails.author.thumbnails[0].url
-        : musicDetails.videoDetails.thumbnails[0].url,
+      channelThumbnail: musicDetails.videoDetails.author.thumbnails?.map((thumbnail) => thumbnail.url)[0],
     },
     relatedVideosIDlist: musicDetails.related_videos.map((item) => item.id ?? ''),
   };

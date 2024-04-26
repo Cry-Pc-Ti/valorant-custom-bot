@@ -1,9 +1,9 @@
 import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-import { mapCommandMainEvent } from '../../events/valorant/mapCommandMainEvent';
-import { agentCommandMainEvent } from '../../events/valorant/agentCommandMainEvent';
-import { compositionCommandMainEvent } from '../../events/valorant/compositionCommandMainEvent';
-import { randomteamsCommandMainEvent } from '../../events/valorant/randomteamsCommandMainEvent';
+import { mapCommandMainEvent } from './mapCommandMainEvent';
+import { agentCommandMainEvent } from './agentCommandMainEvent';
+import { compositionCommandMainEvent } from './compositionCommandMainEvent';
+import { randomteamsCommandMainEvent } from './randomteamsCommandMainEvent';
 
 export const mainValorantCommand = {
   data: new SlashCommandBuilder()
