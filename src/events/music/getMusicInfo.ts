@@ -63,7 +63,8 @@ export const getSearchMusicPlayListInfo = async (words: string) => {
       playListId: index,
       url: item.url ?? '',
       thumbnail: item.thumbnail?.url,
-      title: item.title?.substring(0, 100),
+      title: item.title?.substring(0, 90) ?? 'titleの取得に失敗しました。',
+      videosLength: String(item.videos),
     };
   });
   return musicplayListInfo;

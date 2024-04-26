@@ -1,10 +1,10 @@
-import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { playCommandMainEvent } from './playCommandMainEvent';
 import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
 
-export const musicCommand = {
+export const mainMusicCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
     .setName('music')
@@ -13,13 +13,6 @@ export const musicCommand = {
       subcommand
         .setName('play')
         .setDescription('VCで音楽を流します。')
-        .addChannelOption((option) =>
-          option
-            .setName('channel')
-            .setDescription('音楽を流すチャンネルを選択')
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildVoice)
-        )
         .addBooleanOption((option) =>
           option
             .setName('shuffle')
@@ -35,13 +28,6 @@ export const musicCommand = {
       subcommand
         .setName('search')
         .setDescription('入力されたワードからplayListを検索して再生します')
-        .addChannelOption((option) =>
-          option
-            .setName('channel')
-            .setDescription('音楽を流すチャンネルを選択')
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildVoice)
-        )
         .addStringOption((option) =>
           option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
         )
@@ -50,13 +36,6 @@ export const musicCommand = {
       subcommand
         .setName('recommend')
         .setDescription('指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
-        .addChannelOption((option) =>
-          option
-            .setName('channel')
-            .setDescription('音楽を流すチャンネルを選択')
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildVoice)
-        )
         .addStringOption((option) =>
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )

@@ -19,5 +19,6 @@ export interface PlayListInfo {
   playListId: number;
   url: string;
   thumbnail: string | undefined;
-  title: string | undefined;
+  title: string;
+  videosLength: string;
 }

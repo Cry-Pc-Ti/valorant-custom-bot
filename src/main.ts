@@ -3,7 +3,7 @@ import { Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
-import { musicCommand } from './commands/music/musicCommand';
+import { mainMusicCommand } from './commands/music/mainMusicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
@@ -12,7 +12,7 @@ import { Logger } from './events/common/log';
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
   [mainValorantCommand.data.name]: mainValorantCommand,
-  [musicCommand.data.name]: musicCommand,
+  [mainMusicCommand.data.name]: mainMusicCommand,
 };
 
 // サーバーにコマンドを登録
@@ -21,7 +21,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   try {
     console.log('サーバーにコマンドを登録中...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [mainDiceCommand.data, mainValorantCommand.data, musicCommand.data],
+      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data],
     });
     console.log('コマンドの登録が完了しました');
   } catch (error) {
@@ -50,12 +50,14 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    Logger.LogAccessError(error);
     if (error.status === 403) {
       interaction.channel?.send('コマンドの実行に必要な権限がありません。権限を付与してください。');
-      Logger.LogAccessError(error);
       return;
     }
-    console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
+    interaction.channel?.send(
+      'エラーが発生したので再度コマンドの入力をお願いいたします。それでも解決しない場合はサーバーを一度蹴ってウィングマン君を招待してください。'
+    );
   }
 });
 // voiceチャンネルでアクションが発生時に実行
@@ -70,11 +72,7 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    if (error.status === 403) {
-      console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
-      Logger.LogAccessError(error);
-    }
-    console.error(`コマンドの実行中にエラーが発生しました : ${error}`);
+    Logger.LogAccessError(error);
   }
 });
 
