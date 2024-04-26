@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { MapData } from '../../types/valorantData';
 import { getMapInfo } from '../../service/valorant.service';
-import { generateRandomNum } from '../common/generateRandomNum';
-import { mapMessage } from '../discord/embedMessage';
-import { Logger } from '../common/log';
+import { generateRandomNum } from '../../events/common/generateRandomNum';
+import { mapMessage } from '../../events/discord/embedMessage';
+import { Logger } from '../../events/common/log';
 
 export const mapCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

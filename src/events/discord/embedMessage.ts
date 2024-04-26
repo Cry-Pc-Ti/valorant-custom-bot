@@ -297,3 +297,19 @@ export const donePlayerMessage = () => {
 
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
+
+// 再生準備中のメッセージを作成
+export const preparingPlayerMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('関連の楽曲を探しております。少々お待ちください')
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};

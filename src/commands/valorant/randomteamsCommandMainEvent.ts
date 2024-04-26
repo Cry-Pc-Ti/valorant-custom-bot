@@ -9,8 +9,8 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { MemberAllocationData, MemberData } from '../../types/memberData';
-import { generateRandomNum } from '../common/generateRandomNum';
-import { memberAllocationMessage } from '../discord/embedMessage';
+import { generateRandomNum } from '../../events/common/generateRandomNum';
+import { memberAllocationMessage } from '../../events/discord/embedMessage';
 
 export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

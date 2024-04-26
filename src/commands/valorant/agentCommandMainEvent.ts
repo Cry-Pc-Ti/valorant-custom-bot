@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { AgentData } from '../../types/valorantData';
-import { valorantAgents } from '../common/readJsonData';
-import { agentMessage } from '../discord/embedMessage';
-import { Logger } from '../common/log';
+import { valorantAgents } from '../../events/common/readJsonData';
+import { agentMessage } from '../../events/discord/embedMessage';
+import { Logger } from '../../events/common/log';
 
 export const agentCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
