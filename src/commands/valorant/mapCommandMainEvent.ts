@@ -22,7 +22,6 @@ export const mapCommandMainEvent = async (interaction: ChatInputCommandInteracti
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    console.error(`mapSelectCommandでエラーが発生しました : ${error}`);
     Logger.LogSystemError(error);
   }
 };

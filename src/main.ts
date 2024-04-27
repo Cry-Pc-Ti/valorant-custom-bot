@@ -7,12 +7,14 @@ import { mainMusicCommand } from './commands/music/mainMusicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
+import { gameCommand } from './commands/play/gameCommand';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
   [mainValorantCommand.data.name]: mainValorantCommand,
   [mainMusicCommand.data.name]: mainMusicCommand,
+  [gameCommand.data.name]: gameCommand,
 };
 
 // サーバーにコマンドを登録
@@ -21,7 +23,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   try {
     console.log('サーバーにコマンドを登録中...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data],
+      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data, gameCommand.data],
     });
     console.log('コマンドの登録が完了しました');
   } catch (error) {

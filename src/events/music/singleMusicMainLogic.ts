@@ -139,7 +139,7 @@ export const singleMusicMainLogic = async (
     });
 
     // 音楽情報のメッセージ作成、送信
-    const embed = musicInfoMessage(musicInfo, buttonRow);
+    const embed = musicInfoMessage(musicInfo, [buttonRow]);
     await interaction.editReply(embed);
 
     // リピートフラグがtrueの時無限再生
