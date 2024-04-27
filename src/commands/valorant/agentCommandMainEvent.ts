@@ -32,7 +32,6 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    console.error(`agentPickCommandでエラーが発生しました : ${error}`);
     Logger.LogSystemError(error);
   }
 };

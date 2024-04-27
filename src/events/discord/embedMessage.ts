@@ -240,7 +240,7 @@ export const chinchiro456Message = (result: string) => {
 //「/playList」コマンドのメッセージを作成
 export const musicInfoMessage = (
   musicInfo: MusicInfo,
-  buttonRow: ActionRowBuilder<ButtonBuilder>,
+  buttonRowList: ActionRowBuilder<ButtonBuilder>[],
   musicCount?: number,
   maxMusicCount?: number,
   channelThumbnail?: string | null
@@ -279,7 +279,7 @@ export const musicInfoMessage = (
 
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
 
-  return { embeds: [embeds], files: [fotterAttachment], components: [buttonRow] };
+  return { embeds: [embeds], files: [fotterAttachment], components: buttonRowList };
 };
 
 // 再生完了のメッセージを作成

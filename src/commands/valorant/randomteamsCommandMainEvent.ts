@@ -11,6 +11,7 @@ import {
 import { MemberAllocationData, MemberData } from '../../types/memberData';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { memberAllocationMessage } from '../../events/discord/embedMessage';
+import { Logger } from '../../events/common/log';
 
 export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -191,8 +192,9 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
         }
       });
     });
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    console.error(error);
+    Logger.LogSystemError(error);
   }
 };

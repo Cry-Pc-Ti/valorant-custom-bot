@@ -20,6 +20,9 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
     const voiceChannelId = (await interaction.guild?.members.fetch(interaction.user.id))?.voice.channelId;
     if (!voiceChannelId) return interaction.editReply('ボイスチャンネルに参加してください。');
 
+    // データ収集
+    Logger.LogAccessInfo(`${interaction.user.username}(${interaction.user.id})さんが${words} を調べました。`);
+
     const musicplayListInfo: PlayListInfo[] = await getSearchMusicPlayListInfo(words);
 
     // セレクトメニューを作成
@@ -64,6 +67,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
 
         // playList再生処理
         await playListMusicMainLogic(interaction, voiceChannelId, musicInfoList);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Logger.LogSystemError(error);
