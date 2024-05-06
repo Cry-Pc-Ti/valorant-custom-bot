@@ -14,7 +14,7 @@ export const disconnectCommandMainEvent = async (interaction: ChatInputCommandIn
     return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(error);
+    Logger.LogSystemError(`disconnectCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply({
       embeds: [],
       files: [],

@@ -1,5 +1,6 @@
 import { CanvasRenderingContext2D, createCanvas, loadImage, registerFont } from 'canvas';
 import fs from 'fs';
+import { Logger } from '../common/log';
 
 // フォントを読み込む
 registerFont('./static/fonts/Yomogi-Regular.ttf', { family: 'Yomogi' });
@@ -51,6 +52,6 @@ export const addTextToImage = async (num: number): Promise<void> => {
       stream.on('error', reject);
     });
   } catch (error) {
-    console.error(error);
+    Logger.LogSystemError(`addTextToImageでエラーが発生しました : ${error}`);
   }
 };

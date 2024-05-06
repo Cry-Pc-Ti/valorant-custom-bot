@@ -194,7 +194,7 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    Logger.LogSystemError(`randomteamsCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    Logger.LogSystemError(error);
   }
 };

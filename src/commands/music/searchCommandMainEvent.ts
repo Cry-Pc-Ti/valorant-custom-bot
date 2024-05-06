@@ -6,11 +6,13 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
-import { MusicInfo, PlayListInfo } from '../../types/musicData';
+import { PlayListInfo } from '../../types/musicData';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo } from '../../events/music/getMusicInfo';
 import { Logger } from '../../events/common/log';
 
 export const searchCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
+  // 修正するメッセージのIDを取得
+  const replyMessageId: string = (await interaction.fetchReply()).id;
   try {
     const words = interaction.options.getString('words');
 
@@ -53,38 +55,29 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
     });
 
     collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-      try {
-        await interaction.editReply({
-          content: `【${musicplayListInfo[Number(selectMenuInteraction.values)].title}】を再生しております。`,
-          components: [],
-        });
+      await interaction.channel?.messages.edit(replyMessageId, {
+        content: `【${musicplayListInfo[Number(selectMenuInteraction.values)].title}】を再生しております。`,
+        files: [],
+        components: [],
+      });
 
-        // URLからプレイリスト情報を取得
-        const musicInfoList: MusicInfo[] = await getMusicPlayListInfo(
-          musicplayListInfo[Number(selectMenuInteraction.values)].url,
-          true
-        );
+      // URLからプレイリスト情報を取得
+      const playListInfo: PlayListInfo = await getMusicPlayListInfo(
+        musicplayListInfo[Number(selectMenuInteraction.values)].url,
+        true
+      );
+      playListInfo.searchWord = words;
 
-        // playList再生処理
-        await playListMusicMainLogic(interaction, voiceChannelId, musicInfoList);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        Logger.LogSystemError(error);
-        await interaction.editReply({
-          content: `もう一度選択するか、再度コマンドを入力してください`,
-          files: [],
-          components: [],
-        });
-      }
+      // playList再生処理
+      await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(error);
-    await interaction.editReply({
-      embeds: [],
+    Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+    await interaction.channel?.messages.edit(replyMessageId, {
+      content: `再度コマンドを入力してください`,
       files: [],
-      content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
+      components: [],
     });
   }
 };

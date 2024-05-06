@@ -21,4 +21,6 @@ export interface PlayListInfo {
   thumbnail: string | undefined;
   title: string;
   videosLength: string;
+  searchWord?: string;
+  musicInfo: MusicInfo[];
 }

@@ -8,6 +8,9 @@ dotenv.config();
 const TOKEN = process.env.DISCORD_TOKEN as string;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID as string;
 
-const discord = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
+const discord = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+  closeTimeout: 60000,
+});
 
 export { discord, TOKEN, CLIENT_ID };

@@ -26,7 +26,8 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
 
     await interaction.editReply(embed);
 
-    const relatedMusicInfoList: MusicInfo[] = [];
+    let originMusicTitle: string;
+    const relatedplayListInfo: MusicInfo[] = [];
     let musicInfo: MusicInfo;
 
     const maxPlayListNum = 15;
@@ -34,45 +35,59 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
 
     // プレイリストの時はプレイリストの中から関連楽曲をとってくる
     if (playListFlag.result) {
-      const musicInfoList = await getMusicPlayListInfo(url, false);
+      const playListInfo = await getMusicPlayListInfo(url, false);
+      originMusicTitle = playListInfo.title;
 
       do {
-        const musicInfoListNum = generateRandomNum(0, musicInfoList.length - 1);
-        musicInfo = await getSingleMusicInfo(musicInfoList[musicInfoListNum].url ?? '');
+        const playListInfoNum = generateRandomNum(0, playListInfo.musicInfo.length - 1);
+        musicInfo = await getSingleMusicInfo(playListInfo.musicInfo[playListInfoNum].url ?? '');
         const relatedRandomNum = generateRandomNum(
           1,
           musicInfo.relatedVideosIDlist.length - 5 >= 1 ? musicInfo.relatedVideosIDlist.length - 5 : 2
         );
-        musicInfoList.splice(musicInfoListNum, 1);
+        playListInfo.musicInfo.splice(playListInfoNum, 1);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         musicInfo.relatedVideosIDlist.sort((_a, _b) => 0.5 - Math.random());
         for (let i = 0; i <= relatedRandomNum; i++)
-          relatedMusicInfoList.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
+          relatedplayListInfo.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
 
         playListNum += relatedRandomNum;
-        musicInfo = musicInfoList[generateRandomNum(0, musicInfoList.length - 1)];
+        musicInfo = playListInfo.musicInfo[generateRandomNum(0, playListInfo.musicInfo.length - 1)];
       } while (playListNum <= maxPlayListNum);
       // 曲の時はその曲の関連楽曲をとってくる
     } else {
       musicInfo = await getSingleMusicInfo(url);
+      originMusicTitle = musicInfo.title;
       do {
         const relatedRandomNum = generateRandomNum(1, musicInfo.relatedVideosIDlist.length - 5);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         musicInfo.relatedVideosIDlist.sort((_a, _b) => 0.5 - Math.random());
         for (let i = 0; i <= relatedRandomNum; i++)
-          relatedMusicInfoList.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
+          relatedplayListInfo.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
 
         playListNum += relatedRandomNum;
-        musicInfo = relatedMusicInfoList[generateRandomNum(0, relatedMusicInfoList.length - 1)];
+        musicInfo = relatedplayListInfo[generateRandomNum(0, relatedplayListInfo.length - 1)];
       } while (playListNum <= maxPlayListNum);
     }
 
     // playList再生処理
-    await playListMusicMainLogic(interaction, voiceChannelId, relatedMusicInfoList);
+    await playListMusicMainLogic(
+      interaction,
+      voiceChannelId,
+      {
+        playListId: 1,
+        url: url,
+        thumbnail: undefined,
+        title: originMusicTitle,
+        videosLength: String(relatedplayListInfo.length),
+        musicInfo: relatedplayListInfo,
+      },
+      2
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(error);
+    Logger.LogSystemError(`recommendCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply({
       embeds: [],
       files: [],

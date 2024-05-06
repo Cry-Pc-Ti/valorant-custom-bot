@@ -31,8 +31,7 @@ export const selectAgentsByRole = (
     return composition;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error(`selectAgentsByRoleでエラーが発生しました : ${error}`);
-    Logger.LogSystemError(error);
+    Logger.LogSystemError(`selectAgentsByRoleでエラーが発生しました : ${error}`);
     return composition;
   }
 };

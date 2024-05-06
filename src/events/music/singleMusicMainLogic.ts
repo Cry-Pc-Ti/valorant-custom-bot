@@ -120,19 +120,16 @@ export const singleMusicMainLogic = async (
         }
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
+      } catch (error: any) {
         if (replyMessageId === buttonInteraction.message.id) {
-          if (e.status == '400' || e.status == '404') {
+          if (error.status == '400' || error.status == '404') {
             // 400:DiscordAPIError[40060]: Interaction has already been acknowledged
             // 404:Unknown interaction
-            Logger.LogSystemError(e.message);
+            Logger.LogSystemError(error.message);
             await interaction.editReply('ボタンをもう一度押してください');
             return;
-          } else if (e.status == '401') {
-            console.log('401' + e);
-            return;
           }
-          Logger.LogSystemError(e);
+          Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
           //  [code: 'ABORT_ERR']AbortError: The operation was aborted
         }
       }
@@ -151,16 +148,18 @@ export const singleMusicMainLogic = async (
     // 再生完了した際メッセージを送信
     const embeds = donePlayerMessage();
     await interaction.editReply(embeds);
+
     // PlayerとListenerを削除
     deletePlayerInfo(player);
     // BOTをdiscordから切断
     connection.destroy();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    Logger.LogSystemError(e);
+  } catch (error: any) {
+    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
     // それぞれのエラー制御
-    if (e.status == '400') return interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
-    else if (e.status == '410')
+    if (error.status == '400') return interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
+    else if (error.status == '410')
       return interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
 
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
