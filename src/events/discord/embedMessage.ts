@@ -273,20 +273,12 @@ export const musicInfoPlayListMessage = (
   // 0: playCommand,1: searchCommand
   commandFlg: number
 ) => {
-  const embeds = new EmbedBuilder()
-    .setColor('#fd4556')
-    .setTitle(playListInfo.musicInfo[musicCount - 1].title)
-    .setURL(playListInfo.musicInfo[musicCount - 1].url ?? null)
-    .setImage(playListInfo.musicInfo[musicCount - 1].musicImg ?? null)
-    .setFooter({
-      text: `YouTube Playlist ${musicCount} / ${playListInfo.musicInfo.length}`,
-      iconURL: 'attachment://youtube_icon.png',
-    })
-    .setTimestamp();
+  const embeds = new EmbedBuilder().setColor('#fd4556');
+
   if (commandFlg === 0) {
     embeds.addFields({
-      name: 'プレイリスト名',
-      value: `[${playListInfo.title}](${playListInfo.url})`,
+      name: 'プレイリスト',
+      value: `【[${playListInfo.title}](${playListInfo.url})】を再生中🎵`,
     });
   } else if (commandFlg === 1) {
     embeds.addFields(
@@ -296,11 +288,16 @@ export const musicInfoPlayListMessage = (
         inline: true,
       },
       {
-        name: 'プレイリスト',
-        value: `[${playListInfo.title}](${playListInfo.url})`,
+        name: '曲順',
+        value: `${musicCount} / ${playListInfo.musicInfo.length}`,
         inline: true,
       }
     );
+  } else if (commandFlg === 2) {
+    embeds.addFields({
+      name: '最初に指定した楽曲',
+      value: `${playListInfo.title}`,
+    });
   }
 
   if (musicCount === playListInfo.musicInfo.length) {
@@ -311,20 +308,31 @@ export const musicInfoPlayListMessage = (
       value: `[${playListInfo.musicInfo[musicCount].title}](${playListInfo.musicInfo[musicCount].url})`,
     });
   }
+  const embeds2 = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(playListInfo.musicInfo[musicCount - 1].title)
+    .setURL(playListInfo.musicInfo[musicCount - 1].url ?? null)
+    .setImage(playListInfo.musicInfo[musicCount - 1].musicImg ?? null)
+    .setFooter({
+      text: `YouTube Playlist`,
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
   if (channelThumbnail) {
-    embeds.setAuthor({
+    embeds2.setAuthor({
       name: playListInfo.musicInfo[musicCount - 1].author.name,
       iconURL: channelThumbnail,
     });
   } else {
-    embeds.setAuthor({
+    embeds2.setAuthor({
       name: playListInfo.musicInfo[musicCount - 1].author.name,
     });
   }
 
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
 
-  return { embeds: [embeds], files: [fotterAttachment], components: buttonRowList };
+  return { embeds: [embeds, embeds2], files: [fotterAttachment], components: buttonRowList };
 };
 
 // 再生完了のメッセージを作成

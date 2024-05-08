@@ -55,11 +55,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
     });
 
     collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-      await interaction.channel?.messages.edit(replyMessageId, {
-        content: `【${musicplayListInfo[Number(selectMenuInteraction.values)].title}】を再生しております。`,
-        files: [],
-        components: [],
-      });
+      selectMenuInteraction.deferUpdate();
 
       // URLからプレイリスト情報を取得
       const playListInfo: PlayListInfo = await getMusicPlayListInfo(

@@ -59,7 +59,7 @@ export const getSingleMusicInfo = async (url: string, index?: number) => {
 
 // wordsからプリリスト情報を検索しデータ加工をして返す
 export const getSearchMusicPlayListInfo = async (words: string) => {
-  const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 20, safeSearch: true });
+  const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 30, safeSearch: true });
 
   // 取得したplaylist情報から必要な情報だけ格納
   return searchPlayListInfo.map((item, index) => {
