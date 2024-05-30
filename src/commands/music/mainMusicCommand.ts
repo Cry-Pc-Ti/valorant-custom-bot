@@ -3,6 +3,7 @@ import { playCommandMainEvent } from './playCommandMainEvent';
 import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
+import { stopPreviousInteraction } from '../../events/music/playListMusicMainLogic';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -49,12 +50,15 @@ export const mainMusicCommand = {
       await disconnectCommandMainEvent(interaction);
       // 「play」コマンド
     } else if (interaction.options.getSubcommand() === 'play') {
+      await stopPreviousInteraction();
       await playCommandMainEvent(interaction);
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
+      await stopPreviousInteraction();
       await searchCommandMainEvent(interaction);
       // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
+      await stopPreviousInteraction();
       await recommendCommandMainEvent(interaction);
     }
   },

@@ -1,4 +1,4 @@
-import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -6,6 +6,7 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
   ComponentType,
+  InteractionCollector,
 } from 'discord.js';
 import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
 import { CLIENT_ID } from '../../modules/discordModule';
@@ -15,6 +16,60 @@ import { PlayListInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
 import { Logger } from '../common/log';
 
+let currentPlayer: AudioPlayer | null = null;
+let currentCollector: InteractionCollector<ButtonInteraction> | null = null;
+
+// コレクションを削除
+export const stopPreviousInteraction = async () => {
+  if (currentPlayer) {
+    currentPlayer.stop();
+    currentPlayer = null;
+  }
+  if (currentCollector) {
+    currentCollector.stop();
+    currentCollector = null;
+  }
+};
+
+// ボタンを作成
+const createButtonRow = (uniqueId: number) => {
+  const stopPlayMusicButton = new ButtonBuilder()
+    .setCustomId(`stopPlayMusicButton_${uniqueId}`)
+    .setStyle(ButtonStyle.Secondary)
+    .setLabel('停止')
+    .setEmoji('⏸');
+
+  const repeatSingleButton = new ButtonBuilder()
+    .setCustomId(`repeatSingleButton_${uniqueId}`)
+    .setStyle(ButtonStyle.Secondary)
+    .setLabel('リピート')
+    .setEmoji('🔁');
+
+  const prevPlayMusicButton = new ButtonBuilder()
+    .setCustomId(`prevPlayMusicButton_${uniqueId}`)
+    .setStyle(ButtonStyle.Secondary)
+    .setLabel('前の曲へ')
+    .setEmoji('⏮');
+
+  const nextPlayMusicButton = new ButtonBuilder()
+    .setCustomId(`nextPlayMusicButton_${uniqueId}`)
+    .setStyle(ButtonStyle.Secondary)
+    .setLabel('次の曲へ')
+    .setEmoji('⏭');
+
+  const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    prevPlayMusicButton,
+    stopPlayMusicButton,
+    nextPlayMusicButton
+  );
+  const buttonRow2: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    repeatSingleButton
+  );
+
+  return { buttonRow, buttonRow2, stopPlayMusicButton, repeatSingleButton };
+};
+
+// 音楽再生
 export const playListMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
   voiceChannelId: string,
@@ -25,43 +80,9 @@ export const playListMusicMainLogic = async (
     // DateをuniqueIdとして取得
     const uniqueId = Date.now();
 
-    // 「一時停止」ボタン
-    const stopPlayMusicButton = new ButtonBuilder()
-      .setCustomId(`stopPlayMusicButton_${uniqueId}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('停止')
-      .setEmoji('⏸');
+    // ボタンを作成
+    const { buttonRow, buttonRow2, stopPlayMusicButton, repeatSingleButton } = createButtonRow(uniqueId);
 
-    // 「１曲リピート」ボタン
-    const repeatSingleButton = new ButtonBuilder()
-      .setCustomId(`repeatSingleButton_${uniqueId}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('リピート')
-      .setEmoji('🔁');
-
-    // 「前の曲へ」ボタン
-    const prevPlayMusicButton = new ButtonBuilder()
-      .setCustomId(`prevPlayMusicButton_${uniqueId}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('前の曲へ')
-      .setEmoji('⏮');
-
-    // 「次の曲へ」ボタン
-    const nextPlayMusicButton = new ButtonBuilder()
-      .setCustomId(`nextPlayMusicButton_${uniqueId}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('次の曲へ')
-      .setEmoji('⏭');
-
-    // ボタンをActionRowに追加
-    const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      prevPlayMusicButton,
-      stopPlayMusicButton,
-      nextPlayMusicButton
-    );
-    const buttonRow2: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      repeatSingleButton
-    );
     const buttonCollector = interaction.channel?.createMessageComponentCollector({
       componentType: ComponentType.Button,
     });
@@ -89,8 +110,13 @@ export const playListMusicMainLogic = async (
     // 再生している曲のindexを取得
     let songIndex: number;
 
+    currentPlayer = player;
+    currentCollector = buttonCollector;
+
     // ボタンが押された時の処理
     buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
+      if (!buttonInteraction.customId.endsWith(`_${uniqueId}`)) return;
+
       try {
         if (!buttonInteraction.replied && !buttonInteraction.deferred) {
           await buttonInteraction.deferUpdate();
@@ -105,9 +131,6 @@ export const playListMusicMainLogic = async (
           interactionEditMessages(interaction, buttonInteraction.message.id, { components: [] });
           return;
         }
-
-        // 他メッセージのボタン押されたときに処理しない
-        if (replyMessageId !== buttonInteraction.message.id) return;
 
         // メッセージを削除
         if (interaction.channel?.messages.fetch(replyMessageId))
@@ -261,13 +284,7 @@ export const playListMusicMainLogic = async (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if ((replyMessageId === buttonInteraction.message.id && error.status == '400') || error.status == '404') {
-          // 400:DiscordAPIError[40060]: Interaction has already been acknowledged.
-          // 404:DiscordAPIError[10062]: Unknown interaction
-          await interactionEditMessages(
-            interaction,
-            replyMessageId,
-            `ボタンをもう一度押してください\n(すいません。バグってるので根気よく押してください。動きます。)`
-          );
+          await interactionEditMessages(interaction, replyMessageId, `ボタンをもう一度押してください`);
           Logger.LogSystemError(error.message);
           return;
         }
@@ -279,6 +296,9 @@ export const playListMusicMainLogic = async (
           embeds: [],
         });
       }
+    });
+    buttonCollector.on('end', () => {
+      currentCollector = null;
     });
 
     // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
