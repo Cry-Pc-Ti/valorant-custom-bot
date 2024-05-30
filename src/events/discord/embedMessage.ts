@@ -278,8 +278,16 @@ export const musicInfoPlayListMessage = (
   if (commandFlg === 0) {
     embeds.addFields({
       name: 'プレイリスト',
-      value: `【[${playListInfo.title}](${playListInfo.url})】を再生中🎵`,
+      value: `【[${playListInfo.title}](${playListInfo.url})】を再生中🎵 `,
+      inline: true,
     });
+    if (playListInfo.musicInfo.length) {
+      embeds.addFields({
+        name: '曲順',
+        value: `${musicCount} / ${playListInfo.musicInfo.length}`,
+        inline: true,
+      });
+    }
   } else if (commandFlg === 1) {
     embeds.addFields(
       {

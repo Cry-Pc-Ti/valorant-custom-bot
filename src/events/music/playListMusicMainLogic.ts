@@ -4,6 +4,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  CacheType,
   ChatInputCommandInteraction,
   ComponentType,
   InteractionCollector,
@@ -16,18 +17,22 @@ import { PlayListInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
 import { Logger } from '../common/log';
 
-let currentPlayer: AudioPlayer | null = null;
-let currentCollector: InteractionCollector<ButtonInteraction> | null = null;
+const guildStates = new Map<
+  string,
+  {
+    player: AudioPlayer;
+    buttonCollector: InteractionCollector<ButtonInteraction<CacheType>>;
+    songIndex: number;
+  }
+>();
 
 // コレクションを削除
-export const stopPreviousInteraction = async () => {
-  if (currentPlayer) {
-    currentPlayer.stop();
-    currentPlayer = null;
-  }
-  if (currentCollector) {
-    currentCollector.stop();
-    currentCollector = null;
+export const stopPreviousInteraction = async (guildId: string) => {
+  const state = guildStates.get(guildId);
+  if (state) {
+    state.player.stop();
+    state.buttonCollector.stop();
+    guildStates.delete(guildId);
   }
 };
 
@@ -56,6 +61,11 @@ const createButtonRow = (uniqueId: number) => {
     .setStyle(ButtonStyle.Secondary)
     .setLabel('次の曲へ')
     .setEmoji('⏭');
+  // const showUrlButton = new ButtonBuilder()
+  //   .setCustomId(`showUrlButton_${uniqueId}`)
+  //   .setStyle(ButtonStyle.Secondary)
+  //   .setLabel('URLを表示')
+  //   .setEmoji('🔗');
 
   const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     prevPlayMusicButton,
@@ -64,6 +74,7 @@ const createButtonRow = (uniqueId: number) => {
   );
   const buttonRow2: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     repeatSingleButton
+    //showUrlButton
   );
 
   return { buttonRow, buttonRow2, stopPlayMusicButton, repeatSingleButton };
@@ -77,6 +88,7 @@ export const playListMusicMainLogic = async (
   commandFlg: number
 ) => {
   try {
+    const guildId = interaction.guildId ?? null;
     // DateをuniqueIdとして取得
     const uniqueId = Date.now();
 
@@ -87,7 +99,7 @@ export const playListMusicMainLogic = async (
       componentType: ComponentType.Button,
     });
 
-    if (!buttonCollector || !interaction.guildId || !interaction.guild?.voiceAdapterCreator)
+    if (!buttonCollector || !guildId || !interaction.guild?.voiceAdapterCreator)
       return interaction.editReply('ボイスチャンネルが見つかりません。');
 
     // playerを作成しdisに音をながす
@@ -95,7 +107,7 @@ export const playListMusicMainLogic = async (
     // BOTをVCに接続
     const connection = joinVoiceChannel({
       channelId: voiceChannelId,
-      guildId: interaction.guildId,
+      guildId: guildId,
       adapterCreator: interaction.guild?.voiceAdapterCreator,
       selfDeaf: true,
     });
@@ -108,10 +120,9 @@ export const playListMusicMainLogic = async (
     let repeatNumberFlg: number = 0;
 
     // 再生している曲のindexを取得
-    let songIndex: number;
+    let songIndex: number = 0;
 
-    currentPlayer = player;
-    currentCollector = buttonCollector;
+    guildStates.set(guildId, { player, buttonCollector, songIndex: songIndex });
 
     // ボタンが押された時の処理
     buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
@@ -131,6 +142,8 @@ export const playListMusicMainLogic = async (
           interactionEditMessages(interaction, buttonInteraction.message.id, { components: [] });
           return;
         }
+        const state = guildStates.get(guildId);
+        if (!state) return;
 
         // メッセージを削除
         if (interaction.channel?.messages.fetch(replyMessageId))
@@ -280,6 +293,24 @@ export const playListMusicMainLogic = async (
           }
           return;
         }
+        // // URL表示ボタン押下時
+        // if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
+        //   const modal = new ModalBuilder()
+        //     .setCustomId(`showUrlModal_${uniqueId}`)
+        //     .setTitle('再生中のURL')
+        //     .addComponents(
+        //       new ActionRowBuilder<TextInputBuilder>().addComponents(
+        //         new TextInputBuilder()
+        //           .setCustomId('urlInput')
+        //           .setLabel('URL')
+        //           .setStyle(TextInputStyle.Short)
+        //           .setValue(playListInfo.url)
+        //       )
+        //     );
+
+        //   await buttonInteraction.showModal(modal);
+        //   return;
+        // }
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -298,7 +329,10 @@ export const playListMusicMainLogic = async (
       }
     });
     buttonCollector.on('end', () => {
-      currentCollector = null;
+      const state = guildStates.get(guildId);
+      if (state && state.buttonCollector === buttonCollector) {
+        guildStates.delete(guildId);
+      }
     });
 
     // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生

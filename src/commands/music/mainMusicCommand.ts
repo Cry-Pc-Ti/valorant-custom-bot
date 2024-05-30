@@ -45,20 +45,23 @@ export const mainMusicCommand = {
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-    // 「disconnect」コマンド
+    const guildId = interaction.guildId;
+    if (!guildId) return;
+
     if (interaction.options.getSubcommand() === 'disconnect') {
+      // 「disconnect」コマンド
       await disconnectCommandMainEvent(interaction);
       // 「play」コマンド
     } else if (interaction.options.getSubcommand() === 'play') {
-      await stopPreviousInteraction();
+      await stopPreviousInteraction(guildId);
       await playCommandMainEvent(interaction);
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
-      await stopPreviousInteraction();
+      await stopPreviousInteraction(guildId);
       await searchCommandMainEvent(interaction);
       // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
-      await stopPreviousInteraction();
+      await stopPreviousInteraction(guildId);
       await recommendCommandMainEvent(interaction);
     }
   },
