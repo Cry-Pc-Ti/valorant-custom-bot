@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { MusicInfo } from '../../types/musicData';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
+import { playListMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { preparingPlayerMessage } from '../../events/discord/embedMessage';
 import { Logger } from '../../events/common/log';

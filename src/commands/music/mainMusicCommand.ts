@@ -3,7 +3,7 @@ import { playCommandMainEvent } from './playCommandMainEvent';
 import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
-import { stopPreviousInteraction } from '../../events/music/playListMusicMainLogic';
+import { stopPreviousInteraction } from '../../events/music/MusicPlayMainLogic';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -28,9 +28,21 @@ export const mainMusicCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('search')
-        .setDescription('入力されたワードからplayListを検索して再生します')
+        .setDescription('入力されたワードから検索して再生します')
         .addStringOption((option) =>
           option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
+        )
+        .addStringOption((option) =>
+          option.setName('type').setDescription('選択してください').setRequired(true).setChoices(
+            {
+              name: '動画を検索',
+              value: 'video',
+            },
+            {
+              name: 'プレイリストを検索',
+              value: 'playlist',
+            }
+          )
         )
     )
     .addSubcommand((subcommand) =>
@@ -46,22 +58,19 @@ export const mainMusicCommand = {
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const guildId = interaction.guildId;
-    if (!guildId) return;
+    if (guildId) await stopPreviousInteraction(guildId);
 
+    // 「disconnect」コマンド
     if (interaction.options.getSubcommand() === 'disconnect') {
-      // 「disconnect」コマンド
       await disconnectCommandMainEvent(interaction);
       // 「play」コマンド
     } else if (interaction.options.getSubcommand() === 'play') {
-      await stopPreviousInteraction(guildId);
       await playCommandMainEvent(interaction);
       // 「search」コマンド
     } else if (interaction.options.getSubcommand() === 'search') {
-      await stopPreviousInteraction(guildId);
       await searchCommandMainEvent(interaction);
       // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
-      await stopPreviousInteraction(guildId);
       await recommendCommandMainEvent(interaction);
     }
   },

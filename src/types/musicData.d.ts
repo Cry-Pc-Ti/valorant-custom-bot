@@ -4,6 +4,7 @@ export interface MusicInfo {
   url?: string;
   title: string;
   musicImg?: string;
+  durationFormatted: string;
   author: YoutubeChannelInfo;
   relatedVideosIDlist: string[];
 }

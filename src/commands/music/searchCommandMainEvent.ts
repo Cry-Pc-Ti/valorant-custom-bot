@@ -5,9 +5,9 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
-import { PlayListInfo } from '../../types/musicData';
-import { getMusicPlayListInfo, getSearchMusicPlayListInfo } from '../../events/music/getMusicInfo';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
+import { MusicInfo, PlayListInfo } from '../../types/musicData';
+import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSearchMusicVideo } from '../../events/music/getMusicInfo';
 import { Logger } from '../../events/common/log';
 
 export const searchCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
@@ -15,8 +15,9 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
   const replyMessageId: string = (await interaction.fetchReply()).id;
   try {
     const words = interaction.options.getString('words');
+    const type = interaction.options.getString('type');
 
-    if (!words) return interaction.editReply('wordsが不正です');
+    if (!words || !type) return interaction.editReply('wordsが不正です');
 
     // ボイスチャンネルにいない場合は処理しない
     const voiceChannelId = (await interaction.guild?.members.fetch(interaction.user.id))?.voice.channelId;
@@ -25,48 +26,89 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
     // データ収集
     Logger.LogAccessInfo(`${interaction.user.username}(${interaction.user.id})さんが${words} を調べました。`);
 
-    const musicplayListInfo: PlayListInfo[] = await getSearchMusicPlayListInfo(words);
+    if (type === 'playlist') {
+      const musicplayListInfo: PlayListInfo[] = await getSearchMusicPlayListInfo(words);
+      // セレクトメニューを作成
+      const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
+        .setCustomId('playListSelect')
+        .setPlaceholder('再生したいplaylistを選択してください')
+        .setMinValues(1)
+        .setMaxValues(1)
+        .addOptions(
+          musicplayListInfo.map((musicplayList, index) => ({
+            value: String(musicplayList.playListId),
+            label: `${index + 1}: ${musicplayList.title}`,
+            description: `全${musicplayList.videosLength}曲`,
+          }))
+        );
+      // セレクトメニューを作成
+      const row: ActionRowBuilder<StringSelectMenuBuilder> =
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(playListSelect);
 
-    // セレクトメニューを作成
-    const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
-      .setCustomId('playListSelect')
-      .setPlaceholder('再生したいplaylistを選択してください')
-      .setMinValues(1)
-      .setMaxValues(1)
-      .addOptions(
-        musicplayListInfo.map((musicplayList, index) => ({
-          value: String(musicplayList.playListId),
-          label: `${index + 1}: ${musicplayList.title}`,
-          description: `全${musicplayList.videosLength}曲`,
-        }))
-      );
-    // セレクトメニューを作成
-    const row: ActionRowBuilder<StringSelectMenuBuilder> =
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(playListSelect);
+      const selectResponse = await interaction.editReply({
+        components: [row],
+      });
 
-    const selectResponse = await interaction.editReply({
-      components: [row],
-    });
+      // セレクトメニューで選択された値を取得
+      const collector = selectResponse.createMessageComponentCollector({
+        componentType: ComponentType.StringSelect,
+        filter: (selectMenuInteraction) => selectMenuInteraction.user.id === interaction.user.id,
+      });
 
-    // セレクトメニューで選択された値を取得
-    const collector = selectResponse.createMessageComponentCollector({
-      componentType: ComponentType.StringSelect,
-      filter: (selectMenuInteraction) => selectMenuInteraction.user.id === interaction.user.id,
-    });
+      collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
+        selectMenuInteraction.deferUpdate();
 
-    collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-      selectMenuInteraction.deferUpdate();
+        // URLからプレイリスト情報を取得
+        const playListInfo: PlayListInfo = await getMusicPlayListInfo(
+          musicplayListInfo[Number(selectMenuInteraction.values)].url,
+          true
+        );
+        playListInfo.searchWord = words;
 
-      // URLからプレイリスト情報を取得
-      const playListInfo: PlayListInfo = await getMusicPlayListInfo(
-        musicplayListInfo[Number(selectMenuInteraction.values)].url,
-        true
-      );
-      playListInfo.searchWord = words;
+        // playList再生処理
+        await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
+      });
+    } else if (type === 'video') {
+      const musicplayVideoList: MusicInfo[] = await getSearchMusicVideo(words);
 
-      // playList再生処理
-      await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
-    });
+      // セレクトメニューを作成
+      const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
+        .setCustomId('videoSelect')
+        .setPlaceholder('再生したい動画を選択してください')
+        .setMinValues(1)
+        .setMaxValues(1)
+        .addOptions(
+          musicplayVideoList.map((musicplayVideo, index) => ({
+            value: String(index),
+            label: `${index + 1}: ${musicplayVideo.title}`,
+            description: ` ${musicplayVideo.durationFormatted}`,
+          }))
+        );
+
+      // セレクトメニューを作成
+      const row: ActionRowBuilder<StringSelectMenuBuilder> =
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(playListSelect);
+
+      const selectResponse = await interaction.editReply({
+        components: [row],
+      });
+      // セレクトメニューで選択された値を取得
+      const collector = selectResponse.createMessageComponentCollector({
+        componentType: ComponentType.StringSelect,
+        filter: (selectMenuInteraction) => selectMenuInteraction.user.id === interaction.user.id,
+      });
+
+      collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
+        selectMenuInteraction.deferUpdate();
+
+        await singleMusicMainLogic(
+          interaction,
+          voiceChannelId,
+          musicplayVideoList[Number(selectMenuInteraction.values)]
+        );
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);

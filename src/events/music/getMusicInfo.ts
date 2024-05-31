@@ -24,6 +24,7 @@ export const getMusicPlayListInfo = async (url: string, shuffleFlag: boolean) =>
         url: musicInfo.url,
         title: musicInfo.title ?? 'titleの取得に失敗しました。',
         musicImg: musicInfo.thumbnail?.url,
+        durationFormatted: '',
         author: {
           url: musicInfo.channel?.url,
           channelID: musicInfo.channel?.id,
@@ -47,6 +48,7 @@ export const getSingleMusicInfo = async (url: string, index?: number) => {
     url: musicDetails.videoDetails.video_url,
     title: musicDetails.videoDetails.title,
     musicImg: musicDetails.videoDetails.thumbnails[3].url,
+    durationFormatted: '',
     author: {
       url: musicDetails.videoDetails.author.channel_url,
       channelID: musicDetails.videoDetails.author.id,
@@ -70,6 +72,30 @@ export const getSearchMusicPlayListInfo = async (words: string) => {
       title: item.title?.substring(0, 90) ?? 'titleの取得に失敗しました。',
       videosLength: String(item.videos),
       musicInfo: [],
+    };
+  });
+};
+
+// wordsからVideo情報を検索しデータ加工をして返す
+export const getSearchMusicVideo = async (words: string) => {
+  const searchPlayVideo = await YouTube.search(words, { type: 'video', limit: 50, safeSearch: true });
+
+  // 取得したplaylist情報から必要な情報だけ格納
+  return searchPlayVideo.map((item, index) => {
+    return {
+      songIndex: index,
+      id: item.id ?? '',
+      url: item.url,
+      title: item.title ?? 'titleの取得に失敗しました。',
+      musicImg: item.thumbnail?.url,
+      durationFormatted: item.durationFormatted,
+      author: {
+        url: item.channel?.url,
+        channelID: item.channel?.id,
+        name: item.channel?.name ?? 'チャンネル名の取得に失敗しました。',
+        channelThumbnail: item.channel?.icon.url,
+      },
+      relatedVideosIDlist: [],
     };
   });
 };

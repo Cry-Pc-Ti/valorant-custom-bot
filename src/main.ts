@@ -8,6 +8,7 @@ import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { gameCommand } from './commands/play/gameCommand';
+import { stopPreviousInteraction } from './events/music/MusicPlayMainLogic';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -68,6 +69,10 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
     if (oldState.channel?.members.size === 1) {
       const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
       if (botJoinVoiceChannelId?.voice.channelId) {
+        // guildIdを取得してコレクションを削除
+        const guildId = oldState.guild.id;
+        if (guildId) await stopPreviousInteraction(guildId);
+        // BOTを切断
         botJoinVoiceChannelId?.voice.disconnect();
         return;
       }

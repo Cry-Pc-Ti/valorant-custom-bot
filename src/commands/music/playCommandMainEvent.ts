@@ -1,9 +1,8 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic } from '../../events/music/playListMusicMainLogic';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
-import { singleMusicMainLogic } from '../../events/music/singleMusicMainLogic';
 import { Logger } from '../../events/common/log';
 
 // playCommand
