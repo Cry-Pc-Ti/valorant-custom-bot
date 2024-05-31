@@ -86,7 +86,7 @@ export const getSearchMusicVideo = async (words: string) => {
       songIndex: index,
       id: item.id ?? '',
       url: item.url,
-      title: item.title ?? 'titleの取得に失敗しました。',
+      title: item.title?.substring(0, 90) ?? 'titleの取得に失敗しました。',
       musicImg: item.thumbnail?.url,
       durationFormatted: item.durationFormatted,
       author: {

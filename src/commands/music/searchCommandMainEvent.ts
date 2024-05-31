@@ -81,7 +81,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
           musicplayVideoList.map((musicplayVideo, index) => ({
             value: String(index),
             label: `${index + 1}: ${musicplayVideo.title}`,
-            description: ` ${musicplayVideo.durationFormatted}`,
+            description: `【再生時間】 ${musicplayVideo.durationFormatted}`,
           }))
         );
 
