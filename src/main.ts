@@ -8,7 +8,7 @@ import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { gameCommand } from './commands/play/gameCommand';
-import { stopPreviousInteraction } from './events/music/MusicPlayMainLogic';
+import { stopPreviousInteraction } from './events/music/musicPlayMainLogic';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -35,6 +35,10 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 // クライアントオブジェクトが準備完了時に実行
 discord.on('ready', () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
+  discord.user?.setPresence({
+    activities: [{ name: '今日も元気に働いています', type: 0 }],
+    status: 'online',
+  });
   Logger.initialize();
 });
 

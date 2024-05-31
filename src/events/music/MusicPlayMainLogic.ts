@@ -16,6 +16,7 @@ import { donePlayerMessage, musicInfoMessage, musicInfoPlayListMessage } from '.
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
 import { Logger } from '../common/log';
+import { genius } from '../../modules/geniusModule';
 
 const guildStates = new Map<
   string,
@@ -62,11 +63,12 @@ const createButtonRow = (uniqueId: number) => {
     .setStyle(ButtonStyle.Secondary)
     .setLabel('次の曲へ')
     .setEmoji('⏭');
-  // const showUrlButton = new ButtonBuilder()
-  //   .setCustomId(`showUrlButton_${uniqueId}`)
-  //   .setStyle(ButtonStyle.Secondary)
-  //   .setLabel('URLを表示')
-  //   .setEmoji('🔗');
+
+  const showUrlButton = new ButtonBuilder()
+    .setCustomId(`showUrlButton_${uniqueId}`)
+    .setStyle(ButtonStyle.Secondary)
+    .setLabel('URLを表示')
+    .setEmoji('🔗');
 
   const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
     prevPlayMusicButton,
@@ -74,8 +76,8 @@ const createButtonRow = (uniqueId: number) => {
     nextPlayMusicButton
   );
   const buttonRow2: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    repeatSingleButton
-    //showUrlButton
+    repeatSingleButton,
+    showUrlButton
   );
 
   return { buttonRow, buttonRow2, stopPlayMusicButton, repeatSingleButton };
@@ -294,27 +296,24 @@ export const playListMusicMainLogic = async (
           }
           return;
         }
-        // // URL表示ボタン押下時
-        // if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
-        //   const modal = new ModalBuilder()
-        //     .setCustomId(`showUrlModal_${uniqueId}`)
-        //     .setTitle('再生中のURL')
-        //     .addComponents(
-        //       new ActionRowBuilder<TextInputBuilder>().addComponents(
-        //         new TextInputBuilder()
-        //           .setCustomId('urlInput')
-        //           .setLabel('URL')
-        //           .setStyle(TextInputStyle.Short)
-        //           .setValue(playListInfo.url)
-        //       )
-        //     );
 
-        //   await buttonInteraction.showModal(modal);
-        //   return;
-        // }
-        return;
+        // プレイリストのURLを表示
+        if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
+          await buttonInteraction.followUp({ content: `${playListInfo.url}`, ephemeral: true });
+
+          // const searches = await genius.songs.search(playListInfo.musicInfo[songIndex].title);
+
+          // // Pick first one
+          // const firstSong = searches[0];
+          // console.log('About the Song:\n', firstSong, '\n');
+
+          // // Ok lets get the lyrics
+          // const lyrics = await firstSong.lyrics();
+          // console.log('Lyrics of the Song:\n', lyrics, '\n');
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
+        console.log(error);
         if ((replyMessageId === buttonInteraction.message.id && error.status == '400') || error.status == '404') {
           await interactionEditMessages(interaction, replyMessageId, `ボタンをもう一度押してください`);
           Logger.LogSystemError(error.message);

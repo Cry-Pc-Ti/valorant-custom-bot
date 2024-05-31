@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/musicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { Logger } from '../../events/common/log';
 

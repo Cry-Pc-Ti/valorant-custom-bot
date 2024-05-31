@@ -5,7 +5,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/musicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSearchMusicVideo } from '../../events/music/getMusicInfo';
 import { Logger } from '../../events/common/log';

@@ -51,9 +51,9 @@ Valorantコマンドは、ゲーム「Valorant」のための便利な機能を�
 
 #### `/valo agent`
 
-- 説明: エージェントをランダムに選択します（ロール指定可）。
+- 説明: エージェントをランダムに選択します。
 - オプション:
-  - `role`: エージェントのロールを指定します。
+  - `role`(任意): エージェントのロールを指定します。
     - `Duelist`: デュエリスト
     - `Initiator`: イニシエーター
     - `Controller`: コントローラー
@@ -61,27 +61,30 @@ Valorantコマンドは、ゲーム「Valorant」のための便利な機能を�
 
 #### `/valo composition`
 
-- 説明: ランダムにチーム構成を作成します。
+- 説明: ランダムなチーム構成を作成します。
 - オプション:
-  - `duelist`: デュエリストの人数を指定します。
-  - `initiator`: イニシエーターの人数を指定します。
-  - `controller`: コントローラーの人数を指定します。
-  - `sentinel`: センチネルの人数を指定します。
-  - `ban`: BANエージェントを選択するかどうかを指定します。
+  - `duelist`(任意): デュエリストの人数を指定します。
+  - `initiator`(任意): イニシエーターの人数を指定します。
+  - `controller`(任意): コントローラーの人数を指定します。
+  - `sentinel`(任意): センチネルの人数を指定します。
+  - `ban`(任意): BANエージェントを選択するかどうかを指定します。
 
 #### `/valo randomteams`
 
-- 説明: メンバーをランダムでチーム分けします。
+- 説明: メンバーをランダムでチーム分けします。その後ボタンを押下すると指定したVCに飛ばすことができます。
 - オプション:
   - `attacker` (必須): アタッカーのボイスチャンネルを指定します。
   - `defender` (必須): ディフェンダーのボイスチャンネルを指定します。
 
 ### 使用例
 
-/valo map
-/valo agent role
-/valo composition duelist:2 initiator:1 controller:1 sentinel:1 ban
-/valo randomteams attacker:<ボイスチャンネル> defender:<ボイスチャンネル>
+`/valo map`
+
+`/valo agent role:Duelist`
+
+`/valo composition duelist:2 initiator:1 controller:1 sentinel:1 ban:true`
+
+`/valo randomteams attacker:<ボイスチャンネル> defender:<ボイスチャンネル>`
 
 ---
 
@@ -89,7 +92,7 @@ Valorantコマンドは、ゲーム「Valorant」のための便利な機能を�
 
 ### コマンド概要
 
-Musicコマンドは、音楽関連の操作を行うためのコマンドです。以下のサブコマンドを提供します。
+Musicコマンドは、音楽再生関連の操作を行うためのコマンドです。以下のサブコマンドを提供します。
 
 - play
 - disconnect
@@ -100,10 +103,10 @@ Musicコマンドは、音楽関連の操作を行うためのコマンドです
 
 #### `/music play`
 
-- 説明: ボイスチャンネルで音楽を再生します。
+- 説明: ボイスチャンネルでyoutubeから指定した音楽を再生します。
 - オプション:
   - `shuffle` (必須): プレイリストをランダム再生するかどうかを指定します。
-  - `url` (必須): 再生したい音楽またはプレイリストのURLを指定します。
+  - `url` (必須): 再生したい音楽またはプレイリストのURLを入力してください。
 
 #### `/music disconnect`
 
@@ -111,23 +114,22 @@ Musicコマンドは、音楽関連の操作を行うためのコマンドです
 
 #### `/music search`
 
-- 説明: 指定されたワードで音楽を検索して再生します。
+- 説明: 入力されたワードで音楽を検索して再生します。
 - オプション:
-  - `words` (必須): 検索したいワードを指定します。
+  - `words` (必須): 検索したいワードを入力してください。（複数の条件を入れることも可能　例：VALO　曲）
   - `type` (必須): 検索対象を指定します。
-    - `video`: 動画を検索
-    - `playlist`: プレイリストを検索
+    - `動画を検索`: 動画で検索をします。
+    - `プレイリストを検索`: プレイリストで検索をします。
 
 #### `/music recommend`
 
-- 説明: 指定されたURLから関連のある曲を再生します。
+- 説明: 入力されたURLから関連のある曲を再生します。
 - オプション:
-  - `url` (必須): 再生したい音楽またはプレイリストのURLを指定します。
+  - `url` (必須): 動画またはプレイリストのURLを入力してください。
 
 ### 使用例
 
-`
-/music play shuffle:true url:<URL>`
+`/music play shuffle:true url:<URL>`
 
 `/music disconnect`
 
@@ -141,7 +143,7 @@ Musicコマンドは、音楽関連の操作を行うためのコマンドです
 
 ### コマンド概要
 
-Diceコマンドは、以下の2つのサブコマンドを提供します。
+Diceコマンドは、さいころ関連のコマンドです。以下の2つのサブコマンドを提供します。
 
 - chinchiro
 - number
@@ -161,6 +163,19 @@ Diceコマンドは、以下の2つのサブコマンドを提供します。
 
 ### 使用例
 
-`/dice chinchiro`
+`/dice chinchiro cheat:true`
 
 `/dice number`
+
+---
+
+## 困ったときの問い合わせ先
+
+ウィングマンくんに関する質問や問題がある場合は、以下の方法でお問い合わせください。
+
+- **Discordサポートサーバー**: [サポートサーバーに参加する]()
+- **Twitter**:
+  - <img src="https://abs.twimg.com/icons/apple-touch-icon-192x192.png" alt="Twitter" width="20" height="20"> [R1xu\_](https://twitter.com/R1xu_)
+  - <img src="https://abs.twimg.com/icons/apple-touch-icon-192x192.png" alt="Twitter" width="20" height="20"> [cry_pc_ti](https://twitter.com/cry_pc_ti)
+
+ご不明な点がございましたら、お気軽にお問い合わせください。
