@@ -8,7 +8,7 @@ import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { gameCommand } from './commands/play/gameCommand';
-import { stopPreviousInteraction } from './events/music/musicPlayMainLogic';
+import { stopPreviousInteraction } from './store/guildStates';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -70,16 +70,18 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 // voiceチャンネルでアクションが発生時に実行
 discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
   try {
-    if (oldState.channel?.members.size === 1) {
-      const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
-      if (botJoinVoiceChannelId?.voice.channelId) {
-        // guildIdを取得してコレクションを削除
-        const guildId = oldState.guild.id;
-        if (guildId) await stopPreviousInteraction(guildId);
-        // BOTを切断
-        botJoinVoiceChannelId?.voice.disconnect();
-        return;
-      }
+    // ボットがいるチャンネルであるかを確認
+    const botMember = await oldState.guild?.members.fetch(CLIENT_ID);
+    if (!botMember?.voice.channelId) return;
+
+    // ボットが現在いるチャンネル
+    const botChannel = botMember.voice.channel;
+
+    // ボットがいるチャンネルで一人残った場合にのみ切断
+    if (botChannel && botChannel.members.size === 1) {
+      const guildId = oldState.guild.id;
+      if (guildId) await stopPreviousInteraction(guildId);
+      botMember.voice.disconnect();
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

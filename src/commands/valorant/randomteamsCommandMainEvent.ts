@@ -1,8 +1,5 @@
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   ChatInputCommandInteraction,
   ComponentType,
   StringSelectMenuBuilder,
@@ -24,15 +21,14 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
 
     // メンバーがいる場合は処理を続行
 
-    const { options } = interaction;
-    const attackerChannelId = options.getChannel('attacker')?.id;
-    const defenderChannelId = options.getChannel('defender')?.id;
+    // const attackerChannelId = options.getChannel('attacker')?.id;
+    // const defenderChannelId = options.getChannel('defender')?.id;
 
-    // チャンネルが取得できない場合はエラーを返す
-    if (!attackerChannelId || !defenderChannelId) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
-    }
+    // // チャンネルが取得できない場合はエラーを返す
+    // if (!attackerChannelId || !defenderChannelId) {
+    //   await interaction.editReply('ボイスチャンネルが取得できませんでした');
+    //   return;
+    // }
 
     // セレクトメニューを作成
     const memberSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -122,76 +118,80 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
         components: [],
       });
 
-      // ボタンを作成
-      const uniqueId = Date.now();
-      const attackerVCButton = new ButtonBuilder()
-        .setCustomId(`attacker_${uniqueId}`)
-        .setLabel('Attacker VC')
-        .setStyle(ButtonStyle.Danger);
+      // // ボタンを作成
+      // const uniqueId = Date.now();
+      // const attackerVCButton = new ButtonBuilder()
+      //   .setCustomId(`attacker_${uniqueId}`)
+      //   .setLabel('Attacker VC')
+      //   .setStyle(ButtonStyle.Danger);
 
-      const difenderVCButton = new ButtonBuilder()
-        .setCustomId(`difender_${uniqueId}`)
-        .setLabel('Defender VC')
-        .setStyle(ButtonStyle.Primary);
+      // const difenderVCButton = new ButtonBuilder()
+      //   .setCustomId(`difender_${uniqueId}`)
+      //   .setLabel('Defender VC')
+      //   .setStyle(ButtonStyle.Primary);
 
-      // ボタンをActionRowに追加
-      const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        attackerVCButton,
-        difenderVCButton
-      );
+      // // ボタンをActionRowに追加
+      // const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      //   attackerVCButton,
+      //   difenderVCButton
+      // );
 
-      // ボタンを送信
-      await interaction.followUp({ components: [buttonRow], ephemeral: true });
+      // // ボタンを送信
+      // await interaction.followUp({ components: [buttonRow], ephemeral: true });
 
-      const buttonCollector = interaction.channel?.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-      });
+      // const buttonCollector = interaction.channel?.createMessageComponentCollector({
+      //   componentType: ComponentType.Button,
+      // });
 
-      if (!buttonCollector) return;
+      // if (!buttonCollector) return;
 
-      // ボタンが押された時の処理
-      buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
-        try {
-          if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-            await buttonInteraction.deferUpdate();
-          }
+      // // ボタンが押された時の処理
+      // buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction<CacheType>) => {
+      //   try {
+      //     if (!buttonInteraction.replied && !buttonInteraction.deferred) {
+      //       await buttonInteraction.deferUpdate();
+      //     }
 
-          // アタッカーのメンバーをメインのボイスチャンネルに移動
-          if (buttonInteraction.customId === `attacker_${uniqueId}`) {
-            const targetVoiceChannel = await interaction.guild?.channels.fetch(attackerChannelId);
+      //     // アタッカーのメンバーをメインのボイスチャンネルに移動
+      //     if (buttonInteraction.customId === `attacker_${uniqueId}`) {
+      //       const targetVoiceChannel = await interaction.guild?.channels.fetch(attackerChannelId);
 
-            if (targetVoiceChannel) {
-              if (targetVoiceChannel.isVoiceBased()) {
-                for (const member of teamAllocation.attack) {
-                  const targetMember = await interaction.guild?.members.fetch(member.id);
-                  await targetMember?.voice.setChannel(targetVoiceChannel);
-                }
-              }
-            }
-          }
+      //       if (targetVoiceChannel) {
+      //         if (targetVoiceChannel.isVoiceBased()) {
+      //           for (const member of teamAllocation.attack) {
+      //             const targetMember = await interaction.guild?.members.fetch(member.id);
+      //             await targetMember?.voice.setChannel(targetVoiceChannel);
+      //           }
+      //         }
+      //       }
+      //     }
 
-          // ディフェンダーのメンバーをサブのボイスチャンネルに移動
-          if (buttonInteraction.customId === `difender_${uniqueId}`) {
-            const targetVoiceChannel = await interaction.guild?.channels.fetch(defenderChannelId);
+      //     // ディフェンダーのメンバーをサブのボイスチャンネルに移動
+      //     if (buttonInteraction.customId === `difender_${uniqueId}`) {
+      //       const targetVoiceChannel = await interaction.guild?.channels.fetch(defenderChannelId);
 
-            if (targetVoiceChannel) {
-              if (targetVoiceChannel.isVoiceBased()) {
-                for (const member of teamAllocation.defense) {
-                  const targetMember = await interaction.guild?.members.fetch(member.id);
-                  await targetMember?.voice.setChannel(targetVoiceChannel);
-                }
-              }
-            }
-          }
-        } catch (error) {
-          console.error(error);
-          await interaction.followUp({
-            content: 'ボタンの処理中にエラーが発生しました。再度ボタンを押してください。',
-            ephemeral: true,
-          });
-        }
-      });
+      //       if (targetVoiceChannel) {
+      //         if (targetVoiceChannel.isVoiceBased()) {
+      //           for (const member of teamAllocation.defense) {
+      //             const targetMember = await interaction.guild?.members.fetch(member.id);
+      //             await targetMember?.voice.setChannel(targetVoiceChannel);
+      //           }
+      //         }
+      //       }
+      //     }
+      //   } catch (error) {
+      //     console.error(error);
+      //     await interaction.followUp({
+      //       content: 'ボタンの処理中にエラーが発生しました。再度ボタンを押してください。',
+      //       ephemeral: true,
+      //     });
+      //   }
+      // });
+      // buttonCollector.on('end', () => {
+      //   buttonCollector.stop();
+      // });
     });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     Logger.LogSystemError(`randomteamsCommandMainEventでエラーが発生しました : ${error}`);

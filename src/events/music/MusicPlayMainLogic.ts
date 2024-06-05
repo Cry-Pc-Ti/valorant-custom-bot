@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -7,36 +7,19 @@ import {
   CacheType,
   ChatInputCommandInteraction,
   ComponentType,
-  InteractionCollector,
 } from 'discord.js';
-import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
+import {
+  donePlayerInteractionEditMessages,
+  interactionEditMessages,
+  terminateMidwayInteractionEditMessages,
+} from '../discord/interactionMessages';
 import { CLIENT_ID } from '../../modules/discordModule';
 import { deletePlayerInfo, playBackMusic } from './playBackMusic';
 import { donePlayerMessage, musicInfoMessage, musicInfoPlayListMessage } from '../discord/embedMessage';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
 import { Logger } from '../common/log';
-import { genius } from '../../modules/geniusModule';
-
-const guildStates = new Map<
-  string,
-  {
-    player: AudioPlayer;
-    buttonCollector: InteractionCollector<ButtonInteraction<CacheType>>;
-    interaction: ChatInputCommandInteraction;
-    songIndex: number;
-  }
->();
-
-// コレクションを削除
-export const stopPreviousInteraction = async (guildId: string) => {
-  const state = guildStates.get(guildId);
-  if (state) {
-    state.player.stop();
-    state.buttonCollector.stop();
-    guildStates.delete(guildId);
-  }
-};
+import { guildStates } from '../../store/guildStates';
 
 // ボタンを作成
 const createButtonRow = (uniqueId: number) => {
@@ -120,15 +103,15 @@ export const playListMusicMainLogic = async (
     let replyMessageId: string = (await interaction.fetchReply()).id;
 
     // リピートするかのフラグ 0:デフォルト 1:曲リピートする 2:プレイリストリピートする
-    let repeatNumberFlg: number = 0;
+    let repeatMode: number = 0;
 
     // 再生している曲のindexを取得
     let songIndex: number = 0;
 
-    guildStates.set(guildId, { player, buttonCollector, interaction, songIndex });
+    guildStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
 
     // ボタンが押された時の処理
-    buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
+    buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction<CacheType>) => {
       if (!buttonInteraction.customId.endsWith(`_${uniqueId}`)) return;
 
       try {
@@ -145,8 +128,6 @@ export const playListMusicMainLogic = async (
           interactionEditMessages(interaction, buttonInteraction.message.id, { components: [] });
           return;
         }
-        const state = guildStates.get(guildId);
-        if (!state) return;
 
         // メッセージを削除
         if (interaction.channel?.messages.fetch(replyMessageId))
@@ -160,14 +141,12 @@ export const playListMusicMainLogic = async (
           // ボタンが再生ボタンだった時停止ボタンに変更
           if (stopPlayMusicButton.data.label === '再生') {
             stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
 
-          // ボタンがリピート中ボタンだった時リピートボタンに変更;
-          if (repeatNumberFlg === 1) {
-            repeatNumberFlg = 0;
+          // ボタンがリピート中ボタンだった時リピートボタンに変更
+          if (repeatMode === 1) {
+            repeatMode = 0;
             repeatSingleButton.setLabel('リピート').setEmoji('🔁');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
 
           // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
@@ -183,7 +162,7 @@ export const playListMusicMainLogic = async (
                   playListInfo,
                   [buttonRow, buttonRow2],
                   musicInfo.songIndex,
-                  channelThumbnail[0].url,
+                  channelThumbnail[0].url ?? null,
                   commandFlg
                 );
                 interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
@@ -194,11 +173,11 @@ export const playListMusicMainLogic = async (
                 do {
                   // 音楽再生
                   await playBackMusic(player, musicInfo);
-                } while (repeatNumberFlg === 1);
+                } while (repeatMode === 1);
               }
             }
             songIndex = 0;
-          } while (repeatNumberFlg === 2);
+          } while (repeatMode === 2);
           // 再生完了した際メッセージを送信
           await donePlayerInteractionEditMessages(interaction, replyMessageId);
 
@@ -217,14 +196,12 @@ export const playListMusicMainLogic = async (
           // ボタンが再生ボタンだった時停止ボタンに変更
           if (stopPlayMusicButton.data.label === '再生') {
             stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
 
-          // ボタンがリピート中ボタンだった時リピートボタンに変更;
-          if (repeatNumberFlg === 1) {
-            repeatNumberFlg = 0;
+          // ボタンがリピート中ボタンだった時リピートボタンに変更
+          if (repeatMode === 1) {
+            repeatMode = 0;
             repeatSingleButton.setLabel('リピート').setEmoji('🔁');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
 
           // musicInfoListからmusicInfoを取り出し音楽情報のメッセージを送信し再生
@@ -240,7 +217,7 @@ export const playListMusicMainLogic = async (
                   playListInfo,
                   [buttonRow, buttonRow2],
                   musicInfo.songIndex,
-                  channelThumbnail[0].url,
+                  channelThumbnail[0].url ?? null,
                   commandFlg
                 );
                 interaction.channel?.messages.edit(replyMessageId, embed).catch(() => {
@@ -249,11 +226,11 @@ export const playListMusicMainLogic = async (
                 // リピートフラグがtrueの時無限再生
                 do {
                   await playBackMusic(player, musicInfo);
-                } while (repeatNumberFlg === 1);
+                } while (repeatMode === 1);
               }
             }
             songIndex = 0;
-          } while (repeatNumberFlg === 2);
+          } while (repeatMode === 2);
           // 再生完了した際メッセージを送信
           await donePlayerInteractionEditMessages(interaction, replyMessageId);
           // PlayerとListenerを削除
@@ -268,48 +245,40 @@ export const playListMusicMainLogic = async (
           if (player.state.status === AudioPlayerStatus.Playing) {
             player.pause();
             stopPlayMusicButton.setLabel('再生').setEmoji('▶');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           } else if (player.state.status === AudioPlayerStatus.Paused) {
             player.unpause();
             stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
+          interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           return;
         }
 
         // 1曲リピートボタン押下時
         if (buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-          repeatNumberFlg++;
-          if (repeatNumberFlg >= 3) repeatNumberFlg = 0;
+          repeatMode++;
+          if (repeatMode >= 3) repeatMode = 0;
+
           // メッセージを削除
-          if (interaction.channel?.messages.fetch(replyMessageId))
+          if (await interaction.channel?.messages.fetch(replyMessageId)) {
             await interactionEditMessages(interaction, replyMessageId, '');
-          if (repeatNumberFlg === 0) {
-            repeatSingleButton.setLabel('リピート').setEmoji('🔁');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
-          } else if (repeatNumberFlg === 1) {
-            repeatSingleButton.setLabel('曲リピート中').setEmoji('🔂');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
-          } else if (repeatNumberFlg === 2) {
-            repeatSingleButton.setLabel('リストリピート中').setEmoji('🔁');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
           }
+
+          const labelsAndEmojis = [
+            { label: 'リピート', emoji: '🔁' },
+            { label: '曲リピート中', emoji: '🔂' },
+            { label: 'リストリピート中', emoji: '🔁' },
+          ];
+
+          const { label, emoji } = labelsAndEmojis[repeatMode];
+          repeatSingleButton.setLabel(label).setEmoji(emoji);
+          interactionEditMessages(interaction, replyMessageId, { components: [buttonRow, buttonRow2] });
+
           return;
         }
 
         // プレイリストのURLを表示
         if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
           await buttonInteraction.followUp({ content: `${playListInfo.url}`, ephemeral: true });
-
-          // const searches = await genius.songs.search(playListInfo.musicInfo[songIndex].title);
-
-          // // Pick first one
-          // const firstSong = searches[0];
-          // console.log('About the Song:\n', firstSong, '\n');
-
-          // // Ok lets get the lyrics
-          // const lyrics = await firstSong.lyrics();
-          // console.log('Lyrics of the Song:\n', lyrics, '\n');
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -319,7 +288,8 @@ export const playListMusicMainLogic = async (
           Logger.LogSystemError(error.message);
           return;
         }
-        Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました : ${error}`);
+        Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました :`);
+        Logger.LogSystemError(`${error}`);
         await interactionEditMessages(interaction, replyMessageId, {
           content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
           components: [],
@@ -328,9 +298,11 @@ export const playListMusicMainLogic = async (
         });
       }
     });
-    buttonCollector.on('end', () => {
+    buttonCollector.on('end', async () => {
       const state = guildStates.get(guildId);
       if (state && state.buttonCollector === buttonCollector) {
+        await terminateMidwayInteractionEditMessages(state.interaction, state.replyMessageId);
+        state.buttonCollector.stop();
         guildStates.delete(guildId);
       }
     });
@@ -346,7 +318,7 @@ export const playListMusicMainLogic = async (
           playListInfo,
           [buttonRow, buttonRow2],
           musicInfo.songIndex,
-          channelThumbnail[0].url,
+          channelThumbnail[0].url ?? null,
           commandFlg
         );
         if (musicInfo.songIndex === 1) await interaction.editReply(embed);
@@ -358,9 +330,9 @@ export const playListMusicMainLogic = async (
         // リピートフラグがtrueの時無限再生
         do {
           await playBackMusic(player, musicInfo);
-        } while (repeatNumberFlg === 1);
+        } while (repeatMode === 1);
       }
-    } while (repeatNumberFlg === 2);
+    } while (repeatMode === 2);
     // 再生完了した際メッセージを送信
     await donePlayerInteractionEditMessages(interaction, replyMessageId);
     // PlayerとListenerを削除
@@ -369,7 +341,8 @@ export const playListMusicMainLogic = async (
     connection.destroy();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました :`);
+    Logger.LogSystemError(`${error}`);
     // それぞれのエラー制御
     if (error.status == '400')
       return await interaction.channel?.send('音楽情報のメッセージ存在しないため再生できません。');
@@ -391,7 +364,7 @@ export const singleMusicMainLogic = async (
     const replyMessageId: string = (await interaction.fetchReply()).id;
 
     // リピートするかのフラグ
-    let repeatFlg: boolean = false;
+    let repeatFlag: boolean = false;
 
     // DateをuniqueIdとして取得
     const uniqueId = Date.now();
@@ -438,7 +411,7 @@ export const singleMusicMainLogic = async (
     });
     connection.subscribe(player);
 
-    guildStates.set(guildId, { player, buttonCollector, interaction: interaction, songIndex: 0 });
+    guildStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
 
     // ボタンが押された時の処理
     buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction) => {
@@ -461,48 +434,39 @@ export const singleMusicMainLogic = async (
         // 他メッセージのボタン押されたときに処理しない
         if (replyMessageId !== buttonInteraction.message.id) return;
 
+        // メッセージを削除
+        if (interaction.channel?.messages.fetch(replyMessageId))
+          await interactionEditMessages(interaction, replyMessageId, '');
+
         // 再生/一時停止ボタン押下時
         if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
-          // メッセージを削除
-          await interaction.editReply('');
           if (player.state.status === AudioPlayerStatus.Playing) {
             player.pause();
             stopPlayMusicButton.setLabel('再生').setEmoji('▶');
-            interaction.editReply({ components: [buttonRow] });
           } else if (player.state.status === AudioPlayerStatus.Paused) {
             player.unpause();
             stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-            interaction.editReply({ components: [buttonRow] });
           }
+          interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
           return;
         }
         // リピートボタン押下時
         if (buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-          repeatFlg = !repeatFlg;
-          await interaction.editReply('');
-          if (repeatFlg) {
-            repeatSingleButton.setLabel('リピート中').setEmoji('🔂');
-            interaction.editReply({ components: [buttonRow] });
-          } else {
-            repeatSingleButton.setLabel('リピート').setEmoji('🔂');
-            interaction.editReply({ components: [buttonRow] });
-          }
+          repeatFlag = !repeatFlag;
+          repeatSingleButton.setLabel(repeatFlag ? 'リピート中' : 'リピート').setEmoji('🔂');
+          interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
           return;
         }
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        if (replyMessageId === buttonInteraction.message.id) {
-          if (error.status == '400' || error.status == '404') {
-            // 400:DiscordAPIError[40060]: Interaction has already been acknowledged
-            // 404:Unknown interaction
-            Logger.LogSystemError(error.message);
-            await interaction.editReply('ボタンをもう一度押してください');
-            return;
-          }
-          Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
-          //  [code: 'ABORT_ERR']AbortError: The operation was aborted
+        Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
+        if ((replyMessageId === buttonInteraction.message.id && error.status == '400') || error.status == '404') {
+          Logger.LogSystemError(error.message);
+          await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
+          return;
         }
+        //  [code: 'ABORT_ERR']AbortError: The operation was aborted
       }
     });
 
@@ -514,11 +478,11 @@ export const singleMusicMainLogic = async (
     do {
       // BOTに音楽を流す
       await playBackMusic(player, musicInfo);
-    } while (repeatFlg);
+    } while (repeatFlag);
 
     // 再生完了した際メッセージを送信
     const embeds = donePlayerMessage();
-    await interaction.editReply(embeds);
+    interactionEditMessages(interaction, replyMessageId, embeds);
 
     // PlayerとListenerを削除
     deletePlayerInfo(player);
@@ -527,7 +491,8 @@ export const singleMusicMainLogic = async (
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました :`);
+    Logger.LogSystemError(`${error}`);
     // それぞれのエラー制御
     if (error.status == '400') return interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
     else if (error.status == '410')

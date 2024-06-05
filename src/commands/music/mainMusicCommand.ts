@@ -3,7 +3,7 @@ import { playCommandMainEvent } from './playCommandMainEvent';
 import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
-import { stopPreviousInteraction } from '../../events/music/musicPlayMainLogic';
+import { stopPreviousInteraction } from '../../store/guildStates';
 
 export const mainMusicCommand = {
   // コマンドの設定

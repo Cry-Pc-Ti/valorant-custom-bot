@@ -56,17 +56,27 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       });
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-        selectMenuInteraction.deferUpdate();
+        try {
+          selectMenuInteraction.deferUpdate();
 
-        // URLからプレイリスト情報を取得
-        const playListInfo: PlayListInfo = await getMusicPlayListInfo(
-          musicplayListInfo[Number(selectMenuInteraction.values)].url,
-          true
-        );
-        playListInfo.searchWord = words;
+          // URLからプレイリスト情報を取得
+          const playListInfo: PlayListInfo = await getMusicPlayListInfo(
+            musicplayListInfo[Number(selectMenuInteraction.values)].url,
+            false
+          );
+          playListInfo.searchWord = words;
 
-        // playList再生処理
-        await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
+          // playList再生処理
+          await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+          await interaction.channel?.messages.edit(replyMessageId, {
+            content: `再度コマンドを入力してください`,
+            files: [],
+            components: [],
+          });
+        }
       });
     } else if (type === 'video') {
       const musicplayVideoList: MusicInfo[] = await getSearchMusicVideo(words);
@@ -99,13 +109,23 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       });
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-        selectMenuInteraction.deferUpdate();
+        try {
+          selectMenuInteraction.deferUpdate();
 
-        await singleMusicMainLogic(
-          interaction,
-          voiceChannelId,
-          musicplayVideoList[Number(selectMenuInteraction.values)]
-        );
+          await singleMusicMainLogic(
+            interaction,
+            voiceChannelId,
+            musicplayVideoList[Number(selectMenuInteraction.values)]
+          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+          await interaction.channel?.messages.edit(replyMessageId, {
+            content: `再度コマンドを入力してください`,
+            files: [],
+            components: [],
+          });
+        }
       });
     }
 

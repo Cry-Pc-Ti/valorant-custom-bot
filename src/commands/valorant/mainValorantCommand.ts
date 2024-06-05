@@ -1,4 +1,4 @@
-import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 import { mapCommandMainEvent } from './mapCommandMainEvent';
 import { agentCommandMainEvent } from './agentCommandMainEvent';
@@ -86,24 +86,22 @@ export const mainValorantCommand = {
           option.setName('ban').setDescription('BANエージェントを選択するか指定してください')
         )
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName('randomteams')
-        .setDescription('メンバーをランダムでチーム分けします。')
-        .addChannelOption((option) =>
-          option
-            .setName('attacker')
-            .setDescription('アタッカーのボイスチャンネルを指定してください')
-            .addChannelTypes(ChannelType.GuildVoice)
-            .setRequired(true)
-        )
-        .addChannelOption((option) =>
-          option
-            .setName('defender')
-            .setDescription('ディフェンダーのボイスチャンネルを指定してください')
-            .addChannelTypes(ChannelType.GuildVoice)
-            .setRequired(true)
-        )
+    .addSubcommand(
+      (subcommand) => subcommand.setName('randomteams').setDescription('メンバーをランダムでチーム分けします。')
+      // .addChannelOption((option) =>
+      //   option
+      //     .setName('attacker')
+      //     .setDescription('アタッカーのボイスチャンネルを指定してください')
+      //     .addChannelTypes(ChannelType.GuildVoice)
+      //     .setRequired(true)
+      // )
+      // .addChannelOption((option) =>
+      //   option
+      //     .setName('defender')
+      //     .setDescription('ディフェンダーのボイスチャンネルを指定してください')
+      //     .addChannelTypes(ChannelType.GuildVoice)
+      //     .setRequired(true)
+      // )
     )
     .toJSON(),
 

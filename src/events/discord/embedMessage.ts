@@ -342,6 +342,21 @@ export const musicInfoPlayListMessage = (
 
   return { embeds: [embeds, embeds2], files: [fotterAttachment], components: buttonRowList };
 };
+// 再生途中のメッセージを作成
+export const terminateMidwayPlayerMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('途中で再生が終了しました。')
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
 
 // 再生完了のメッセージを作成
 export const donePlayerMessage = () => {
