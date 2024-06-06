@@ -29,6 +29,7 @@
     "discord.js": "^14.14.1",
     "discord.js-akinator": "^4.1.5",
     "dotenv": "^16.4.5",
+    "ffmpeg-static": "^5.2.0",
     "fs": "^0.0.1-security",
     "genius-lyrics": "^4.4.7",
     "libsodium-wrappers": "^0.7.13",

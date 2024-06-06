@@ -32,7 +32,7 @@ export const playListMusicMainLogic = async (
   commandFlg: number
 ) => {
   try {
-    const guildId = interaction.guildId ?? null;
+    const guildId = interaction.guildId;
 
     // uuidをuniqueIdとして取得
     const uniqueId = uuidv4();
@@ -53,6 +53,7 @@ export const playListMusicMainLogic = async (
 
     // playerを作成しdisに音をながす
     const player = createAudioPlayer();
+
     // BOTをVCに接続
     const connection = joinVoiceChannel({
       channelId: voiceChannelId,
@@ -85,12 +86,10 @@ export const playListMusicMainLogic = async (
           }
           // BOTがVCにいない場合処理しない
           if (!(await interaction.guild?.members.fetch(CLIENT_ID))?.voice.channelId) {
-            interactionEditMessages(
-              interaction,
-              buttonInteraction.message.id,
-              'もう一度、再生したい場合はコマンドで再度入力してください。'
-            );
-            interactionEditMessages(interaction, buttonInteraction.message.id, { components: [] });
+            interactionEditMessages(interaction, buttonInteraction.message.id, {
+              content: 'もう一度、再生したい場合はコマンドで再度入力してください。',
+              components: [],
+            });
             return;
           }
 
@@ -134,7 +133,7 @@ export const playListMusicMainLogic = async (
                     prevPlayMusicButton.setDisabled(false);
                     nextPlayMusicButton.setDisabled(false);
                   }
-
+                  // 音楽情報をを作成
                   const embed = musicInfoPlayListMessage(
                     playListInfo,
                     [buttonRow, buttonRow2],
@@ -159,6 +158,7 @@ export const playListMusicMainLogic = async (
                         );
                         return;
                       }
+                      console.log(error.message);
                       Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
                       player.stop();
                     });
@@ -236,6 +236,7 @@ export const playListMusicMainLogic = async (
                         );
                         return;
                       }
+                      console.log(error.message);
                       Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
                       player.stop();
                     });
@@ -373,6 +374,7 @@ export const playListMusicMainLogic = async (
               );
               return;
             }
+            console.log(error.messege);
             Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
             player.stop();
           });

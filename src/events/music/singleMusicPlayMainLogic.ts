@@ -66,6 +66,8 @@ export const singleMusicMainLogic = async (
     buttonCollector.on(
       'collect',
       debounce(async (buttonInteraction: ButtonInteraction<CacheType>) => {
+        if (!buttonInteraction.customId.endsWith(`_${uniqueId}`)) return;
+
         try {
           if (!buttonInteraction.replied && !buttonInteraction.deferred) {
             await buttonInteraction.deferUpdate();
@@ -73,17 +75,12 @@ export const singleMusicMainLogic = async (
 
           // BOTがVCにいない場合処理しない
           if (!(await interaction.guild?.members.fetch(CLIENT_ID))?.voice.channelId) {
-            interactionEditMessages(
-              interaction,
-              buttonInteraction.message.id,
-              'もう一度、再生したい場合はコマンドで再度入力してください。'
-            );
-            interactionEditMessages(interaction, buttonInteraction.message.id, { components: [] });
+            interactionEditMessages(interaction, buttonInteraction.message.id, {
+              content: 'もう一度、再生したい場合はコマンドで再度入力してください。',
+              components: [],
+            });
             return;
           }
-
-          // 他メッセージのボタン押されたときに処理しない
-          if (replyMessageId !== buttonInteraction.message.id) return;
 
           // メッセージを削除
           if (interaction.channel?.messages.fetch(replyMessageId))

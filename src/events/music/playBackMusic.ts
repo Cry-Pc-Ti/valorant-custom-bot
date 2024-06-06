@@ -5,8 +5,8 @@ import { AudioPlayer, AudioPlayerStatus, StreamType, createAudioResource, enters
 // 音楽情報をエンコードしdiscordへ流す
 export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo) => {
   const stream = ytdl(musicInfo.id, {
-    filter: (format) => format.audioCodec === 'opus' && format.container === 'webm',
-    quality: 'highest',
+    filter: (format) => format.hasAudio && !format.hasVideo,
+    quality: 'highestaudio',
     highWaterMark: 32 * 1024 * 1024,
   });
 
@@ -15,7 +15,7 @@ export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo)
     inlineVolume: true,
   });
 
-  if (resource.volume) resource.volume.setVolumeDecibels(-31);
+  if (resource.volume) resource.volume.setVolumeDecibels(-28);
 
   player.play(resource);
 

@@ -2,6 +2,7 @@ import ytdl from 'ytdl-core';
 import YouTube from 'youtube-sr';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { Logger } from '../common/log';
+import ytpl from 'ytpl';
 
 // プレイリストの動画をシャッフルする関数
 const shuffleArray = <T>(array: T[]): T[] => {
@@ -78,7 +79,7 @@ export const getSingleMusicInfo = async (url: string, index: number = 0) => {
 
 // wordsからプリリスト情報を検索しデータ加工をして返す
 export const getSearchMusicPlayListInfo = async (words: string) => {
-  const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 30, safeSearch: true });
+  const searchPlayListInfo = await YouTube.search(words, { type: 'playlist', limit: 25, safeSearch: true });
 
   // 取得したplaylist情報から必要な情報だけ格納
   return searchPlayListInfo.map((item, index) => {
@@ -95,7 +96,7 @@ export const getSearchMusicPlayListInfo = async (words: string) => {
 
 // wordsからVideo情報を検索しデータ加工をして返す
 export const getSearchMusicVideo = async (words: string) => {
-  const searchPlayVideo = await YouTube.search(words, { type: 'video', limit: 50, safeSearch: true });
+  const searchPlayVideo = await YouTube.search(words, { type: 'video', limit: 25, safeSearch: true });
 
   // 取得したplaylist情報から必要な情報だけ格納
   return searchPlayVideo.map((item, index) => {
@@ -156,4 +157,23 @@ export const getChannelThumbnails = async (musicInfos: MusicInfo[]): Promise<{ [
   await Promise.all(thumbnailPromises);
 
   return channelThumbnails;
+};
+
+// URLからプレイリストかどうかを判別
+export const checkUrlType = (url: string) => {
+  let isUrlError = false;
+  let isPlayList = false;
+
+  if (!ytdl.validateURL(url)) {
+    if (ytpl.validateID(url)) {
+      isPlayList = true;
+    } else {
+      isUrlError = true;
+    }
+  }
+
+  return {
+    urlError: isUrlError,
+    result: isPlayList,
+  };
 };
