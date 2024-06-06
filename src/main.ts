@@ -9,6 +9,7 @@ import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { gameCommand } from './commands/play/gameCommand';
 import { stopPreviousInteraction } from './store/guildStates';
+import { isHttpError } from './events/common/errorUtils';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -55,10 +56,9 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       // コマンドが存在すれば実行
       if (command) command.execute(interaction);
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogAccessError(error);
-    if (error.status === 403) {
+    if (isHttpError(error) && error.status === 403) {
       interaction.channel?.send('コマンドの実行に必要な権限がありません。権限を付与してください。');
       return;
     }
