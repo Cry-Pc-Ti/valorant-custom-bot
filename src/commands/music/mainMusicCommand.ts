@@ -5,6 +5,7 @@ import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
 import { stopPreviousInteraction } from '../../store/guildStates';
 import { hitSongsCommandMainEvent } from './hitSongsCommandMainEvent';
+import { spotifyPlaylistId } from '../../events/common/readJsonData';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -59,20 +60,20 @@ export const mainMusicCommand = {
         .setName('hitsongs')
         .setDescription('ヒットソングを再生します。')
         .addStringOption((option) =>
-          option.setName('genre').setDescription('ジャンルを選択してください').setRequired(true).setChoices(
-            {
-              name: '日本',
-              value: '日本',
-            },
-            {
-              name: 'グローバル',
-              value: 'グローバル',
-            },
-            {
-              name: '韓国',
-              value: '韓国',
-            }
-          )
+          option
+            .setName('genre')
+            .setDescription('ジャンルを選択してください')
+            .setRequired(true)
+            .setChoices(
+              ...Object.values(
+                spotifyPlaylistId.map((item) => {
+                  return {
+                    name: item.name,
+                    value: item.name,
+                  };
+                })
+              )
+            )
         )
     )
     .toJSON(),

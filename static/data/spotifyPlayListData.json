@@ -2,15 +2,33 @@
   "playlist": [
     {
       "name": "日本",
-      "id": "37i9dQZEVXbKXQ4mDTEBXq"
+      "id": "37i9dQZEVXbKXQ4mDTEBXq",
+      "rankingu": true
     },
     {
       "name": "グローバル",
-      "id": "37i9dQZEVXbMDoHDwVN2tF"
+      "id": "37i9dQZEVXbMDoHDwVN2tF",
+      "ranking": true
     },
     {
       "name": "韓国",
-      "id": "37i9dQZEVXbNxXF4SkHj9F"
+      "id": "37i9dQZEVXbNxXF4SkHj9F",
+      "ranking": true
+    },
+    {
+      "name": "japan急上昇チャート",
+      "id": "37i9dQZF1DX9vYRBO9gjDe",
+      "ranking": false
+    },
+    {
+      "name": "【期間限定】アニメ 2010年代",
+      "id": "37i9dQZF1DWYzHfIcEruXw",
+      "ranking": false
+    },
+    {
+      "name": "【期間限定】アニメ 2000年代",
+      "id": "37i9dQZF1DWZZu9JWZK2dy",
+      "ranking": false
     }
   ]
 }

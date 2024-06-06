@@ -21,11 +21,15 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
     const token = await getSpotifyToken();
     const topSongs = await getTopSongs(token, genre);
-    const musicplayVideoList: MusicInfo[] = [];
-    for (let i = 0; i < topSongs.length; i++) {
-      const song = topSongs[i];
-      musicplayVideoList.push(await getOneSearchMusicVideo(`${song.artists} ${song.name}`, i + 1));
-    }
+
+    const videoPromises = topSongs
+      .slice(0, 50)
+      .map((song: { artists: string; name: string }, index: number) =>
+        getOneSearchMusicVideo(`${song.artists} ${song.name}`, index + 1)
+      );
+
+    const videoResults = await Promise.all(videoPromises);
+    const musicplayVideoList: MusicInfo[] = [...videoResults];
 
     // playList再生処理
     await playListMusicMainLogic(

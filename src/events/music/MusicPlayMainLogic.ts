@@ -336,7 +336,7 @@ export const playListMusicMainLogic = async (
             embeds: [],
           });
         }
-      }, 600)
+      }, 500)
     );
     buttonCollector.on('end', async () => {
       const state = guildStates.get(guildId);
@@ -526,7 +526,7 @@ export const singleMusicMainLogic = async (
             }
           }
         }
-      }, 600)
+      }, 500)
     );
 
     // 音楽情報のメッセージ作成、送信
