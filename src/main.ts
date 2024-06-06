@@ -83,8 +83,7 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
       if (guildId) await stopPreviousInteraction(guildId);
       botMember.voice.disconnect();
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogAccessError(error);
   }
 });

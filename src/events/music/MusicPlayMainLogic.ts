@@ -20,6 +20,7 @@ import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import ytdl from 'ytdl-core';
 import { Logger } from '../common/log';
 import { guildStates } from '../../store/guildStates';
+import { isHttpError } from '../common/errorUtils';
 
 // ボタンを作成
 const createButtonRow = (uniqueId: number) => {
@@ -280,12 +281,18 @@ export const playListMusicMainLogic = async (
         if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
           await buttonInteraction.followUp({ content: `${playListInfo.url}`, ephemeral: true });
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.log(error);
-        if ((replyMessageId === buttonInteraction.message.id && error.status == '400') || error.status == '404') {
+      } catch (error) {
+        console.error(error);
+        if (
+          replyMessageId === buttonInteraction.message.id ||
+          (isHttpError(error) && error.status === 400) ||
+          (isHttpError(error) && error.status === 404)
+        ) {
           await interactionEditMessages(interaction, replyMessageId, `ボタンをもう一度押してください`);
-          Logger.LogSystemError(error.message);
+
+          if (error instanceof Error) {
+            Logger.LogSystemError(error.message);
+          }
           return;
         }
         Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました :`);
@@ -339,14 +346,12 @@ export const playListMusicMainLogic = async (
     deletePlayerInfo(player);
     // BOTをdiscordから切断
     connection.destroy();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました :`);
-    Logger.LogSystemError(`${error}`);
-    // それぞれのエラー制御
-    if (error.status == '400')
+  } catch (error) {
+    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました : ${error}`);
+
+    if (isHttpError(error) && error.status === 400)
       return await interaction.channel?.send('音楽情報のメッセージ存在しないため再生できません。');
-    else if (error.status == '410')
+    else if (isHttpError(error) && error.status === 410)
       return await interaction.channel?.send('ポリシーに適していないものが含まれるため再生できません。');
 
     await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
@@ -458,15 +463,18 @@ export const singleMusicMainLogic = async (
           return;
         }
         return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
-        if ((replyMessageId === buttonInteraction.message.id && error.status == '400') || error.status == '404') {
-          Logger.LogSystemError(error.message);
-          await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
-          return;
+      } catch (error) {
+        if (error instanceof Error) {
+          Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
+          if (
+            (replyMessageId === buttonInteraction.message.id && isHttpError(error) && error.status === 400) ||
+            (isHttpError(error) && error.status === 404)
+          ) {
+            Logger.LogSystemError(error.message);
+            await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
+            return;
+          }
         }
-        //  [code: 'ABORT_ERR']AbortError: The operation was aborted
       }
     });
 
@@ -488,14 +496,12 @@ export const singleMusicMainLogic = async (
     deletePlayerInfo(player);
     // BOTをdiscordから切断
     connection.destroy();
+  } catch (error) {
+    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました: ${error}`);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました :`);
-    Logger.LogSystemError(`${error}`);
-    // それぞれのエラー制御
-    if (error.status == '400') return interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
-    else if (error.status == '410')
+    if (isHttpError(error) && error.status === 400)
+      return interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
+    else if (isHttpError(error) && error.status === 410)
       return interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
 
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');

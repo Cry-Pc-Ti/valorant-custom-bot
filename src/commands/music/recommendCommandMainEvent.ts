@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { MusicInfo } from '../../types/musicData';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic } from '../../events/music/musicPlayMainLogic';
+import { playListMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { preparingPlayerMessage } from '../../events/discord/embedMessage';
 import { Logger } from '../../events/common/log';
@@ -84,9 +84,7 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
       },
       2
     );
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogSystemError(`recommendCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply({
       embeds: [],

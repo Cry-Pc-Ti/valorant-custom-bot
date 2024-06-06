@@ -21,10 +21,8 @@ export const playBackMusic = async (player: AudioPlayer, musicInfo: MusicInfo) =
 
     await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
     await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    Logger.LogSystemError(`playBackMusicでエラーが発生しました :`);
-    Logger.LogSystemError(error);
+  } catch (error) {
+    Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
   }
 };
 

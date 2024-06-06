@@ -23,8 +23,10 @@ export const addTextToImage = async (num: number): Promise<void> => {
       imagePath += 'content.png';
     } else if (num >= 10 && num <= 49) {
       imagePath += 'neutral.png';
-    } else if (num >= 1 && num <= 9) {
+    } else if (num >= 2 && num <= 9) {
       imagePath += 'sad.png';
+    } else if (num === 1) {
+      imagePath += 'feel_down.png';
     } else return;
 
     // 画像を読み込む
@@ -36,9 +38,31 @@ export const addTextToImage = async (num: number): Promise<void> => {
 
     context.drawImage(image, 0, 0, image.width, image.height);
     context.fillStyle = 'black';
-    context.font = '120px "Yomogi"';
     context.textAlign = 'center';
-    context.fillText(num.toString(), canvas.width / 2, canvas.height / 4.3);
+
+    if (num != 1) {
+      // フォントサイズとフォントを指定
+      context.font = '120px "Yomogi"';
+
+      // テキストを描画
+      context.fillText(num.toString(), canvas.width / 2, canvas.height / 4.3);
+    } else {
+      // フォントサイズとフォントを指定
+      context.font = '150px "Yomogi"';
+
+      // テキストを回転させるために原点を移動
+      context.translate(canvas.width / 4.9, canvas.height / 1.65);
+
+      // 20度（ラジアンに変換）回転
+      context.rotate((-20 * Math.PI) / 180);
+
+      // テキストを描画
+      context.fillText(num.toString(), 0, 0);
+
+      // コンテキストの回転と移動を元に戻す
+      context.rotate((20 * Math.PI) / 180);
+      context.translate(-canvas.width / 4.9, -canvas.height / 1.65);
+    }
 
     const outputStream = fs.createWriteStream('./static/img/generate_image.png');
     const stream = canvas.createPNGStream();

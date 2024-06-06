@@ -1,9 +1,10 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/musicPlayMainLogic';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { Logger } from '../../events/common/log';
+import { isHttpError } from '../../events/common/errorUtils';
 
 // playCommand
 export const playCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
@@ -39,12 +40,12 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
       // shingleSong再生処理
       await singleMusicMainLogic(interaction, voiceChannelId, musicInfo);
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogSystemError(`playCommandMainEventでエラーが発生しました : ${error}`);
-    // それぞれのエラー制御
-    if (error.status == '400') return await interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
-    else if (error.status == '410')
+
+    if (isHttpError(error) && error.status === 400)
+      return await interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
+    else if (isHttpError(error) && error.status == 410)
       return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
 
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');

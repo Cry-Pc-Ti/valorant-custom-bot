@@ -5,7 +5,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/musicPlayMainLogic';
+import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/MusicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { getMusicPlayListInfo, getSearchMusicPlayListInfo, getSearchMusicVideo } from '../../events/music/getMusicInfo';
 import { Logger } from '../../events/common/log';
@@ -68,8 +68,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
 
           // playList再生処理
           await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
+        } catch (error) {
           Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
           await interaction.channel?.messages.edit(replyMessageId, {
             content: `再度コマンドを入力してください`,
@@ -117,8 +116,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
             voiceChannelId,
             musicplayVideoList[Number(selectMenuInteraction.values)]
           );
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
+        } catch (error) {
           Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
           await interaction.channel?.messages.edit(replyMessageId, {
             content: `再度コマンドを入力してください`,
@@ -128,9 +126,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
         }
       });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.channel?.messages.edit(replyMessageId, {
       content: `再度コマンドを入力してください`,
