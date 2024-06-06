@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../modules/spotifyModule';
-import { spotifyPlaylistId } from '../events/common/readJsonData';
 
 export const getSpotifyToken = async () => {
   const token = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
@@ -19,8 +18,7 @@ export const getSpotifyToken = async () => {
   }
 };
 
-export const getTopSongs = async (accessToken: string, genre: string) => {
-  const playlistId = spotifyPlaylistId.find((item) => item.name === genre)?.id;
+export const getTopSongs = async (accessToken: string, playlistId: string) => {
   const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
   try {

@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { generateRandomNum } from '../../events/common/generateRandomNum';
-import { addTextToImage } from '../../events/dice/addTextToImage';
-import { diceMessage } from '../../events/discord/embedMessage';
-import { Logger } from '../../events/common/log';
+import { generateRandomNum } from '../../../events/common/generateRandomNum';
+import { addTextToImage } from '../../../events/dice/addTextToImage';
+import { diceMessage } from '../../../events/discord/embedMessage';
+import { Logger } from '../../../events/common/log';
 
 export const numberCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

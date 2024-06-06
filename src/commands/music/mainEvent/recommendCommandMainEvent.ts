@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { MusicInfo } from '../../types/musicData';
-import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { playListMusicMainLogic } from '../../events/music/musicPlayMainLogic';
-import { generateRandomNum } from '../../events/common/generateRandomNum';
-import { preparingPlayerMessage } from '../../events/discord/embedMessage';
-import { Logger } from '../../events/common/log';
-import { checkUrlType } from '../../events/music/musicCommon';
+import { checkUrlType } from '../../../events/music/musicCommon';
+import { preparingPlayerMessage } from '../../../events/discord/embedMessage';
+import { MusicInfo } from '../../../types/musicData';
+import { getMusicPlayListInfo, getSingleMusicInfo } from '../../../events/music/getMusicInfo';
+import { generateRandomNum } from '../../../events/common/generateRandomNum';
+import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
+import { Logger } from '../../../events/common/log';
 
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

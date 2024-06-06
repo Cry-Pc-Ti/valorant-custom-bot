@@ -7,13 +7,13 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { AgentData, CompositionData } from '../../types/valorantData';
-import { selectAgentsByRole } from '../../events/valorant/selectAgentsByRole';
-import { createConcatImage } from '../../events/common/createConcatImage';
-import { compositionMessage } from '../../events/discord/embedMessage';
-import { valorantAgents } from '../../events/common/readJsonData';
-import { countAgentsByRole, countBanAgentsByRole } from '../../events/valorant/countAgentsNum';
-import { Logger } from '../../events/common/log';
+import { AgentData, CompositionData } from '../../../types/valorantData';
+import { selectAgentsByRole } from '../../../events/valorant/selectAgentsByRole';
+import { createConcatImage } from '../../../events/common/createConcatImage';
+import { compositionMessage } from '../../../events/discord/embedMessage';
+import { valorantAgents } from '../../../events/common/readJsonData';
+import { countAgentsByRole, countBanAgentsByRole } from '../../../events/valorant/countAgentsNum';
+import { Logger } from '../../../events/common/log';
 
 export const compositionCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

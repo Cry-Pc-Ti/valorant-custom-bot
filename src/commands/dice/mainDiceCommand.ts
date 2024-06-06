@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { chinchiroCommandMainEvent } from './chinchiroCommandMainEvent';
-import { numberCommandMainEvent } from './numberCommandMainEvent';
+import { chinchiroCommandMainEvent } from './mainEvent/chinchiroCommandMainEvent';
+import { numberCommandMainEvent } from './mainEvent/numberCommandMainEvent';
 
 export const mainDiceCommand = {
   data: new SlashCommandBuilder()

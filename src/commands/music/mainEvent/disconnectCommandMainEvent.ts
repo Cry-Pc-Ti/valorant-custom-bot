@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { CLIENT_ID } from '../../modules/discordModule';
-import { Logger } from '../../events/common/log';
+import { CLIENT_ID } from '../../../modules/discordModule';
+import { Logger } from '../../../events/common/log';
 
 export const disconnectCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

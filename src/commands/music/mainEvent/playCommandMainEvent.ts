@@ -1,10 +1,11 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
-import { MusicInfo, PlayListInfo } from '../../types/musicData';
-import { Logger } from '../../events/common/log';
-import { checkUrlType } from '../../events/music/musicCommon';
-import { isHttpError } from '../../events/common/errorUtils';
-import { playListMusicMainLogic, singleMusicMainLogic } from '../../events/music/musicPlayMainLogic';
+import { getMusicPlayListInfo, getSingleMusicInfo } from '../../../events/music/getMusicInfo';
+import { MusicInfo, PlayListInfo } from '../../../types/musicData';
+import { Logger } from '../../../events/common/log';
+import { checkUrlType } from '../../../events/music/musicCommon';
+import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
+import { playListPlayMusicMessage } from '../../../events/discord/embedMessage';
+import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainLogic';
 
 // playCommand
 export const playCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
@@ -26,6 +27,11 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
     // データ収集
     Logger.LogAccessInfo(`${interaction.user.username}(${interaction.user.id})さんが${url} を再生しています。`);
 
+    // メッセージを作成
+    const embed = playListPlayMusicMessage();
+
+    await interaction.editReply(embed);
+
     // プレイリストの場合
     if (playListFlag.result) {
       // URLからプレイリスト情報を取得
@@ -40,13 +46,13 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
       // shingleSong再生処理
       await singleMusicMainLogic(interaction, voiceChannelId, musicInfo);
     }
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     Logger.LogSystemError(`playCommandMainEventでエラーが発生しました : ${error}`);
 
-    if (isHttpError(error) && error.status === 400)
+    if (error.statusCode === 400)
       return await interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');
-    else if (isHttpError(error) && error.status == 410)
-      return await interaction.editReply('ポリシーに適していないものが含まれるため再生できません。');
+    else if (error.statusCode == 410) return await interaction.editReply('ポリシーに反しているため再生できません。');
 
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }

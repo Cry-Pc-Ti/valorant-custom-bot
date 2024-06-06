@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { playCommandMainEvent } from './playCommandMainEvent';
-import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
-import { searchCommandMainEvent } from './searchCommandMainEvent';
-import { recommendCommandMainEvent } from './recommendCommandMainEvent';
+import { playCommandMainEvent } from './mainEvent/playCommandMainEvent';
 import { stopPreviousInteraction } from '../../store/guildStates';
-import { hitSongsCommandMainEvent } from './hitSongsCommandMainEvent';
+import { hitSongsCommandMainEvent } from './mainEvent/hitSongsCommandMainEvent';
 import { spotifyPlaylistId } from '../../events/common/readJsonData';
+import { disconnectCommandMainEvent } from './mainEvent/disconnectCommandMainEvent';
+import { searchCommandMainEvent } from './mainEvent/searchCommandMainEvent';
+import { recommendCommandMainEvent } from './mainEvent/recommendCommandMainEvent';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -59,17 +59,17 @@ export const mainMusicCommand = {
       subcommand
         .setName('hitsongs')
         .setDescription('ヒットソングを再生します。')
-        .addStringOption((option) =>
+        .addNumberOption((option) =>
           option
             .setName('genre')
             .setDescription('ジャンルを選択してください')
             .setRequired(true)
             .setChoices(
               ...Object.values(
-                spotifyPlaylistId.map((item) => {
+                spotifyPlaylistId.map((item, index) => {
                   return {
                     name: item.name,
-                    value: item.name,
+                    value: index,
                   };
                 })
               )
@@ -95,6 +95,7 @@ export const mainMusicCommand = {
       // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
       await recommendCommandMainEvent(interaction);
+      // 「hitsongs」コマンド
     } else if (interaction.options.getSubcommand() === 'hitsongs') {
       await hitSongsCommandMainEvent(interaction);
     }

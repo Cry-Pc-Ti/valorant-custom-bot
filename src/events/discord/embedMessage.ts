@@ -2,6 +2,7 @@ import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from
 import { AgentData, CompositionData, MapData } from '../../types/valorantData';
 import { MemberAllocationData } from '../../types/memberData';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
+import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -275,6 +276,7 @@ export const musicInfoPlayListMessage = (
 ) => {
   const embeds = new EmbedBuilder().setColor('#fd4556');
 
+  // playCommand
   if (commandFlg === 0) {
     embeds.addFields({
       name: 'プレイリスト',
@@ -288,6 +290,8 @@ export const musicInfoPlayListMessage = (
         inline: true,
       });
     }
+
+    // searchCommand
   } else if (commandFlg === 1) {
     embeds.addFields(
       {
@@ -301,6 +305,7 @@ export const musicInfoPlayListMessage = (
         inline: true,
       }
     );
+    // recommend
   } else if (commandFlg === 2) {
     embeds.addFields(
       {
@@ -313,18 +318,25 @@ export const musicInfoPlayListMessage = (
         inline: true,
       }
     );
+    // hitsong
   } else if (commandFlg === 3) {
-    embeds.addFields(
-      {
-        name: playListInfo.title,
-        value: `再生回数が多い曲 (毎日更新) `,
-      },
-      {
-        name: '現在の順位',
+    embeds.addFields({
+      name: playListInfo.title,
+      value: playListInfo.description ?? '',
+    });
+    if (playListInfo.rankingFlag) {
+      embeds.addFields({
+        name: `順位`,
         value: `${musicCount}位`,
         inline: true,
-      }
-    );
+      });
+    } else {
+      embeds.addFields({
+        name: '曲順',
+        value: `${musicCount} / ${playListInfo.musicInfo.length}`,
+        inline: true,
+      });
+    }
   }
 
   if (musicCount === playListInfo.musicInfo.length) {
@@ -361,27 +373,11 @@ export const musicInfoPlayListMessage = (
 
   return { embeds: [embeds, embeds2], files: [fotterAttachment], components: buttonRowList };
 };
-// 再生途中のメッセージを作成
-export const terminateMidwayPlayerMessage = () => {
+// playList再生準備中のメッセージを作成(play)
+export const playListPlayMusicMessage = () => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('途中で再生が終了しました。')
-    .setFooter({
-      text: 'YouTube',
-      iconURL: 'attachment://youtube_icon.png',
-    })
-    .setTimestamp();
-
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
-
-  return { embeds: [embeds], files: [fotterAttachment], components: [] };
-};
-
-// 再生完了のメッセージを作成
-export const donePlayerMessage = () => {
-  const embeds = new EmbedBuilder()
-    .setColor('#fd4556')
-    .setTitle('再生完了')
+    .setTitle(`プレイリスト情報を取得しております。少々お待ちください\n\n※取得に時間がかかる場合がございます。`)
     .setFooter({
       text: 'YouTube',
       iconURL: 'attachment://youtube_icon.png',
@@ -410,10 +406,42 @@ export const preparingPlayerMessage = () => {
 };
 
 // 再生準備中のメッセージを作成(ヒットソング)
-export const hitSongsPreparingPlayerMessage = (words: string) => {
+export const hitSongsPreparingPlayerMessage = (spotifyPlaylistInfo: SpotifyPlaylistInfo) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle(`${words}で再生回数が多い曲を検索中です。\n少々お待ちください\n\n※再生回数はspotify調べです。`)
+    .setTitle(`${spotifyPlaylistInfo.name}を検索中です。\n少々お待ちください\n\n※hitsongはspotify調べです。`)
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
+
+// 再生途中のメッセージを作成
+export const terminateMidwayPlayerMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('途中で再生が終了しました。')
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
+
+// 再生完了のメッセージを作成
+export const donePlayerMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle('再生完了')
     .setFooter({
       text: 'YouTube',
       iconURL: 'attachment://youtube_icon.png',

@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { generateRandomNum } from '../../events/common/generateRandomNum';
-import { createConcatImage } from '../../events/common/createConcatImage';
-import { chinchiro456Message, chinchiroMessage } from '../../events/discord/embedMessage';
-import { exportChinchiroResult } from '../../events/dice/exportChinchiroResult';
-import { Logger } from '../../events/common/log';
+import { generateRandomNum } from '../../../events/common/generateRandomNum';
+import { createConcatImage } from '../../../events/common/createConcatImage';
+import { chinchiro456Message, chinchiroMessage } from '../../../events/discord/embedMessage';
+import { exportChinchiroResult } from '../../../events/dice/exportChinchiroResult';
+import { Logger } from '../../../events/common/log';
 
 export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

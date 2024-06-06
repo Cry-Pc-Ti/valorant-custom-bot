@@ -23,5 +23,7 @@ export interface PlayListInfo {
   title: string;
   videosLength: string;
   searchWord?: string;
+  description?: string;
+  rankingFlag?: boolean;
   musicInfo: MusicInfo[];
 }

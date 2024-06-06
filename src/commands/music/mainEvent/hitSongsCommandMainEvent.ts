@@ -1,26 +1,28 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { getSpotifyToken, getTopSongs } from '../../service/spotify.service';
-import { getOneSearchMusicVideo } from '../../events/music/getMusicInfo';
-import { MusicInfo } from '../../types/musicData';
-import { playListMusicMainLogic } from '../../events/music/musicPlayMainLogic';
-import { hitSongsPreparingPlayerMessage } from '../../events/discord/embedMessage';
-import { Logger } from '../../events/common/log';
+import { getSpotifyToken, getTopSongs } from '../../../service/spotify.service';
+import { getOneSearchMusicVideo } from '../../../events/music/getMusicInfo';
+import { MusicInfo } from '../../../types/musicData';
+import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
+import { hitSongsPreparingPlayerMessage } from '../../../events/discord/embedMessage';
+import { Logger } from '../../../events/common/log';
+import { spotifyPlaylistId } from '../../../events/common/readJsonData';
 
 export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
-    const genre = interaction.options.getString('genre') ?? '';
+    const genre = interaction.options.getNumber('genre') ?? 0;
 
     // ボイスチャンネルにいない場合は処理しない
     const voiceChannelId = (await interaction.guild?.members.fetch(interaction.user.id))?.voice.channelId;
     if (!voiceChannelId) return interaction.editReply('ボイスチャンネルに参加してください。');
 
+    const spotifyPlaylistInfo = spotifyPlaylistId[genre];
     // メッセージを作成
-    const embed = hitSongsPreparingPlayerMessage(genre);
+    const embed = hitSongsPreparingPlayerMessage(spotifyPlaylistInfo);
 
     await interaction.editReply(embed);
 
     const token = await getSpotifyToken();
-    const topSongs = await getTopSongs(token, genre);
+    const topSongs = await getTopSongs(token, spotifyPlaylistInfo.id);
 
     const videoPromises = topSongs
       .slice(0, 50)
@@ -39,7 +41,9 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
         playListId: 1,
         url: 'なんもないです',
         thumbnail: undefined,
-        title: `TOP50- ${genre}`,
+        title: `${spotifyPlaylistInfo.name}`,
+        description: `${spotifyPlaylistInfo.description}`,
+        rankingFlag: spotifyPlaylistInfo.ranking,
         videosLength: String(musicplayVideoList.length),
         musicInfo: musicplayVideoList,
       },

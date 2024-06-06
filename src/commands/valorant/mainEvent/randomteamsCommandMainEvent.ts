@@ -5,10 +5,10 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { MemberAllocationData, MemberData } from '../../types/memberData';
-import { generateRandomNum } from '../../events/common/generateRandomNum';
-import { memberAllocationMessage } from '../../events/discord/embedMessage';
-import { Logger } from '../../events/common/log';
+import { MemberAllocationData, MemberData } from '../../../types/memberData';
+import { generateRandomNum } from '../../../events/common/generateRandomNum';
+import { memberAllocationMessage } from '../../../events/discord/embedMessage';
+import { Logger } from '../../../events/common/log';
 
 export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {

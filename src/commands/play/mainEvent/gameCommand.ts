@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { akinatorCommandMainEvent } from './akinatorCommandMainEvent';
+import { akinatorCommandMainEvent } from '../akinatorCommandMainEvent';
 
 export const gameCommand = {
   data: new SlashCommandBuilder()

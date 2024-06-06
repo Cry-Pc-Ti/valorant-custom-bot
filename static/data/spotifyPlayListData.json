@@ -3,31 +3,50 @@
     {
       "name": "日本",
       "id": "37i9dQZEVXbKXQ4mDTEBXq",
-      "rankingu": true
+      "title": "TOP50 - 日本",
+      "description": "再生回数が多い曲 (毎日更新)",
+      "ranking": true
     },
     {
       "name": "グローバル",
       "id": "37i9dQZEVXbMDoHDwVN2tF",
+      "title": "TOP50 - グローバル",
+      "description": "再生回数が多い曲 (毎日更新)",
+      "ranking": true
+    },
+    {
+      "name": "台湾",
+      "id": "37i9dQZEVXbMnZEatlMSiu",
+      "title": "TOP50 - 台湾",
+      "description": "再生回数が多い曲 (毎日更新)",
       "ranking": true
     },
     {
       "name": "韓国",
       "id": "37i9dQZEVXbNxXF4SkHj9F",
+      "title": "TOP50 - 韓国",
+      "description": "再生回数が多い曲 (毎日更新)",
       "ranking": true
     },
     {
       "name": "japan急上昇チャート",
       "id": "37i9dQZF1DX9vYRBO9gjDe",
+      "title": "japan急上昇チャート",
+      "description": "最近の流行りの新曲をご案内します。",
       "ranking": false
     },
     {
       "name": "【期間限定】アニメ 2010年代",
       "id": "37i9dQZF1DWYzHfIcEruXw",
+      "title": "アニメ 2010年代",
+      "description": "2010年から2019年にはやったあの懐かしのアニメソングをご用意しました。",
       "ranking": false
     },
     {
       "name": "【期間限定】アニメ 2000年代",
       "id": "37i9dQZF1DWZZu9JWZK2dy",
+      "title": "アニメ 2000年代",
+      "description": "2000年から2009年にはやったあの懐かしのアニメソングをご用意しました。",
       "ranking": false
     }
   ]

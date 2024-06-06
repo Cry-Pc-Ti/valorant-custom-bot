@@ -18,6 +18,7 @@ export const donePlayerInteractionEditMessages = async (
   interaction: ChatInputCommandInteraction,
   messageId: string
 ) => {
+  await interactionEditMessages(interaction, messageId, '');
   const embeds = donePlayerMessage();
   interaction.channel?.messages.edit(messageId, embeds).catch(async () => await interaction.channel?.send(embeds));
 };
