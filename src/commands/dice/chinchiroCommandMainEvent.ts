@@ -3,7 +3,10 @@ import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { createConcatImage } from '../../events/common/createConcatImage';
 import { chinchiro456Message, chinchiroMessage } from '../../events/discord/embedMessage';
 import { exportChinchiroResult } from '../../events/dice/exportChinchiroResult';
+<<<<<<< HEAD
 import { Logger } from '../../events/common/log';
+=======
+>>>>>>> origin/master
 
 export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -40,6 +43,10 @@ export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInt
     }
   } catch (error) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+<<<<<<< HEAD
     Logger.LogSystemError(`chinchiroCommandMainEventでエラーが発生しました : ${error}`);
+=======
+    console.error(error);
+>>>>>>> origin/master
   }
 };

@@ -4,7 +4,10 @@ export interface MusicInfo {
   url?: string;
   title: string;
   musicImg?: string;
+<<<<<<< HEAD
   durationFormatted: string;
+=======
+>>>>>>> origin/master
   author: YoutubeChannelInfo;
   relatedVideosIDlist: string[];
 }
@@ -22,6 +25,9 @@ export interface PlayListInfo {
   thumbnail: string | undefined;
   title: string;
   videosLength: string;
+<<<<<<< HEAD
   searchWord?: string;
   musicInfo: MusicInfo[];
+=======
+>>>>>>> origin/master
 }

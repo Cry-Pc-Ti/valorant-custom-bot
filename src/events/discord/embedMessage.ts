@@ -1,7 +1,11 @@
 import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../../types/valorantData';
 import { MemberAllocationData } from '../../types/memberData';
+<<<<<<< HEAD
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
+=======
+import { MusicInfo } from '../../types/musicData';
+>>>>>>> origin/master
 
 const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
 
@@ -236,6 +240,7 @@ export const chinchiro456Message = (result: string) => {
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
+<<<<<<< HEAD
 //「/play」コマンドのメッセージを作成
 export const musicInfoMessage = (musicInfo: MusicInfo, buttonRowList: ActionRowBuilder<ButtonBuilder>[]) => {
   const embeds = new EmbedBuilder()
@@ -250,6 +255,27 @@ export const musicInfoMessage = (musicInfo: MusicInfo, buttonRowList: ActionRowB
     .setTimestamp();
 
   if (musicInfo.author.channelThumbnail) {
+=======
+
+//「/playList」コマンドのメッセージを作成
+export const musicInfoMessage = (
+  musicInfo: MusicInfo,
+  buttonRowList: ActionRowBuilder<ButtonBuilder>[],
+  musicCount?: number,
+  maxMusicCount?: number,
+  channelThumbnail?: string | null
+) => {
+  const embeds = new EmbedBuilder().setColor('#fd4556').setTitle(musicInfo.title).setTimestamp();
+
+  if (musicInfo.url) embeds.setURL(musicInfo.url);
+  if (musicInfo.musicImg) embeds.setImage(musicInfo.musicImg);
+  if (channelThumbnail) {
+    embeds.setAuthor({
+      name: musicInfo.author.name,
+      iconURL: channelThumbnail,
+    });
+  } else if (musicInfo.author.channelThumbnail) {
+>>>>>>> origin/master
     embeds.setAuthor({
       name: musicInfo.author.name,
       iconURL: musicInfo.author.channelThumbnail,
@@ -260,10 +286,26 @@ export const musicInfoMessage = (musicInfo: MusicInfo, buttonRowList: ActionRowB
     });
   }
 
+<<<<<<< HEAD
+=======
+  if (!musicCount && !maxMusicCount) {
+    embeds.setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    });
+  } else {
+    embeds.setFooter({
+      text: `YouTube Playlist ${musicCount} / ${maxMusicCount}`,
+      iconURL: 'attachment://youtube_icon.png',
+    });
+  }
+
+>>>>>>> origin/master
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
 
   return { embeds: [embeds], files: [fotterAttachment], components: buttonRowList };
 };
+<<<<<<< HEAD
 //「/playList」コマンドのメッセージを作成
 export const musicInfoPlayListMessage = (
   playListInfo: PlayListInfo,
@@ -357,6 +399,8 @@ export const terminateMidwayPlayerMessage = () => {
 
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
+=======
+>>>>>>> origin/master
 
 // 再生完了のメッセージを作成
 export const donePlayerMessage = () => {

@@ -21,7 +21,12 @@ export const mapCommandMainEvent = async (interaction: ChatInputCommandInteracti
     await interaction.editReply(embed);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+<<<<<<< HEAD
     Logger.LogSystemError(`mapCommandMainEventでエラーが発生しました : ${error}`);
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+=======
+    interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+    Logger.LogSystemError(error);
+>>>>>>> origin/master
   }
 };

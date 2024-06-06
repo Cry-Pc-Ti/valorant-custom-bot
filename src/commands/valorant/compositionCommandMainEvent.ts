@@ -254,7 +254,12 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+<<<<<<< HEAD
     Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+=======
+    await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+    Logger.LogSystemError(error);
+>>>>>>> origin/master
   }
 };

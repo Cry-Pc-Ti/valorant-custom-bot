@@ -8,7 +8,10 @@ import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { gameCommand } from './commands/play/gameCommand';
+<<<<<<< HEAD
 import { stopPreviousInteraction } from './store/guildStates';
+=======
+>>>>>>> origin/master
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -35,10 +38,13 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 // クライアントオブジェクトが準備完了時に実行
 discord.on('ready', () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
+<<<<<<< HEAD
   discord.user?.setPresence({
     activities: [{ name: '今日も元気に働いています', type: 0 }],
     status: 'online',
   });
+=======
+>>>>>>> origin/master
   Logger.initialize();
 });
 
@@ -70,6 +76,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 // voiceチャンネルでアクションが発生時に実行
 discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
   try {
+<<<<<<< HEAD
     // ボットがいるチャンネルであるかを確認
     const botMember = await oldState.guild?.members.fetch(CLIENT_ID);
     if (!botMember?.voice.channelId) return;
@@ -82,6 +89,14 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
       const guildId = oldState.guild.id;
       if (guildId) await stopPreviousInteraction(guildId);
       botMember.voice.disconnect();
+=======
+    if (oldState.channel?.members.size === 1) {
+      const botJoinVoiceChannelId = await oldState.guild?.members.fetch(CLIENT_ID);
+      if (botJoinVoiceChannelId?.voice.channelId) {
+        botJoinVoiceChannelId?.voice.disconnect();
+        return;
+      }
+>>>>>>> origin/master
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

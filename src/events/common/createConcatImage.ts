@@ -1,6 +1,9 @@
 import fs from 'fs';
 import sharp, { OverlayOptions } from 'sharp';
+<<<<<<< HEAD
 import { Logger } from './log';
+=======
+>>>>>>> origin/master
 
 // 画像を連結し1枚の画像にまとめる
 export const createConcatImage = async (imagePaths: string[]) => {
@@ -43,6 +46,10 @@ export const createConcatImage = async (imagePaths: string[]) => {
       )
       .toFile('static/img/generate_image.png');
   } catch (error) {
+<<<<<<< HEAD
     Logger.LogSystemError(`画像の連結中にエラーが発生しました : ${error}`);
+=======
+    console.error(`画像の連結中にエラーが発生しました : ${error}`);
+>>>>>>> origin/master
   }
 };

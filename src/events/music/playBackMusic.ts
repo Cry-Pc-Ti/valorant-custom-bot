@@ -23,15 +23,23 @@ export const playBackMusic = async (player: AudioPlayer, musicInfo: MusicInfo) =
     await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+<<<<<<< HEAD
     Logger.LogSystemError(`playBackMusicでエラーが発生しました :`);
+=======
+>>>>>>> origin/master
     Logger.LogSystemError(error);
   }
 };
 
 // playerとListenerを削除する
 export const deletePlayerInfo = (player: AudioPlayer) => {
+<<<<<<< HEAD
   if (player) {
     player.stop();
     player.removeAllListeners();
   }
+=======
+  player.stop();
+  player.removeAllListeners();
+>>>>>>> origin/master
 };

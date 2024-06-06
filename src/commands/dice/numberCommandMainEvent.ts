@@ -2,7 +2,10 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { addTextToImage } from '../../events/dice/addTextToImage';
 import { diceMessage } from '../../events/discord/embedMessage';
+<<<<<<< HEAD
 import { Logger } from '../../events/common/log';
+=======
+>>>>>>> origin/master
 
 export const numberCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -29,6 +32,10 @@ export const numberCommandMainEvent = async (interaction: ChatInputCommandIntera
     await interaction.editReply(embed);
   } catch (error) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+<<<<<<< HEAD
     Logger.LogSystemError(`numberCommandMainEventでエラーが発生しました : ${error}`);
+=======
+    console.error(`agentPickCommandでエラーが発生しました : ${error}`);
+>>>>>>> origin/master
   }
 };

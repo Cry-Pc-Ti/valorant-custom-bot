@@ -3,7 +3,10 @@ import { playCommandMainEvent } from './playCommandMainEvent';
 import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
+<<<<<<< HEAD
 import { stopPreviousInteraction } from '../../store/guildStates';
+=======
+>>>>>>> origin/master
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -28,6 +31,7 @@ export const mainMusicCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('search')
+<<<<<<< HEAD
         .setDescription('入力されたワードから検索して再生します')
         .addStringOption((option) =>
           option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
@@ -44,6 +48,12 @@ export const mainMusicCommand = {
             }
           )
         )
+=======
+        .setDescription('入力されたワードからplayListを検索して再生します')
+        .addStringOption((option) =>
+          option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
+        )
+>>>>>>> origin/master
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -57,9 +67,12 @@ export const mainMusicCommand = {
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
+<<<<<<< HEAD
     const guildId = interaction.guildId;
     if (guildId) await stopPreviousInteraction(guildId);
 
+=======
+>>>>>>> origin/master
     // 「disconnect」コマンド
     if (interaction.options.getSubcommand() === 'disconnect') {
       await disconnectCommandMainEvent(interaction);

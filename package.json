@@ -29,7 +29,10 @@
     "discord.js-akinator": "^4.1.5",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
+<<<<<<< HEAD
     "genius-lyrics": "^4.4.7",
+=======
+>>>>>>> origin/master
     "libsodium-wrappers": "^0.7.13",
     "log4js": "^6.9.1",
     "opusscript": "^0.0.8",
