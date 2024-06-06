@@ -2,13 +2,20 @@ import ytdl from 'ytdl-core';
 import ytpl from 'ytpl';
 
 // URLからプレイリストかどうかを判別
-export const isPlayListFlag = (url: string) => {
-  let urlErrorFlag = false;
-  let playListFlag = false;
-  if (!ytdl.validateURL(url) && ytpl.validateID(url)) playListFlag = true;
-  else if (!ytdl.validateURL(url) && !ytpl.validateID(url)) urlErrorFlag = true;
+export const checkUrlType = (url: string) => {
+  let isUrlError = false;
+  let isPlayList = false;
+
+  if (!ytdl.validateURL(url)) {
+    if (ytpl.validateID(url)) {
+      isPlayList = true;
+    } else {
+      isUrlError = true;
+    }
+  }
+
   return {
-    urlError: urlErrorFlag,
-    result: playListFlag,
+    urlError: isUrlError,
+    result: isPlayList,
   };
 };

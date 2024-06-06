@@ -1,47 +1,41 @@
 // サイコロを振った結果を出力
-export const exportChinchiroResult = (randomIndexArray: number[]) => {
-  let result = '';
-  const isAllIncludes = (array: number[], target: number[]) => array.every((element) => target.includes(element));
-  const isSomeInclude = (array: number[], target: number[]) => array.some((element) => target.includes(element));
-  const arrayString = `${randomIndexArray[0]}, ${randomIndexArray[1]}, ${randomIndexArray[2]}`;
+export const exportChinchiroResult = (randomIndexArray: number[]): string => {
+  const includesAll = (array: number[], target: number[]) => target.every((element) => array.includes(element));
+  const arrayString = randomIndexArray.join(', ');
 
-  switch (true) {
-    case isAllIncludes(randomIndexArray, [1]):
-      result = `ピンゾロ : ${arrayString}`;
-      break;
+  const [first, second, third] = randomIndexArray;
+  const allSame = first === second && second === third;
+  const twoSame1 = first === second && second !== third;
+  const twoSame2 = second === third && third !== first;
+  const twoSame3 = third === first && first !== second;
 
-    case isAllIncludes(randomIndexArray, [randomIndexArray[0]]):
-      result = `アラシ : ${randomIndexArray[0]}`;
-      break;
-
-    case isSomeInclude(randomIndexArray, [4]) &&
-      isSomeInclude(randomIndexArray, [5]) &&
-      isSomeInclude(randomIndexArray, [6]):
-      result = `シゴロ : ${arrayString}`;
-      break;
-
-    case randomIndexArray[0] === randomIndexArray[1] && randomIndexArray[1] !== randomIndexArray[2]:
-      result = `目 : ${randomIndexArray[2]}`;
-      break;
-
-    case randomIndexArray[1] === randomIndexArray[2] && randomIndexArray[2] !== randomIndexArray[0]:
-      result = `目 : ${randomIndexArray[0]}`;
-      break;
-
-    case randomIndexArray[2] === randomIndexArray[0] && randomIndexArray[0] !== randomIndexArray[1]:
-      result = `目 : ${randomIndexArray[1]}`;
-      break;
-
-    case isSomeInclude(randomIndexArray, [1]) &&
-      isSomeInclude(randomIndexArray, [2]) &&
-      isSomeInclude(randomIndexArray, [3]):
-      result = `ヒフミ : ${arrayString}`;
-      break;
-
-    default:
-      result = `目なし : ${arrayString}`;
-      break;
+  if (allSame) {
+    if (first === 1) {
+      return `ピンゾロ : ${arrayString}`;
+    } else {
+      return `ゾロ目 : ${first}`;
+    }
   }
 
-  return result;
+  if (includesAll(randomIndexArray, [1, 2, 3])) {
+    return `ヒフミ : ${arrayString}`;
+  }
+
+  if (includesAll(randomIndexArray, [4, 5, 6])) {
+    return `シゴロ : ${arrayString}`;
+  }
+
+  if (twoSame1) {
+    return `役 : ${third}`;
+  }
+
+  if (twoSame2) {
+    return `役 : ${first}`;
+  }
+
+  if (twoSame3) {
+    return `役 : ${second}`;
+  }
+
+  return `目なし : ${arrayString}`;
 };

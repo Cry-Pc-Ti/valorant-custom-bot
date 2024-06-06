@@ -4,6 +4,7 @@ import { disconnectCommandMainEvent } from './disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './searchCommandMainEvent';
 import { recommendCommandMainEvent } from './recommendCommandMainEvent';
 import { stopPreviousInteraction } from '../../store/guildStates';
+import { hitSongsCommandMainEvent } from './hitSongsCommandMainEvent';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -53,6 +54,27 @@ export const mainMusicCommand = {
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('hitsongs')
+        .setDescription('ヒットソングを再生します。')
+        .addStringOption((option) =>
+          option.setName('genre').setDescription('ジャンルを選択してください').setRequired(true).setChoices(
+            {
+              name: '日本',
+              value: '日本',
+            },
+            {
+              name: 'グローバル',
+              value: 'グローバル',
+            },
+            {
+              name: '韓国',
+              value: '韓国',
+            }
+          )
+        )
+    )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
@@ -72,6 +94,8 @@ export const mainMusicCommand = {
       // 「recommend」コマンド
     } else if (interaction.options.getSubcommand() === 'recommend') {
       await recommendCommandMainEvent(interaction);
+    } else if (interaction.options.getSubcommand() === 'hitsongs') {
+      await hitSongsCommandMainEvent(interaction);
     }
   },
 };

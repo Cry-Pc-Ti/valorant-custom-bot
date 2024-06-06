@@ -302,10 +302,29 @@ export const musicInfoPlayListMessage = (
       }
     );
   } else if (commandFlg === 2) {
-    embeds.addFields({
-      name: '最初に指定した楽曲',
-      value: `${playListInfo.title}`,
-    });
+    embeds.addFields(
+      {
+        name: '最初に指定した楽曲',
+        value: `${playListInfo.title}`,
+      },
+      {
+        name: '曲順',
+        value: `${musicCount} / ${playListInfo.musicInfo.length}`,
+        inline: true,
+      }
+    );
+  } else if (commandFlg === 3) {
+    embeds.addFields(
+      {
+        name: playListInfo.title,
+        value: `再生回数が多い曲 (毎日更新) `,
+      },
+      {
+        name: '現在の順位',
+        value: `${musicCount}位`,
+        inline: true,
+      }
+    );
   }
 
   if (musicCount === playListInfo.musicInfo.length) {
@@ -374,11 +393,27 @@ export const donePlayerMessage = () => {
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
 
-// 再生準備中のメッセージを作成
+// 再生準備中のメッセージを作成(レコメンド)
 export const preparingPlayerMessage = () => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('関連の楽曲を探しております。少々お待ちください')
+    .setFooter({
+      text: 'YouTube',
+      iconURL: 'attachment://youtube_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
+
+// 再生準備中のメッセージを作成(ヒットソング)
+export const hitSongsPreparingPlayerMessage = (words: string) => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(`${words}で再生回数が多い曲を検索中です。\n少々お待ちください\n\n※再生回数はspotify調べです。`)
     .setFooter({
       text: 'YouTube',
       iconURL: 'attachment://youtube_icon.png',

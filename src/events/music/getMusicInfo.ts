@@ -99,3 +99,23 @@ export const getSearchMusicVideo = async (words: string) => {
     };
   });
 };
+
+export const getOneSearchMusicVideo = async (words: string, index: number) => {
+  const searchVideo = await YouTube.searchOne(words, 'video', true);
+
+  return {
+    songIndex: index,
+    id: searchVideo.id ?? '',
+    url: searchVideo.url,
+    title: searchVideo.title?.substring(0, 90) ?? 'titleの取得に失敗しました。',
+    musicImg: searchVideo.thumbnail?.url,
+    durationFormatted: searchVideo.durationFormatted,
+    author: {
+      url: searchVideo.channel?.url,
+      channelID: searchVideo.channel?.id,
+      name: searchVideo.channel?.name ?? 'チャンネル名の取得に失敗しました。',
+      channelThumbnail: searchVideo.channel?.icon.url,
+    },
+    relatedVideosIDlist: [],
+  };
+};

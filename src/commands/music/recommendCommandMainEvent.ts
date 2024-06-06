@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { MusicInfo } from '../../types/musicData';
-import { isPlayListFlag } from '../../events/music/musicCommon';
 import { getMusicPlayListInfo, getSingleMusicInfo } from '../../events/music/getMusicInfo';
 import { playListMusicMainLogic } from '../../events/music/musicPlayMainLogic';
 import { generateRandomNum } from '../../events/common/generateRandomNum';
 import { preparingPlayerMessage } from '../../events/discord/embedMessage';
 import { Logger } from '../../events/common/log';
+import { checkUrlType } from '../../events/music/musicCommon';
 
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -16,7 +16,7 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
     if (!voiceChannelId) return interaction.editReply('ボイスチャンネルに参加してください。');
 
     // プレイリストか曲か判別
-    const playListFlag: { result: boolean; urlError: boolean } = isPlayListFlag(url);
+    const playListFlag: { result: boolean; urlError: boolean } = checkUrlType(url);
 
     if (playListFlag.urlError)
       return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');

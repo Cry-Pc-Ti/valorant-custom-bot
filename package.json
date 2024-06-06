@@ -23,7 +23,7 @@
   "dependencies": {
     "@discordjs/voice": "^0.16.1",
     "@types/log4js": "^2.3.5",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "canvas": "^2.11.2",
     "discord.js": "^14.14.1",
     "discord.js-akinator": "^4.1.5",

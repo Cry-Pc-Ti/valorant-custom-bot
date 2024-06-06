@@ -3,27 +3,24 @@ import sharp, { OverlayOptions } from 'sharp';
 import { Logger } from './log';
 
 // 画像を連結し1枚の画像にまとめる
-export const createConcatImage = async (imagePaths: string[]) => {
-  // 既存の画像を削除
-  if (fs.existsSync('static/img/generate_image.png')) {
-    fs.unlinkSync('static/img/generate_image.png');
-  }
-
-  // 画像を読み込む
-  const images: sharp.Sharp[] = imagePaths.map((path) => sharp(path));
-
+export const createConcatImage = async (imagePaths: string[]): Promise<void> => {
   try {
+    // 既存の画像を削除
+    if (fs.existsSync('static/img/generate_image.png')) {
+      await fs.promises.unlink('static/img/generate_image.png');
+    }
+
+    // 画像を読み込む
+    const images = await Promise.all(imagePaths.map((path) => sharp(path).toBuffer()));
+
     // 画像のメタデータを取得
-    const metadataList: sharp.Metadata[] = await Promise.all(images.map((image) => image.metadata()));
+    const metadataList = await Promise.all(images.map((image) => sharp(image).metadata()));
 
     // 画像を連結するための新しい幅と高さを計算
-    const newWidth: number = metadataList.reduce((totalWidth, metadata) => totalWidth + (metadata.width || 0), 0);
-    const newHeight: number = Math.max(...metadataList.map((metadata) => metadata.height || 0));
+    const newWidth = metadataList.reduce((totalWidth, metadata) => totalWidth + (metadata.width || 0), 0);
+    const newHeight = Math.max(...metadataList.map((metadata) => metadata.height || 0));
 
     // 画像を連結する
-    const buffers: Buffer[] = await Promise.all(images.map((image) => image.toBuffer()));
-
-    // 画像を作成
     await sharp({
       create: {
         width: newWidth,
@@ -33,7 +30,7 @@ export const createConcatImage = async (imagePaths: string[]) => {
       },
     })
       .composite(
-        buffers.map(
+        images.map(
           (buffer, index): OverlayOptions => ({
             input: buffer,
             top: 0,

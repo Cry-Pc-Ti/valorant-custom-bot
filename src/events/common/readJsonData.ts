@@ -1,14 +1,19 @@
 import fs from 'fs';
 import { AgentData, MapData } from '../../types/valorantData';
+import { spotifyPlaylistID } from '../../types/spotifyData';
 
 // JSONファイルのパス
-const jsonFilePath = './static/data/valorantData.json';
+const valorantJsonFilePath = './static/data/valorantData.json';
+const spotifyJsonFilePath = './static/data/spotifyPlayListData.json';
 
 // JSONファイルの読み込み
-const fileData = fs.readFileSync(jsonFilePath, 'utf-8');
+const valorantFileData = fs.readFileSync(valorantJsonFilePath, 'utf-8');
+const spotifyFileData = fs.readFileSync(spotifyJsonFilePath, 'utf-8');
 
 // JSONデータをオブジェクトに変換
-const jsonData: { agents: AgentData[]; maps: MapData[] } = JSON.parse(fileData);
+const valorantJsonData: { agents: AgentData[]; maps: MapData[] } = JSON.parse(valorantFileData);
+const spotifyJsonData: { playlist: spotifyPlaylistID[] } = JSON.parse(spotifyFileData);
 
-export const valorantAgents = jsonData.agents;
-export const valorantMaps = jsonData.maps;
+export const valorantAgents = valorantJsonData.agents;
+export const valorantMaps = valorantJsonData.maps;
+export const spotifyPlaylistId = spotifyJsonData.playlist;
