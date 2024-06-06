@@ -29,8 +29,7 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
 
     // メッセージを送信
     await interaction.editReply(embed);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogSystemError(`agentCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }

@@ -19,10 +19,10 @@ export const mainValorantCommand = {
             .setName('role')
             .setDescription('エージェントのロールを指定してください')
             .addChoices(
-              { name: 'Duelist', value: 'duelist' },
-              { name: 'Initiator', value: 'initiator' },
-              { name: 'Controller', value: 'controller' },
-              { name: 'Sentinel', value: 'sentinel' }
+              { name: 'デュエリスト', value: 'duelist' },
+              { name: 'イニシエーター', value: 'initiator' },
+              { name: 'コントローラー', value: 'controller' },
+              { name: 'センチネル', value: 'sentinel' }
             )
         )
     )
@@ -82,8 +82,11 @@ export const mainValorantCommand = {
               { name: '5', value: 5 }
             )
         )
-        .addBooleanOption((option) =>
-          option.setName('ban').setDescription('BANエージェントを選択するか指定してください')
+        .addStringOption((option) =>
+          option
+            .setName('ban')
+            .setDescription('BANエージェントを選択するか指定してください')
+            .addChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
     )
     .addSubcommand(

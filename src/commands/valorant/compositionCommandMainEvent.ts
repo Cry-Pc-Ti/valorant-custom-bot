@@ -26,7 +26,10 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
     let sentinelNum: number = options.getNumber('sentinel') ?? 0;
 
     // BAN機能の有無を取得
-    const ban: boolean = options.getBoolean('ban') ?? false;
+    const ban: string | null = options.getString('ban');
+
+    let isBan = false;
+    if (ban === 'true') isBan = true;
 
     // 構成を格納するオブジェクトを宣言
     const composition: CompositionData = {
@@ -46,7 +49,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
     }
 
     // BAN機能が無効の場合
-    if (!ban) {
+    if (!isBan) {
       // 指定人数が5人未満の場合、不足分のロールをランダムに選択
       if (duelistNum + initiatorNum + controllerNum + sentinelNum < 5) {
         const total = 5;
@@ -133,128 +136,136 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       });
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
-        // BANされたエージェントを取得
-        const banAgentIds: string[] = selectMenuInteraction.values;
+        try {
+          console.log(selectMenuInteraction.user);
+          // BANされたエージェントを取得
+          const banAgentIds: string[] = selectMenuInteraction.values;
 
-        // BANされたエージェントをcompositionに格納
-        banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.id));
+          // BANされたエージェントをcompositionに格納
+          banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.id));
 
-        // ValorantAgentsからBAN対象とされたエージェントを排除
-        const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.id));
+          // ValorantAgentsからBAN対象とされたエージェントを排除
+          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.id));
 
-        // ValorantAgentsのroleから各ロールの人数を取得
-        const allDuelistNum = countAgentsByRole('duelist');
-        const allInitiatorNum = countAgentsByRole('initiator');
-        const allControllerNum = countAgentsByRole('controller');
-        const allSentinelNum = countAgentsByRole('sentinel');
+          // ValorantAgentsのroleから各ロールの人数を取得
+          const allDuelistNum = countAgentsByRole('duelist');
+          const allInitiatorNum = countAgentsByRole('initiator');
+          const allControllerNum = countAgentsByRole('controller');
+          const allSentinelNum = countAgentsByRole('sentinel');
 
-        // BANされたエージェントのロールを取得し、各ロールのBANされたエージェントの人数を取得
-        const banDuelistNum = countBanAgentsByRole('duelist', banAgentIds);
-        const banInitiatorNum = countBanAgentsByRole('initiator', banAgentIds);
-        const banControllerNum = countBanAgentsByRole('controller', banAgentIds);
-        const banSentinelNum = countBanAgentsByRole('sentinel', banAgentIds);
+          // BANされたエージェントのロールを取得し、各ロールのBANされたエージェントの人数を取得
+          const banDuelistNum = countBanAgentsByRole('duelist', banAgentIds);
+          const banInitiatorNum = countBanAgentsByRole('initiator', banAgentIds);
+          const banControllerNum = countBanAgentsByRole('controller', banAgentIds);
+          const banSentinelNum = countBanAgentsByRole('sentinel', banAgentIds);
 
-        // 各ロールの指定可能人数が超えている場合、エラーを返却
-        if (duelistNum > 0 && allDuelistNum - banDuelistNum < duelistNum) {
-          await interaction.editReply({
-            content: '指定されたデュエリストの人数が選択可能な最大人数を超えています',
-            components: [],
-          });
-          return;
-        }
+          // BANされたエージェントが各ロールの指定可能人数を超えているかどうか
+          let isBanError = false;
+          let banErrorMessage = '';
 
-        if (initiatorNum > 0 && allInitiatorNum - banInitiatorNum < initiatorNum) {
-          await interaction.editReply({
-            content: '指定されたイニシエーターの人数が選択可能な最大人数を超えています',
-            components: [],
-          });
-          return;
-        }
+          // 各ロールの指定可能人数が超えている場合、エラーを返却
+          if (duelistNum > 0 && allDuelistNum - banDuelistNum < duelistNum) {
+            banErrorMessage += 'デュエリストのエージェント数が足りません\n';
+            isBanError = true;
+          }
 
-        if (controllerNum > 0 && allControllerNum - banControllerNum < controllerNum) {
-          await interaction.editReply({
-            content: '指定されたコントローラーの人数が選択可能な最大人数を超えています',
-            components: [],
-          });
-          return;
-        }
+          if (initiatorNum > 0 && allInitiatorNum - banInitiatorNum < initiatorNum) {
+            banErrorMessage += 'イニシエーターのエージェント数が足りません\n';
+            isBanError = true;
+          }
 
-        if (sentinelNum > 0 && allSentinelNum - banSentinelNum < sentinelNum) {
-          await interaction.editReply({
-            content: '指定されたセンチネルの人数が選択可能な最大人数を超えています',
-            components: [],
-          });
-          return;
-        }
+          if (controllerNum > 0 && allControllerNum - banControllerNum < controllerNum) {
+            banErrorMessage += 'コントローラーのエージェント数が足りません\n';
+            isBanError = true;
+          }
 
-        // 指定人数が5人未満の場合、不足分のロールをランダムに選択
-        if (duelistNum + initiatorNum + controllerNum + sentinelNum < 5) {
-          const total = 5;
+          if (sentinelNum > 0 && allSentinelNum - banSentinelNum < sentinelNum) {
+            banErrorMessage += 'センチネルのエージェント数が足りません\n';
+            isBanError = true;
+          }
 
-          // 不足分を計算
-          let shortage = total - duelistNum - initiatorNum - controllerNum - sentinelNum;
+          if (isBanError) {
+            await interaction.editReply({
+              content: `${banErrorMessage}もう一度コマンドを実行してください`,
+              components: [],
+            });
+            return;
+          }
 
-          // 不足分をランダムに選択
-          while (shortage > 0) {
-            // 0~3のランダムな数字を生成
-            const roleNum = Math.floor(Math.random() * 4);
+          // 指定人数が5人未満の場合、不足分のロールをランダムに選択
+          if (duelistNum + initiatorNum + controllerNum + sentinelNum < 5) {
+            const total = 5;
 
-            if (roleNum === 0 && duelistNum < allDuelistNum - banDuelistNum) {
-              duelistNum += 1;
-              shortage -= 1;
-            }
+            // 不足分を計算
+            let shortage = total - duelistNum - initiatorNum - controllerNum - sentinelNum;
 
-            if (roleNum === 1 && initiatorNum < allInitiatorNum - banInitiatorNum) {
-              initiatorNum += 1;
-              shortage -= 1;
-            }
+            // 不足分をランダムに選択
+            while (shortage > 0) {
+              // 0~3のランダムな数字を生成
+              const roleNum = Math.floor(Math.random() * 4);
 
-            if (roleNum === 2 && controllerNum < allControllerNum - banControllerNum) {
-              controllerNum += 1;
-              shortage -= 1;
-            }
+              if (roleNum === 0 && duelistNum < allDuelistNum - banDuelistNum) {
+                duelistNum += 1;
+                shortage -= 1;
+              }
 
-            if (roleNum === 3 && sentinelNum < allSentinelNum - banSentinelNum) {
-              sentinelNum += 1;
-              shortage -= 1;
+              if (roleNum === 1 && initiatorNum < allInitiatorNum - banInitiatorNum) {
+                initiatorNum += 1;
+                shortage -= 1;
+              }
+
+              if (roleNum === 2 && controllerNum < allControllerNum - banControllerNum) {
+                controllerNum += 1;
+                shortage -= 1;
+              }
+
+              if (roleNum === 3 && sentinelNum < allSentinelNum - banSentinelNum) {
+                sentinelNum += 1;
+                shortage -= 1;
+              }
             }
           }
-        }
 
-        // 各クラスのエージェントを指定された人数分ランダムに選択
-        if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition, filteredValorantAgents);
-        if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition, filteredValorantAgents);
-        if (controllerNum) selectAgentsByRole('controller', controllerNum, composition, filteredValorantAgents);
-        if (sentinelNum) selectAgentsByRole('sentinel', sentinelNum, composition, filteredValorantAgents);
+          // 各クラスのエージェントを指定された人数分ランダムに選択
+          if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition, filteredValorantAgents);
+          if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition, filteredValorantAgents);
+          if (controllerNum) selectAgentsByRole('controller', controllerNum, composition, filteredValorantAgents);
+          if (sentinelNum) selectAgentsByRole('sentinel', sentinelNum, composition, filteredValorantAgents);
 
-        // すべての値が空の場合はエラーを返却
-        if (Object.values(composition).every((role) => role.length === 0)) {
-          await interaction.editReply('構成作成中にエラーが発生しました\n開発者にお問い合わせください');
-          return;
-        }
+          // すべての値が空の場合はエラーを返却
+          if (Object.values(composition).every((role) => role.length === 0)) {
+            await interaction.editReply('構成作成中にエラーが発生しました\n開発者にお問い合わせください');
+            return;
+          }
 
-        // 連結したい画像のファイルパス
-        const imagePaths: string[] = [];
+          // 連結したい画像のファイルパス
+          const imagePaths: string[] = [];
 
-        // 画像のパスを配列に格納
-        for (const agentRole in composition) {
-          if (agentRole !== 'ban') {
-            for (const agent of composition[agentRole as keyof CompositionData]) {
-              imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
+          // 画像のパスを配列に格納
+          for (const agentRole in composition) {
+            if (agentRole !== 'ban') {
+              for (const agent of composition[agentRole as keyof CompositionData]) {
+                imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
+              }
             }
           }
-        }
-        // 画像を作成
-        await createConcatImage(imagePaths);
+          // 画像を作成
+          await createConcatImage(imagePaths);
 
-        // メッセージを作成・送信
-        const embed = compositionMessage(composition, banAgents);
-        await interaction.editReply(embed);
+          // メッセージを作成・送信
+          const embed = compositionMessage(composition, banAgents);
+          await interaction.editReply(embed);
+        } catch (error) {
+          Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
+          await interaction.editReply('処理中にエラーが発生しました。\n再度コマンドを入力してください。');
+        }
       });
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error) {
     Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
-    await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
+    await interaction.editReply({
+      content: '処理中にエラーが発生しました。\n再度コマンドを入力してください。',
+      components: [],
+    });
   }
 };

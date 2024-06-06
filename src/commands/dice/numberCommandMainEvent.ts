@@ -21,7 +21,7 @@ export const numberCommandMainEvent = async (interaction: ChatInputCommandIntera
       message = 'それはないぜ... ウィング...';
     }
 
-    // 画像を作成
+    // 数字に応じた画像を作成
     await addTextToImage(randomNum);
 
     // メッセージを作成・送信

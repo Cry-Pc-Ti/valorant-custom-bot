@@ -29,9 +29,8 @@ export const selectAgentsByRole = (
     // compositionにエージェントを格納
     composition[agentRole as keyof CompositionData] = randomAgents;
     return composition;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    Logger.LogSystemError(`selectAgentsByRoleでエラーが発生しました : ${error}`);
+  } catch (error) {
+    Logger.LogSystemError(`selectAgentsByRoleでエラーが発生しました: ${error}`);
     return composition;
   }
 };

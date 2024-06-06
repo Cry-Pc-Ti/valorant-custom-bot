@@ -1,7 +1,5 @@
 import * as Log4js from 'log4js';
 
-// const FILE_DIRECTORY = '/src/logs/app/access.log'
-
 export class Logger {
   public static initialize() {
     Log4js.configure({
@@ -13,6 +11,7 @@ export class Logger {
       },
     });
   }
+
   public static LogAccessInfo(message: string): void {
     const logger = Log4js.getLogger('access');
     logger.info(message);
@@ -23,8 +22,9 @@ export class Logger {
     logger.warn(message);
   }
 
-  public static LogAccessError(message: string): void {
+  public static LogAccessError(error: unknown): void {
     const logger = Log4js.getLogger('access');
+    const message = Logger.extractErrorMessage(error);
     logger.error(message);
   }
 
@@ -42,8 +42,16 @@ export class Logger {
     const logger = Log4js.getLogger('system');
     logger.error(message);
   }
+
   public static LogError(message: string): void {
     const logger = Log4js.getLogger('error');
     logger.error(message);
+  }
+
+  private static extractErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error);
   }
 }
