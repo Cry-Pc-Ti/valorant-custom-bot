@@ -194,7 +194,7 @@ export const diceMessage = (message: string, number: number, userId: string) => 
 };
 
 //「/chinchiro」コマンドのメッセージを作成
-export const chinchiroMessage = (result: string) => {
+export const chinchiroMessage = (result: string, userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setAuthor({ name: 'チンチロバトルじゃ！', iconURL: 'attachment://radianite_box.png' })
@@ -202,7 +202,7 @@ export const chinchiroMessage = (result: string) => {
       name: 'ざわ…ざわ…',
       value: `${result}`,
     })
-    .setImage('attachment://generate_image.png')
+    .setImage(`attachment://${userId}.png`)
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
@@ -210,7 +210,7 @@ export const chinchiroMessage = (result: string) => {
     .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/dice/radianite_box.png');
-  const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const imageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };

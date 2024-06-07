@@ -26,7 +26,7 @@ export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInt
       const result = exportChinchiroResult(randomIndexArray);
 
       // メッセージを作成・送信
-      const embed = chinchiroMessage(result);
+      const embed = chinchiroMessage(result, interaction.user.id);
       await interaction.editReply(embed);
 
       // イカサマモード

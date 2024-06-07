@@ -75,7 +75,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
       Logger.LogAccessInfo(
-        `\n【${guild?.name}(${guild?.id})】${user.username}(${user.id})さんが${commandName} ${interaction.options.getSubcommand()}コマンドを実行しました`
+        `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
       );
       // マップからコマンドを取得
       const command = commands[commandName];
