@@ -1,5 +1,5 @@
 // モジュールをインポート
-import { Interaction, REST, Routes, VoiceState } from 'discord.js';
+import { Collection, Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
@@ -40,16 +40,39 @@ discord.on('ready', () => {
   });
   Logger.initialize();
 });
+// クールダウンのコレクション
+const cooldowns = new Collection<string, Collection<string, number>>();
 
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
     if (interaction.isChatInputCommand()) {
+      const { commandName, user, guild } = interaction;
+      if (!cooldowns.has(commandName)) {
+        cooldowns.set(commandName, new Collection());
+      }
+
+      const now = Date.now();
+      const timestamps = cooldowns.get(commandName);
+      const cooldownAmount = 5 * 1000;
+
+      if (timestamps?.has(user.id)) {
+        const expirationTime = (timestamps.get(user.id) as number) + cooldownAmount;
+
+        if (now < expirationTime) {
+          const timeLeft = (expirationTime - now) / 1000;
+          await interaction.reply(`コマンドが連打されています。あと${timeLeft.toFixed(1)}秒お待ちください。`);
+          return;
+        }
+      }
+      timestamps?.set(user.id, now);
+      setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
+
       Logger.LogAccessInfo(
-        `${interaction.user.username}(${interaction.user.id})さんが${interaction.commandName} ${interaction.options.getSubcommand()}コマンドを実行しました`
+        `【${guild?.name}(${guild?.id})】${user.username}(${user.id})さんが${commandName} ${interaction.options.getSubcommand()}コマンドを実行しました`
       );
       // マップからコマンドを取得
-      const command = commands[interaction.commandName];
+      const command = commands[commandName];
 
       // コマンドが存在すれば実行
       if (command) command.execute(interaction);

@@ -49,8 +49,6 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
       },
       3
     );
-
-    // console.log('Top Songs:', topSongs);
   } catch (error) {
     Logger.LogSystemError(`hitSongsCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply({

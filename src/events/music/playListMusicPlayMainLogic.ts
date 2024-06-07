@@ -157,9 +157,14 @@ export const playListMusicMainLogic = async (
                           `ポリシーに反しているため「${musicInfo.title}」を飛ばしました。`
                         );
                         return;
-                      }
-                      console.log(error.message);
-                      Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
+                      } else if (
+                        error.message === 'The operation was aborted' ||
+                        error.message === 'Invalid regular expression: missing /'
+                      )
+                        return;
+                      Logger.LogSystemError(
+                        `【${interaction.guild?.name}(${interaction.guild?.id})】playBackMusicでエラーが発生しました: ${error}`
+                      );
                       player.stop();
                     });
                   } while (repeatMode === 1);
@@ -235,8 +240,11 @@ export const playListMusicMainLogic = async (
                           `ポリシーに反しているため「${musicInfo.title}」を飛ばしました。`
                         );
                         return;
-                      }
-                      console.log(error.message);
+                      } else if (
+                        error.message === 'The operation was aborted' ||
+                        error.message === 'Invalid regular expression: missing /'
+                      )
+                        return;
                       Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
                       player.stop();
                     });
@@ -373,8 +381,11 @@ export const playListMusicMainLogic = async (
                 `ポリシーに反しているため「${musicInfo.title}」を飛ばしました。`
               );
               return;
-            }
-            console.log(error.messege);
+            } else if (
+              error.message === 'The operation was aborted' ||
+              error.message === 'Invalid regular expression: missing /'
+            )
+              return;
             Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
             player.stop();
           });

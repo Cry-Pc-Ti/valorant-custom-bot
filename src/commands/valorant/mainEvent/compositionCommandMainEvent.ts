@@ -137,7 +137,6 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
         try {
-          console.log(selectMenuInteraction.user);
           // BANされたエージェントを取得
           const banAgentIds: string[] = selectMenuInteraction.values;
 
