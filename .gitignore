@@ -3,3 +3,4 @@ node_modules
 static/img/generate_image.png
 /logs/*
 /translationCache
+static/img/generate_image/*

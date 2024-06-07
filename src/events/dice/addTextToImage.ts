@@ -5,11 +5,13 @@ import { Logger } from '../common/log';
 // フォントを読み込む
 registerFont('./static/fonts/Yomogi-Regular.ttf', { family: 'Yomogi' });
 
-export const addTextToImage = async (num: number): Promise<void> => {
+export const addTextToImage = async (num: number, userId: string): Promise<void> => {
   try {
+    const outputImagePath = `./static/img/generate_image/${userId}.png`;
+
     // 既存の画像を削除
-    if (fs.existsSync('static/img/generate_image.png')) {
-      fs.unlinkSync('static/img/generate_image.png');
+    if (fs.existsSync(outputImagePath)) {
+      fs.unlinkSync(outputImagePath);
     }
 
     // 数字によって画像パスを変更
@@ -64,7 +66,7 @@ export const addTextToImage = async (num: number): Promise<void> => {
       context.translate(-canvas.width / 4.9, -canvas.height / 1.65);
     }
 
-    const outputStream = fs.createWriteStream('./static/img/generate_image.png');
+    const outputStream = fs.createWriteStream(outputImagePath);
     const stream = canvas.createPNGStream();
 
     await new Promise<void>((resolve, reject) => {

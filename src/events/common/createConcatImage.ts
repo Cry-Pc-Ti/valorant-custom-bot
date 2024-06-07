@@ -3,11 +3,12 @@ import sharp, { OverlayOptions } from 'sharp';
 import { Logger } from './log';
 
 // 画像を連結し1枚の画像にまとめる
-export const createConcatImage = async (imagePaths: string[]): Promise<void> => {
+export const createConcatImage = async (imagePaths: string[], userId: string): Promise<void> => {
   try {
+    const outputImagePath = `./static/img/generate_image/${userId}.png`;
     // 既存の画像を削除
-    if (fs.existsSync('static/img/generate_image.png')) {
-      await fs.promises.unlink('static/img/generate_image.png');
+    if (fs.existsSync(outputImagePath)) {
+      await fs.promises.unlink(outputImagePath);
     }
 
     // 画像を読み込む
@@ -38,7 +39,7 @@ export const createConcatImage = async (imagePaths: string[]): Promise<void> => 
           })
         )
       )
-      .toFile('static/img/generate_image.png');
+      .toFile(outputImagePath);
   } catch (error) {
     Logger.LogSystemError(`画像の連結中にエラーが発生しました : ${error}`);
   }

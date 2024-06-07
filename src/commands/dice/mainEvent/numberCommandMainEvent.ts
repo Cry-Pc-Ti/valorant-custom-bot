@@ -21,11 +21,13 @@ export const numberCommandMainEvent = async (interaction: ChatInputCommandIntera
       message = 'それはないぜ... ウィング...';
     }
 
+    const userId = interaction.user.id;
+
     // 数字に応じた画像を作成
-    await addTextToImage(randomNum);
+    await addTextToImage(randomNum, userId);
 
     // メッセージを作成・送信
-    const embed = diceMessage(message, randomNum);
+    const embed = diceMessage(message, randomNum, userId);
     await interaction.editReply(embed);
   } catch (error) {
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');

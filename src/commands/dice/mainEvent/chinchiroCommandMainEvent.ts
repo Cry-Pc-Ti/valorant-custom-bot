@@ -20,7 +20,7 @@ export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInt
       }
 
       // サイコロの画像を作成
-      await createConcatImage(diceImagePaths);
+      await createConcatImage(diceImagePaths, interaction.user.id);
 
       // サイコロを振った結果を出力
       const result = exportChinchiroResult(randomIndexArray);

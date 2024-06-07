@@ -33,12 +33,12 @@ export const agentMessage = (agent: AgentData) => {
 };
 
 // 「/composition」コマンドのメッセージを作成
-export const compositionMessage = (composition: CompositionData, banAgents: AgentData[]) => {
+export const compositionMessage = (composition: CompositionData, banAgents: AgentData[], userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle('Random Composition')
     .setDescription('今回の構成はこちらです')
-    .setImage('attachment://generate_image.png')
+    .setImage(`attachment://${userId}.png`)
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
@@ -52,7 +52,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       duelists.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
     embed.addFields({
-      name: 'Duelist',
+      name: 'デュエリスト',
       value: duelists.join(', '),
     });
   }
@@ -64,7 +64,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       initiators.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
     embed.addFields({
-      name: 'Initiator',
+      name: 'イニシエーター',
       value: initiators.join(', '),
     });
   }
@@ -76,7 +76,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       controllers.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
     embed.addFields({
-      name: 'Controller',
+      name: 'コントローラー',
       value: controllers.join(', '),
     });
   }
@@ -88,7 +88,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       sentinels.push(`[${agent.name}](${agentWebURL}${agent.id})`);
     }
     embed.addFields({
-      name: 'Sentinel',
+      name: 'センチネル',
       value: sentinels.join(', '),
     });
   }
@@ -100,12 +100,12 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       bans.push(agent.name);
     }
     embed.addFields({
-      name: 'Ban',
+      name: 'バン',
       value: bans.join(', '),
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const concatImageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return {
@@ -152,7 +152,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     }
 
     embeds.addFields({
-      name: 'Attacker',
+      name: 'アタッカーサイド',
       value: attack.join(`\n`),
     });
   }
@@ -163,7 +163,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
       defense.push(`:white_small_square:<@${member.id}>`);
     }
     embeds.addFields({
-      name: 'Defender',
+      name: 'ディフェンダーサイド',
       value: defense.join(`\n`),
     });
   }
@@ -174,20 +174,20 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
 };
 
 //「/dice」コマンドのメッセージを作成
-export const diceMessage = (message: string, number: number) => {
+export const diceMessage = (message: string, number: number, userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
     .setAuthor({ name: message, iconURL: 'attachment://gekko_icon.png' })
     .setDescription(`出た数字は${number}だよ～`)
-    .setThumbnail('attachment://generate_image.png')
+    .setThumbnail(`attachment://${userId}.png`)
     .setFooter({
       text: 'VALORANT',
-      iconURL: 'attachment://valorant_icon.png',
+      iconURL: `attachment://valorant_icon.png`,
     })
     .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
-  const imageAttachment = new AttachmentBuilder('static/img/generate_image.png');
+  const imageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };

@@ -17,7 +17,7 @@ import { Logger } from '../../../events/common/log';
 
 export const compositionCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
-    const { options } = interaction;
+    const { options, user } = interaction;
 
     // 各ロールの人数を取得
     let duelistNum: number = options.getNumber('duelist') ?? 0;
@@ -95,13 +95,13 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
         }
       }
       // 画像を作成
-      await createConcatImage(imagePaths);
+      await createConcatImage(imagePaths, user.id);
 
       // メッセージを作成
       const embedMessage: {
         embeds: EmbedBuilder[];
         files: AttachmentBuilder[];
-      } = compositionMessage(composition, banAgents);
+      } = compositionMessage(composition, banAgents, user.id);
 
       // メッセージを送信
       await interaction.editReply(embedMessage);
@@ -132,7 +132,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       // セレクトメニューで選択された値を取得
       const collector = selectResponse.createMessageComponentCollector({
         componentType: ComponentType.StringSelect,
-        filter: (selectMenuInteraction) => selectMenuInteraction.user.id === interaction.user.id,
+        filter: (selectMenuInteraction) => selectMenuInteraction.user.id === user.id,
       });
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
@@ -249,10 +249,10 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
             }
           }
           // 画像を作成
-          await createConcatImage(imagePaths);
+          await createConcatImage(imagePaths, user.id);
 
           // メッセージを作成・送信
-          const embed = compositionMessage(composition, banAgents);
+          const embed = compositionMessage(composition, banAgents, user.id);
           await interaction.editReply(embed);
         } catch (error) {
           Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
