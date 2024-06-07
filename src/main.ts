@@ -43,6 +43,13 @@ discord.on('ready', () => {
 // クールダウンのコレクション
 const cooldowns = new Collection<string, Collection<string, number>>();
 
+// コマンドごとのクールダウン時間（ミリ秒）
+const commandCooldowns = new Map<string, number>([
+  ['music', 6 * 1000], // 6秒
+  ['dice', 2 * 1000], // 2秒
+  ['valo', 3 * 1000], // 3秒
+]);
+
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
@@ -54,7 +61,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
       const now = Date.now();
       const timestamps = cooldowns.get(commandName);
-      const cooldownAmount = 5 * 1000;
+      const cooldownAmount = commandCooldowns.get(commandName) || 0;
 
       if (timestamps?.has(user.id)) {
         const expirationTime = (timestamps.get(user.id) as number) + cooldownAmount;
@@ -67,7 +74,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       }
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
-
       Logger.LogAccessInfo(
         `【${guild?.name}(${guild?.id})】${user.username}(${user.id})さんが${commandName} ${interaction.options.getSubcommand()}コマンドを実行しました`
       );
