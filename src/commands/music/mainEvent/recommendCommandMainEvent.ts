@@ -6,6 +6,9 @@ import { generateRandomNum } from '../../../events/common/generateRandomNum';
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
 import { Logger } from '../../../events/common/log';
 
+const MAX_PLAYLIST_NUM = 15;
+const BATCH_SIZE = 5;
+
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const url = interaction.options.getString('url') ?? '';
@@ -25,11 +28,9 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
 
     await interaction.editReply(embed);
 
+    const relatedPlayListInfo: MusicInfo[] = [];
     let originMusicTitle: string;
-    const relatedplayListInfo: MusicInfo[] = [];
     let musicInfo: MusicInfo;
-
-    const maxPlayListNum = 15;
     let playListNum = 0;
 
     // プレイリストの時はプレイリストの中から関連楽曲をとってくる
@@ -37,36 +38,47 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
       const playListInfo = await getMusicPlayListInfo(url, false);
       originMusicTitle = playListInfo.title;
 
-      do {
+      while (playListNum <= MAX_PLAYLIST_NUM) {
         const playListInfoNum = generateRandomNum(0, playListInfo.musicInfo.length - 1);
-        musicInfo = await getSingleMusicInfo(playListInfo.musicInfo[playListInfoNum].url ?? '');
+        const musicInfo = await getSingleMusicInfo(playListInfo.musicInfo[playListInfoNum].url ?? '');
+
         const relatedRandomNum = generateRandomNum(
           1,
           musicInfo.relatedVideosIDlist.length - 5 >= 1 ? musicInfo.relatedVideosIDlist.length - 5 : 2
         );
-        playListInfo.musicInfo.splice(playListInfoNum, 1);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        musicInfo.relatedVideosIDlist.sort((_a, _b) => 0.5 - Math.random());
-        for (let i = 0; i <= relatedRandomNum; i++)
-          relatedplayListInfo.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
 
-        playListNum += relatedRandomNum;
-        musicInfo = playListInfo.musicInfo[generateRandomNum(0, playListInfo.musicInfo.length - 1)];
-      } while (playListNum <= maxPlayListNum);
-      // 曲の時はその曲の関連楽曲をとってくる
+        musicInfo.relatedVideosIDlist.sort(() => 0.5 - Math.random());
+
+        const batchMusicInfo = await fetchRelatedMusicInfoBatch(
+          musicInfo.relatedVideosIDlist.slice(0, relatedRandomNum + 1),
+          playListNum
+        );
+
+        relatedPlayListInfo.push(...batchMusicInfo);
+        playListNum += batchMusicInfo.length;
+        playListInfo.musicInfo.splice(playListInfoNum, 1);
+      }
     } else {
       musicInfo = await getSingleMusicInfo(url);
       originMusicTitle = musicInfo.title;
-      do {
-        const relatedRandomNum = generateRandomNum(1, musicInfo.relatedVideosIDlist.length - 5);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        musicInfo.relatedVideosIDlist.sort((_a, _b) => 0.5 - Math.random());
-        for (let i = 0; i <= relatedRandomNum; i++)
-          relatedplayListInfo.push(await getSingleMusicInfo(musicInfo.relatedVideosIDlist[i], playListNum + i));
 
-        playListNum += relatedRandomNum;
-        musicInfo = relatedplayListInfo[generateRandomNum(0, relatedplayListInfo.length - 1)];
-      } while (playListNum <= maxPlayListNum);
+      while (playListNum <= MAX_PLAYLIST_NUM) {
+        const relatedRandomNum = generateRandomNum(
+          1,
+          musicInfo.relatedVideosIDlist.length - 5 >= 1 ? musicInfo.relatedVideosIDlist.length - 5 : 2
+        );
+
+        musicInfo.relatedVideosIDlist.sort(() => 0.5 - Math.random());
+
+        const batchMusicInfo = await fetchRelatedMusicInfoBatch(
+          musicInfo.relatedVideosIDlist.slice(0, relatedRandomNum + 1),
+          playListNum
+        );
+
+        relatedPlayListInfo.push(...batchMusicInfo);
+        playListNum += batchMusicInfo.length;
+        musicInfo = relatedPlayListInfo[generateRandomNum(0, relatedPlayListInfo.length - 1)];
+      }
     }
 
     // playList再生処理
@@ -78,8 +90,8 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
         url: url,
         thumbnail: undefined,
         title: originMusicTitle,
-        videosLength: String(relatedplayListInfo.length),
-        musicInfo: relatedplayListInfo,
+        videosLength: String(relatedPlayListInfo.length),
+        musicInfo: relatedPlayListInfo,
       },
       2
     );
@@ -91,4 +103,15 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
       content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
     });
   }
+};
+
+const fetchRelatedMusicInfoBatch = async (musicInfoList: string[], playListNum: number): Promise<MusicInfo[]> => {
+  const relatedPlayListInfo: MusicInfo[] = [];
+  for (let i = 0; i < musicInfoList.length; i += BATCH_SIZE) {
+    const batch = musicInfoList.slice(i, i + BATCH_SIZE);
+    const fetchPromises = batch.map((videoId, index) => getSingleMusicInfo(videoId, playListNum + index));
+    const results = await Promise.all(fetchPromises);
+    relatedPlayListInfo.push(...results);
+  }
+  return relatedPlayListInfo;
 };
