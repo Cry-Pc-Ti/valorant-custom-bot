@@ -140,17 +140,17 @@ export const getOneSearchMusicVideo = async (words: string, index?: number) => {
 };
 
 // チャンネルアイコンを取得
-export const getChannelThumbnails = async (musicInfos: MusicInfo[]): Promise<{ [key: string]: string | null }> => {
-  const channelThumbnails: { [key: string]: string | null } = {};
+export const getChannelThumbnails = async (musicInfos: MusicInfo[]): Promise<{ [key: string]: string }> => {
+  const channelThumbnails: { [key: string]: string } = {};
 
   // 全曲のチャンネルアイコンを並行して一度に取得
   const thumbnailPromises = musicInfos.map(async (musicInfo) => {
     try {
       const info = await ytdl.getBasicInfo(musicInfo.id);
       const thumbnails = info.videoDetails.author.thumbnails;
-      channelThumbnails[musicInfo.id] = thumbnails?.[0]?.url ?? null;
+      channelThumbnails[musicInfo.id] = thumbnails?.[0]?.url ?? '';
     } catch (error) {
-      channelThumbnails[musicInfo.id] = null;
+      channelThumbnails[musicInfo.id] = '';
     }
   });
 

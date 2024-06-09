@@ -49,7 +49,7 @@ export const playListMusicMainLogic = async (
       return interaction.editReply('ボイスチャンネルが見つかりません。');
 
     // 全曲のサムネイルを取得
-    const channelThumbnails: { [key: string]: string | null } = await getChannelThumbnails(playListInfo.musicInfo);
+    const channelThumbnails: { [key: string]: string } = await getChannelThumbnails(playListInfo.musicInfo);
 
     // playerを作成しdisに音をながす
     const player = createAudioPlayer();
@@ -73,7 +73,7 @@ export const playListMusicMainLogic = async (
         buttonRowArray: [buttonRow, buttonRow2],
         playListInfo: playListInfo,
         uniqueId: uniqueId,
-        channelThumbnail: channelThumbnails[0],
+        channelThumbnails: channelThumbnails,
         stopToStartFlag: false,
         songIndex: 0,
         repeatMode: 0,
@@ -133,16 +133,15 @@ export const playListMusicMainLogic = async (
             const commandStates = getCommandStates(guildId, COMMAND_NAME);
             const musicCommandInfo = commandStates?.musicCommandInfo;
             if (!commandStates || !musicCommandInfo) return;
-
             if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Playing) {
               commandStates.musicCommandInfo?.player.pause();
-              musicCommandInfo.buttonRowArray[0].components[1].label = '再生';
-              musicCommandInfo.buttonRowArray[0].components[1].emoji.name = '▶';
+              musicCommandInfo.buttonRowArray[0].components[1].setLabel('再生');
+              musicCommandInfo.buttonRowArray[0].components[1].setEmoji('▶');
               setStopToStartFlagStates(guildId, COMMAND_NAME, true);
             } else if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Paused) {
               commandStates.musicCommandInfo?.player.unpause();
-              musicCommandInfo.buttonRowArray[0].components[1].label = '停止';
-              musicCommandInfo.buttonRowArray[0].components[1].emoji.name = '⏸';
+              musicCommandInfo.buttonRowArray[0].components[1].setLabel('停止');
+              musicCommandInfo.buttonRowArray[0].components[1].setEmoji('⏸');
               setStopToStartFlagStates(guildId, COMMAND_NAME, false);
             }
             // メッセージ送信
@@ -173,9 +172,8 @@ export const playListMusicMainLogic = async (
             ];
 
             const { label, emoji } = labelsAndEmojis[musicCommandInfo.repeatMode];
-
-            musicCommandInfo.buttonRowArray[1].components[0].label = label;
-            musicCommandInfo.buttonRowArray[1].components[0].emoji.name = emoji;
+            musicCommandInfo.buttonRowArray[1].components[0].setLabel(label);
+            musicCommandInfo.buttonRowArray[1].components[0].setEmoji(emoji);
 
             interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, {
               components: musicCommandInfo.buttonRowArray,

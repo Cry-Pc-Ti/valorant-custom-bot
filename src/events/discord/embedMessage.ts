@@ -270,7 +270,7 @@ export const musicInfoPlayListMessage = (
   playListInfo: PlayListInfo,
   buttonRowList: ActionRowBuilder<ButtonBuilder>[],
   musicCount: number,
-  channelThumbnail: string | null,
+  channelThumbnail: string | undefined,
   // 0: playCommand,1: searchCommand
   commandFlg: number
 ) => {

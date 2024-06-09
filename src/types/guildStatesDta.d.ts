@@ -11,7 +11,9 @@ interface MusicCommandInfo {
   buttonRowArray: ActionRowBuilder<ButtonBuilder>[];
   playListInfo?: PlayListInfo;
   musicInfo?: MusicInfo[];
-  channelThumbnail?: string | null;
+  channelThumbnails?: {
+    [key: string]: string;
+  };
   stopToStartFlag: boolean;
   uniqueId: string;
   songIndex: number;
