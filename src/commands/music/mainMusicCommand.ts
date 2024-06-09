@@ -1,11 +1,13 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { playCommandMainEvent } from './mainEvent/playCommandMainEvent';
-import { stopPreviousInteraction } from '../../store/guildStates';
+import { stopPreviousInteraction } from '../../store/guildCommandStates';
 import { hitSongsCommandMainEvent } from './mainEvent/hitSongsCommandMainEvent';
 import { spotifyPlaylistId } from '../../events/common/readJsonData';
 import { disconnectCommandMainEvent } from './mainEvent/disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './mainEvent/searchCommandMainEvent';
 import { recommendCommandMainEvent } from './mainEvent/recommendCommandMainEvent';
+
+export const COMMAND_NAME: string = 'music';
 
 export const mainMusicCommand = {
   // コマンドの設定
@@ -81,7 +83,7 @@ export const mainMusicCommand = {
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const guildId = interaction.guildId;
-    if (guildId) await stopPreviousInteraction(guildId);
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME);
 
     // 「disconnect」コマンド
     if (interaction.options.getSubcommand() === 'disconnect') {

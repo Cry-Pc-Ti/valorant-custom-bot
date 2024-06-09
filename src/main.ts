@@ -3,11 +3,11 @@ import { Collection, Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
-import { mainMusicCommand } from './commands/music/mainMusicCommand';
+import { COMMAND_NAME, mainMusicCommand } from './commands/music/mainMusicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
-import { stopPreviousInteraction } from './store/guildStates';
+import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
@@ -107,7 +107,7 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
     // ボットがいるチャンネルで一人残った場合にのみ切断
     if (botChannel && botChannel.members.size === 1) {
       const guildId = oldState.guild.id;
-      if (guildId) await stopPreviousInteraction(guildId);
+      if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME);
       botMember.voice.disconnect();
     }
   } catch (error) {

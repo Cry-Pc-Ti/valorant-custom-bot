@@ -10,7 +10,6 @@ import {
 import { CLIENT_ID } from '../../modules/discordModule';
 import { interactionEditMessages } from '../discord/interactionMessages';
 import { debounce } from '../common/buttonDebouce';
-import { guildStates } from '../../store/guildStates';
 import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import { isHttpError } from '../common/errorUtils';
 import { Logger } from '../common/log';
@@ -18,12 +17,15 @@ import { musicInfoMessage, donePlayerMessage } from '../discord/embedMessage';
 import { playMusicStream, deletePlayerInfo } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 import { v4 as uuidv4 } from 'uuid';
+import { setGuildCommandStates } from '../../store/guildCommandStates';
+import { COMMAND_NAME } from '../../commands/music/mainMusicCommand';
 
 // シングル再生
 export const singleMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
   voiceChannelId: string,
-  musicInfo: MusicInfo
+  musicInfo: MusicInfo,
+  commandFlg?: number
 ) => {
   try {
     // 修正するメッセージのIDを取得
@@ -35,6 +37,7 @@ export const singleMusicMainLogic = async (
     // uuidをuniqueIdとして取得
     const uniqueId = uuidv4();
 
+    // guildIdを取得
     const guildId = interaction.guildId;
 
     // ボタンを作成
@@ -60,7 +63,22 @@ export const singleMusicMainLogic = async (
     });
     connection.subscribe(player);
 
-    guildStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
+    setGuildCommandStates(guildId, COMMAND_NAME, {
+      buttonCollector: buttonCollector,
+      interaction: interaction,
+      replyMessageId: replyMessageId,
+      musicCommandInfo: {
+        player: player,
+        buttonRowArray: [buttonRow],
+        commandFlg: commandFlg ?? 1,
+        musicInfo: [musicInfo],
+        uniqueId: uniqueId,
+        stopToStartFlag: false,
+        songIndex: 0,
+        repeatMode: 0,
+      },
+    });
+    // guildCommandStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
 
     // ボタンが押された時の処理
     buttonCollector.on(
