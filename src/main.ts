@@ -55,6 +55,8 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
     if (interaction.isChatInputCommand()) {
       const { commandName, user, guild } = interaction;
+
+      // スパム対策
       if (!cooldowns.has(commandName)) {
         cooldowns.set(commandName, new Collection());
       }
@@ -74,6 +76,8 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       }
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
+
+      // データ収集
       Logger.LogAccessInfo(
         `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
       );
@@ -95,8 +99,12 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
   }
 });
 // voiceチャンネルでアクションが発生時に実行
-discord.on('voiceStateUpdate', async (oldState: VoiceState) => {
+discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
   try {
+    if (oldState.member?.id === CLIENT_ID && !newState.channel) {
+      await stopPreviousInteraction(oldState.guild.id, COMMAND_NAME);
+    }
+
     // ボットがいるチャンネルであるかを確認
     const botMember = await oldState.guild?.members.fetch(CLIENT_ID);
     if (!botMember?.voice.channelId) return;

@@ -2,6 +2,7 @@ import ytdl from 'ytdl-core';
 import { MusicInfo } from '../../types/musicData';
 import { AudioPlayer, AudioPlayerStatus, StreamType, createAudioResource, entersState } from '@discordjs/voice';
 import {
+  deleteGuildCommandStates,
   getCommandStates,
   getRepeatModeStates,
   setGuildCommandStates,
@@ -47,7 +48,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
 
   const commandStates = getCommandStates(guildId, COMMAND_NAME);
   const musicCommandInfo = commandStates?.musicCommandInfo;
-  if (!commandStates || !musicCommandInfo) return true;
+  if (!commandStates || !musicCommandInfo) return;
 
   if (buttonFlag) {
     // PlayerとListenerを削除
@@ -151,5 +152,5 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
   // 再生完了した際メッセージを送信
   await donePlayerInteractionEditMessages(commandStates.interaction, commandStates.replyMessageId);
 
-  return false;
+  deleteGuildCommandStates(guildId, COMMAND_NAME);
 };

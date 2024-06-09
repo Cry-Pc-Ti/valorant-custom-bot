@@ -100,3 +100,7 @@ export const getMusicCommandInfo = (guildId: string, commandName: string) => {
   const states = getCommandStates(guildId, commandName);
   return states?.musicCommandInfo;
 };
+
+export const deleteGuildCommandStates = (guildId: string, commandName: string) => {
+  guildCommandStates.get(guildId)?.delete(commandName);
+};

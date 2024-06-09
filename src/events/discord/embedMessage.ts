@@ -409,7 +409,7 @@ export const preparingPlayerMessage = () => {
 export const hitSongsPreparingPlayerMessage = (spotifyPlaylistInfo: SpotifyPlaylistInfo) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle(`${spotifyPlaylistInfo.name}を検索中です。\n少々お待ちください\n\n※hitsongはspotify調べです。`)
+    .setTitle(`${spotifyPlaylistInfo.title}で検索中です。\n少々お待ちください\n\n※hitsongはspotify調べです。`)
     .setFooter({
       text: 'YouTube',
       iconURL: 'attachment://youtube_icon.png',

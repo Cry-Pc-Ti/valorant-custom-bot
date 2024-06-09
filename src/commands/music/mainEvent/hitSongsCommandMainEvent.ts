@@ -16,6 +16,12 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
     if (!voiceChannelId) return interaction.editReply('ボイスチャンネルに参加してください。');
 
     const spotifyPlaylistInfo = spotifyPlaylistId[genre];
+
+    // データ収集
+    Logger.LogAccessInfo(
+      `${interaction.user.username}(${interaction.user.id})さんが${spotifyPlaylistInfo.name} を選択しました。`
+    );
+
     // メッセージを作成
     const embed = hitSongsPreparingPlayerMessage(spotifyPlaylistInfo);
 
@@ -25,7 +31,7 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
     const topSongs = await getTopSongs(token, spotifyPlaylistInfo.id);
 
     const videoPromises = topSongs
-      .slice(0, 50)
+      .slice(0, 100)
       .map((song: { artists: string; name: string }, index: number) =>
         getOneSearchMusicVideo(`${song.artists} ${song.name}`, index + 1)
       );
@@ -39,9 +45,9 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
       voiceChannelId,
       {
         playListId: 1,
-        url: 'なんもないです',
+        url: 'https://open.spotify.com/playlist/' + spotifyPlaylistInfo.id,
         thumbnail: undefined,
-        title: `${spotifyPlaylistInfo.name}`,
+        title: `${spotifyPlaylistInfo.title}`,
         description: `${spotifyPlaylistInfo.description}`,
         rankingFlag: spotifyPlaylistInfo.ranking,
         videosLength: String(musicplayVideoList.length),

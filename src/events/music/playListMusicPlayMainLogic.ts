@@ -225,9 +225,8 @@ export const playListMusicMainLogic = async (
       }
     });
 
-    if (!(await streamPlaylist(guildId, 0, false))) {
-      return;
-    }
+    //
+    await streamPlaylist(guildId, 0, false);
 
     // BOTをdiscordから切断
     connection.destroy();
