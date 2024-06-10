@@ -30,6 +30,7 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       });
       return;
     }
+
     //  customIdからcommandNameを取得
     const commandName = determineCommandName(customId);
 

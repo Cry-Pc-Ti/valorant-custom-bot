@@ -10,12 +10,14 @@ import { Logger } from './events/common/log';
 import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
+import { helpCommand } from './commands/help/helpCommand';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
   [mainValorantCommand.data.name]: mainValorantCommand,
   [mainMusicCommand.data.name]: mainMusicCommand,
+  [helpCommand.data.name]: helpCommand,
 };
 
 // サーバーにコマンドを登録
@@ -24,7 +26,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   try {
     console.log('サーバーにコマンドを登録中...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data],
+      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data, helpCommand.data],
     });
     console.log('コマンドの登録が完了しました');
   } catch (error) {
@@ -78,10 +80,18 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
 
-      // データ収集
-      Logger.LogAccessInfo(
-        `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
-      );
+      try {
+        // サブコマンドがないときのデータ収集ログ
+        Logger.LogAccessInfo(
+          `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
+        );
+      } catch (error) {
+        // サブコマンドがないときのデータ収集ログ
+        Logger.LogAccessInfo(
+          `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName}コマンドを実行`
+        );
+      }
+
       // マップからコマンドを取得
       const command = commands[commandName];
 
