@@ -5,7 +5,9 @@ import { CommandInfo } from '../types/guildStatesDta';
 const guildCommandStates = new Map<string, Map<string, CommandInfo>>();
 
 //ギルド情報を取得
-export const getGuildStates = (guildId: string) => guildCommandStates.get(guildId);
+export const getGuildStates = (guildId: string) => {
+  return guildCommandStates.get(guildId);
+};
 
 //コマンド情報を取得
 export const getCommandStates = (guildId: string, commandName: string) => {
@@ -46,7 +48,7 @@ export const setSongIndexStates = (guildId: string, commandName: string, songInd
   commandInfo.musicCommandInfo.songIndex = songIndex;
 };
 
-// SongIndexをset
+// MessageIdをset
 export const setReplyMessageIdStates = (guildId: string, commandName: string, replyMessageId: string) => {
   if (!guildCommandStates.has(guildId)) {
     guildCommandStates.set(guildId, new Map<string, CommandInfo>());

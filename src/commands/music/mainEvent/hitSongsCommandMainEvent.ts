@@ -6,9 +6,14 @@ import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayM
 import { hitSongsPreparingPlayerMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
 import { spotifyPlaylistId } from '../../../events/common/readJsonData';
+import { stopPreviousInteraction } from '../../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 
 export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
+    const guildId = interaction.guildId;
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+
     const genre = interaction.options.getNumber('genre') ?? 0;
 
     // ボイスチャンネルにいない場合は処理しない

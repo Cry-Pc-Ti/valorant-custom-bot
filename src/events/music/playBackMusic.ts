@@ -9,7 +9,7 @@ import {
   setRepeatModeStates,
   setSongIndexStates,
 } from '../../store/guildCommandStates';
-import { COMMAND_NAME } from '../../commands/music/mainMusicCommand';
+import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 import { musicInfoPlayListMessage } from '../discord/embedMessage';
 import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
 import { Logger } from '../common/log';
@@ -44,9 +44,9 @@ export const deletePlayerInfo = (player: AudioPlayer) => {
 };
 
 export const streamPlaylist = async (guildId: string, songIndex: number, buttonFlag: boolean) => {
-  setSongIndexStates(guildId, COMMAND_NAME, songIndex);
+  setSongIndexStates(guildId, COMMAND_NAME_MUSIC, songIndex);
 
-  const commandStates = getCommandStates(guildId, COMMAND_NAME);
+  const commandStates = getCommandStates(guildId, COMMAND_NAME_MUSIC);
   const musicCommandInfo = commandStates?.musicCommandInfo;
   if (!commandStates || !musicCommandInfo) return;
 
@@ -60,7 +60,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
     }
     if (musicCommandInfo.repeatMode === 1) {
       // ボタンがリピート中ボタンだった時リピートボタンに変更
-      setRepeatModeStates(guildId, COMMAND_NAME, 0);
+      setRepeatModeStates(guildId, COMMAND_NAME_MUSIC, 0);
       musicCommandInfo.buttonRowArray[1].components[0].setLabel('リピート');
       musicCommandInfo.buttonRowArray[1].components[0].setEmoji('🔁');
     }
@@ -103,7 +103,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
       });
     });
     // データをstatesに登録
-    setGuildCommandStates(guildId, COMMAND_NAME, {
+    setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: commandStates.buttonCollector,
       interaction: commandStates.interaction,
       replyMessageId: commandStates.replyMessageId,
@@ -113,7 +113,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
     do {
       await playMusicStream(musicCommandInfo.player, musicInfo).catch(async (error) => {
         if (error.message === 'Status code: 410') {
-          setRepeatModeStates(guildId, COMMAND_NAME, 0);
+          setRepeatModeStates(guildId, COMMAND_NAME_MUSIC, 0);
           await interactionEditMessages(
             commandStates.interaction,
             commandStates.replyMessageId,
@@ -128,22 +128,22 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
         Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
         musicCommandInfo.player.stop();
       });
-    } while (getRepeatModeStates(guildId, COMMAND_NAME) === 1);
+    } while (getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 1);
 
     // indexの更新と音楽が再生しきったら戻す。
     if (
       musicCommandInfo.playListInfo.musicInfo.length - 1 === musicCommandInfo.songIndex &&
-      getRepeatModeStates(guildId, COMMAND_NAME) === 2
+      getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 2
     ) {
       musicCommandInfo.songIndex = 0;
-      setSongIndexStates(guildId, COMMAND_NAME, musicCommandInfo.songIndex);
+      setSongIndexStates(guildId, COMMAND_NAME_MUSIC, musicCommandInfo.songIndex);
     } else {
       musicCommandInfo.songIndex++;
-      setSongIndexStates(guildId, COMMAND_NAME, musicCommandInfo.songIndex);
+      setSongIndexStates(guildId, COMMAND_NAME_MUSIC, musicCommandInfo.songIndex);
     }
   } while (
     musicCommandInfo.playListInfo.musicInfo.length !== musicCommandInfo.songIndex ||
-    getRepeatModeStates(guildId, COMMAND_NAME) === 2
+    getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 2
   );
 
   // PlayerとListenerを削除
@@ -152,5 +152,5 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
   // 再生完了した際メッセージを送信
   await donePlayerInteractionEditMessages(commandStates.interaction, commandStates.replyMessageId);
 
-  deleteGuildCommandStates(guildId, COMMAND_NAME);
+  deleteGuildCommandStates(guildId, COMMAND_NAME_MUSIC);
 };

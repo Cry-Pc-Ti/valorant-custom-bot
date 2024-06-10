@@ -1,29 +1,13 @@
-import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
-  CacheType,
-  ChatInputCommandInteraction,
-  ComponentType,
-} from 'discord.js';
-import { interactionEditMessages } from '../discord/interactionMessages';
-import { CLIENT_ID } from '../../modules/discordModule';
+import { createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 import { streamPlaylist } from './playBackMusic';
 import { PlayListInfo } from '../../types/musicData';
 import { Logger } from '../common/log';
 import { isHttpError } from '../common/errorUtils';
-import { debounce } from '../common/buttonDebouce';
 import { v4 as uuidv4 } from 'uuid';
 import { getChannelThumbnails } from './getMusicInfo';
-import {
-  getCommandStates,
-  setGuildCommandStates,
-  setStopToStartFlagStates,
-  stopPreviousInteraction,
-} from '../../store/guildCommandStates';
-import { COMMAND_NAME } from '../../commands/music/mainMusicCommand';
+import { getCommandStates, setGuildCommandStates, stopPreviousInteraction } from '../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 // 音楽再生
 export const playListMusicMainLogic = async (
@@ -63,7 +47,7 @@ export const playListMusicMainLogic = async (
     });
     connection.subscribe(player);
 
-    setGuildCommandStates(guildId, COMMAND_NAME, {
+    setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: buttonCollector,
       interaction: interaction,
       replyMessageId: (await interaction.fetchReply()).id,
@@ -72,6 +56,7 @@ export const playListMusicMainLogic = async (
         commandFlg: commandFlg,
         buttonRowArray: [buttonRow, buttonRow2],
         playListInfo: playListInfo,
+        playListFlag: true,
         uniqueId: uniqueId,
         channelThumbnails: channelThumbnails,
         stopToStartFlag: false,
@@ -80,148 +65,10 @@ export const playListMusicMainLogic = async (
       },
     });
 
-    // ボタンが押された時の処理
-    buttonCollector.on(
-      'collect',
-      debounce(async (buttonInteraction: ButtonInteraction<CacheType>) => {
-        if (!buttonInteraction.customId.endsWith(`_${uniqueId}`)) return;
-
-        try {
-          if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-            await buttonInteraction.deferUpdate();
-          }
-          // BOTがVCにいない場合処理しない
-          if (!(await interaction.guild?.members.fetch(CLIENT_ID))?.voice.channelId) {
-            interactionEditMessages(interaction, buttonInteraction.message.id, {
-              content: 'もう一度、再生したい場合はコマンドで再度入力してください。',
-              components: [],
-            });
-            return;
-          }
-
-          // 次の曲へボタン押下時の処理
-          if (buttonInteraction.customId === `nextPlayMusicButton_${uniqueId}`) {
-            const commandStates = getCommandStates(guildId, COMMAND_NAME);
-            const musicCommandInfo = commandStates?.musicCommandInfo;
-
-            if (!commandStates || !musicCommandInfo) return;
-
-            // playListを再生する処理
-            await streamPlaylist(guildId, ++musicCommandInfo.songIndex, true);
-
-            // BOTをdiscordから切断
-            connection.destroy();
-
-            return;
-          }
-          // 前の曲へボタン押下時の処理
-          if (buttonInteraction.customId === `prevPlayMusicButton_${uniqueId}`) {
-            const commandStates = getCommandStates(guildId, COMMAND_NAME);
-            const musicCommandInfo = commandStates?.musicCommandInfo;
-            if (!commandStates || !musicCommandInfo) return;
-
-            // playListを再生する処理
-            await streamPlaylist(guildId, --musicCommandInfo.songIndex, true);
-
-            // BOTをdiscordから切断
-            connection.destroy();
-
-            return;
-          }
-          // 再生/停止ボタン押下時
-          if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
-            const commandStates = getCommandStates(guildId, COMMAND_NAME);
-            const musicCommandInfo = commandStates?.musicCommandInfo;
-            if (!commandStates || !musicCommandInfo) return;
-            if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Playing) {
-              commandStates.musicCommandInfo?.player.pause();
-              musicCommandInfo.buttonRowArray[0].components[1].setLabel('再生');
-              musicCommandInfo.buttonRowArray[0].components[1].setEmoji('▶');
-              setStopToStartFlagStates(guildId, COMMAND_NAME, true);
-            } else if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Paused) {
-              commandStates.musicCommandInfo?.player.unpause();
-              musicCommandInfo.buttonRowArray[0].components[1].setLabel('停止');
-              musicCommandInfo.buttonRowArray[0].components[1].setEmoji('⏸');
-              setStopToStartFlagStates(guildId, COMMAND_NAME, false);
-            }
-            // メッセージ送信
-            interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, {
-              components: musicCommandInfo.buttonRowArray,
-            });
-            return;
-          }
-
-          // 1曲リピートボタン押下時
-          if (buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-            const commandStates = getCommandStates(guildId, COMMAND_NAME);
-            const musicCommandInfo = commandStates?.musicCommandInfo;
-            if (!commandStates || !musicCommandInfo) return;
-
-            musicCommandInfo.repeatMode++;
-            if (musicCommandInfo.repeatMode >= 3) musicCommandInfo.repeatMode = 0;
-
-            // メッセージを削除
-            if (await interaction.channel?.messages.fetch(commandStates.replyMessageId)) {
-              await interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, '');
-            }
-
-            const labelsAndEmojis = [
-              { label: 'リピート', emoji: '🔁' },
-              { label: '曲リピート中', emoji: '🔂' },
-              { label: 'リストリピート中', emoji: '🔁' },
-            ];
-
-            const { label, emoji } = labelsAndEmojis[musicCommandInfo.repeatMode];
-            musicCommandInfo.buttonRowArray[1].components[0].setLabel(label);
-            musicCommandInfo.buttonRowArray[1].components[0].setEmoji(emoji);
-
-            interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, {
-              components: musicCommandInfo.buttonRowArray,
-            });
-            setGuildCommandStates(guildId, COMMAND_NAME, {
-              buttonCollector: commandStates.buttonCollector,
-              interaction: commandStates.interaction,
-              replyMessageId: commandStates.replyMessageId,
-              musicCommandInfo: musicCommandInfo,
-            });
-
-            return;
-          }
-
-          // プレイリストのURLを表示
-          if (buttonInteraction.customId === `showUrlButton_${uniqueId}`) {
-            await buttonInteraction.followUp({ content: `${playListInfo.url}`, ephemeral: true });
-          }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-          const commandStates = getCommandStates(guildId, COMMAND_NAME);
-          const musicCommandInfo = commandStates?.musicCommandInfo;
-          if (!commandStates || !musicCommandInfo) return;
-
-          if (error.statusCode === 410) return;
-          if ((isHttpError(error) && error.status === 400) || (isHttpError(error) && error.status === 404)) {
-            await interactionEditMessages(interaction, commandStates.replyMessageId, `ボタンをもう一度押してください`);
-
-            if (error instanceof Error) {
-              Logger.LogSystemError(error.message);
-            }
-            return;
-          }
-          console.log(error);
-          Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました :${error}`);
-          await interactionEditMessages(interaction, commandStates.replyMessageId, {
-            content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
-            components: [],
-            files: [],
-            embeds: [],
-          });
-        }
-      }, 500)
-    );
     buttonCollector.on('end', async () => {
-      const state = getCommandStates(guildId, COMMAND_NAME);
+      const state = getCommandStates(guildId, COMMAND_NAME_MUSIC);
       if (state && state.buttonCollector === buttonCollector) {
-        stopPreviousInteraction(guildId, COMMAND_NAME);
+        stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
       }
     });
 

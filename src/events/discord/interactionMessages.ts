@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, MessageEditOptions, MessagePayload } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, MessageEditOptions, MessagePayload } from 'discord.js';
 import { donePlayerMessage, terminateMidwayPlayerMessage } from './embedMessage';
 
 // メッセージを編集する
 export const interactionEditMessages = async (
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   messageId: string,
   message: string | MessagePayload | MessageEditOptions
 ) => {

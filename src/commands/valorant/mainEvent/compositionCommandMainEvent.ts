@@ -28,8 +28,8 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
     // BAN機能の有無を取得
     const ban: string | null = options.getString('ban');
 
-    let isBan = false;
-    if (ban === 'true') isBan = true;
+    // BAN機能が有効かどうかを判定
+    const isBan: boolean = ban === 'true';
 
     // 構成を格納するオブジェクトを宣言
     const composition: CompositionData = {

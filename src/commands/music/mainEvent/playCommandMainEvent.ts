@@ -5,10 +5,15 @@ import { Logger } from '../../../events/common/log';
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
 import { playListPlayMusicMessage } from '../../../events/discord/embedMessage';
 import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainLogic';
+import { stopPreviousInteraction } from '../../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 
 // playCommand
 export const playCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
+    const guildId = interaction.guildId;
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+
     const url = interaction.options.getString('url');
     const shuffleFlag: boolean = interaction.options.getBoolean('shuffle') ?? false;
 

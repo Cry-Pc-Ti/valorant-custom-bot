@@ -3,12 +3,13 @@ import { Collection, Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
-import { COMMAND_NAME, mainMusicCommand } from './commands/music/mainMusicCommand';
+import { COMMAND_NAME_MUSIC, mainMusicCommand } from './commands/music/mainMusicCommand';
 import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
+import { buttonHandlers } from './button/buttonHandlers';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -86,6 +87,12 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
       // コマンドが存在すれば実行
       if (command) command.execute(interaction);
+    } else if (interaction.isButton()) {
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.deferUpdate();
+      }
+      // ボタン処理
+      await buttonHandlers(interaction);
     }
   } catch (error) {
     Logger.LogAccessError(error);
@@ -102,7 +109,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
   try {
     if (oldState.member?.id === CLIENT_ID && !newState.channel) {
-      await stopPreviousInteraction(oldState.guild.id, COMMAND_NAME);
+      await stopPreviousInteraction(oldState.guild.id, COMMAND_NAME_MUSIC);
     }
 
     // ボットがいるチャンネルであるかを確認
@@ -115,7 +122,7 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState
     // ボットがいるチャンネルで一人残った場合にのみ切断
     if (botChannel && botChannel.members.size === 1) {
       const guildId = oldState.guild.id;
-      if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME);
+      if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
       botMember.voice.disconnect();
     }
   } catch (error) {

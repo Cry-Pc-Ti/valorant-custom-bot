@@ -5,12 +5,17 @@ import { checkUrlType, getMusicPlayListInfo, getSingleMusicInfo } from '../../..
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
 import { Logger } from '../../../events/common/log';
+import { stopPreviousInteraction } from '../../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 
 const MAX_PLAYLIST_NUM = 15;
 const BATCH_SIZE = 5;
 
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
+    const guildId = interaction.guildId;
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+
     const url = interaction.options.getString('url') ?? '';
 
     // ボイスチャンネルにいない場合は処理しない

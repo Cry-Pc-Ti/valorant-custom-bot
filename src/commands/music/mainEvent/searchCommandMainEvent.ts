@@ -14,11 +14,17 @@ import {
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
 import { MusicInfo, PlayListInfo } from '../../../types/musicData';
 import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainLogic';
+import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
+import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 
 export const searchCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   // 修正するメッセージのIDを取得
   const replyMessageId: string = (await interaction.fetchReply()).id;
+
   try {
+    const guildId = interaction.guildId;
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+
     const words = interaction.options.getString('words');
     const type = interaction.options.getString('type');
 

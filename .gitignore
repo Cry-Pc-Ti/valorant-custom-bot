@@ -1,6 +1,5 @@
 node_modules
 .env
-static/img/generate_image.png
 /logs/*
 /translationCache
 static/img/generate_image/*

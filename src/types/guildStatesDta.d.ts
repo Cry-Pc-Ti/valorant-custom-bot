@@ -11,6 +11,7 @@ interface MusicCommandInfo {
   buttonRowArray: ActionRowBuilder<ButtonBuilder>[];
   playListInfo?: PlayListInfo;
   musicInfo?: MusicInfo[];
+  playListFlag: boolean;
   channelThumbnails?: {
     [key: string]: string;
   };

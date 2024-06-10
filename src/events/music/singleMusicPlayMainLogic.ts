@@ -17,8 +17,8 @@ import { musicInfoMessage, donePlayerMessage } from '../discord/embedMessage';
 import { playMusicStream, deletePlayerInfo } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 import { v4 as uuidv4 } from 'uuid';
-import { setGuildCommandStates } from '../../store/guildCommandStates';
-import { COMMAND_NAME } from '../../commands/music/mainMusicCommand';
+import { deleteGuildCommandStates, setGuildCommandStates } from '../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 // シングル再生
 export const singleMusicMainLogic = async (
@@ -63,7 +63,7 @@ export const singleMusicMainLogic = async (
     });
     connection.subscribe(player);
 
-    setGuildCommandStates(guildId, COMMAND_NAME, {
+    setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: buttonCollector,
       interaction: interaction,
       replyMessageId: replyMessageId,
@@ -72,6 +72,7 @@ export const singleMusicMainLogic = async (
         buttonRowArray: [buttonRow],
         commandFlg: commandFlg ?? 1,
         musicInfo: [musicInfo],
+        playListFlag: false,
         uniqueId: uniqueId,
         stopToStartFlag: false,
         songIndex: 0,
@@ -156,6 +157,9 @@ export const singleMusicMainLogic = async (
 
     // PlayerとListenerを削除
     deletePlayerInfo(player);
+
+    // 情報を削除
+    deleteGuildCommandStates(guildId, COMMAND_NAME_MUSIC);
     // BOTをdiscordから切断
     connection.destroy();
   } catch (error) {
