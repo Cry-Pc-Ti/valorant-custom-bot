@@ -10,7 +10,7 @@ export const selectAgentsByRole = (
 ): CompositionData => {
   try {
     const randomAgents: AgentData[] = [];
-    let filterAgents: AgentData[] = valorantAgents.filter((agent) => agent.role === agentRole);
+    let filterAgents: AgentData[] = valorantAgents.filter((agent) => agent.roleId === agentRole);
 
     for (let i = 0; i < agentNum; i++) {
       // filterAgentsからランダムにエージェントを選択
