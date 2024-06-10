@@ -26,9 +26,9 @@
 
 ## 目次
 
-1. [Valorantコマンド](#valorantコマンド)
-2. [Musicコマンド](#musicコマンド)
-3. [Diceコマンド](#diceコマンド)
+1. [Valorantコマンド](#1-valorantコマンド)
+2. [Musicコマンド](#2-musicコマンド)
+3. [Diceコマンド](#3-diceコマンド)
 
 ---
 
@@ -173,9 +173,7 @@ Diceコマンドは、さいころ関連のコマンドです。以下の2つの
 
 ウィングマンくんに関する質問や問題がある場合は、以下の方法でお問い合わせください。
 
-- **Discordサポートサーバー**: [サポートサーバーに参加する]()
-- **Twitter**:
-  - <img src="https://abs.twimg.com/icons/apple-touch-icon-192x192.png" alt="Twitter" width="20" height="20"> [R1xu\_](https://twitter.com/R1xu_)
-  - <img src="https://abs.twimg.com/icons/apple-touch-icon-192x192.png" alt="Twitter" width="20" height="20"> [cry_pc_ti](https://twitter.com/cry_pc_ti)
+- **Discordサポートサーバー**: [サポートサーバーに参加する](https://discord.gg/VE3fg3BUEY)
+- **Email**: [wingmankun38@gmail.com](mailto:wingmankun38@gmail.com)
 
 ご不明な点がございましたら、お気軽にお問い合わせください。

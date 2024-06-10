@@ -100,7 +100,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
       bans.push(agent.name);
     }
     embed.addFields({
-      name: 'バン',
+      name: 'BAN',
       value: bans.join(', '),
     });
   }
