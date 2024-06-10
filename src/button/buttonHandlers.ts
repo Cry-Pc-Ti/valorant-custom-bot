@@ -47,6 +47,9 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       });
       return;
     }
+    // メッセージを削除
+    if (interaction.channel?.messages.fetch(commandStates.replyMessageId))
+      await interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, '');
 
     // 次の曲へボタン押下時の処理
     if (customId === `nextPlayMusicButton_${musicCommandInfo.uniqueId}`) {

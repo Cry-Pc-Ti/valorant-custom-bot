@@ -1,23 +1,15 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
-  CacheType,
-  ChatInputCommandInteraction,
-  ComponentType,
-} from 'discord.js';
-import { CLIENT_ID } from '../../modules/discordModule';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
+
 import { interactionEditMessages } from '../discord/interactionMessages';
-import { debounce } from '../common/buttonDebouce';
-import { AudioPlayerStatus, createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
-import { isHttpError } from '../common/errorUtils';
+
+import { createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
+
 import { Logger } from '../common/log';
 import { musicInfoMessage, donePlayerMessage } from '../discord/embedMessage';
 import { playMusicStream, deletePlayerInfo } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 import { v4 as uuidv4 } from 'uuid';
-import { deleteGuildCommandStates, setGuildCommandStates } from '../../store/guildCommandStates';
+import { deleteGuildCommandStates, getRepeatModeStates, setGuildCommandStates } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 // シングル再生
@@ -31,9 +23,6 @@ export const singleMusicMainLogic = async (
     // 修正するメッセージのIDを取得
     const replyMessageId: string = (await interaction.fetchReply()).id;
 
-    // リピートするかのフラグ
-    let repeatFlag: boolean = false;
-
     // uuidをuniqueIdとして取得
     const uniqueId = uuidv4();
 
@@ -41,7 +30,7 @@ export const singleMusicMainLogic = async (
     const guildId = interaction.guildId;
 
     // ボタンを作成
-    const { buttonRow, stopPlayMusicButton, repeatSingleButton } = createButtonRow(uniqueId);
+    const { buttonRow } = createButtonRow(uniqueId);
 
     const buttonCollector = interaction.channel?.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -81,66 +70,6 @@ export const singleMusicMainLogic = async (
     });
     // guildCommandStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
 
-    // ボタンが押された時の処理
-    buttonCollector.on(
-      'collect',
-      debounce(async (buttonInteraction: ButtonInteraction<CacheType>) => {
-        if (!buttonInteraction.customId.endsWith(`_${uniqueId}`)) return;
-
-        try {
-          if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-            await buttonInteraction.deferUpdate();
-          }
-
-          // BOTがVCにいない場合処理しない
-          if (!(await interaction.guild?.members.fetch(CLIENT_ID))?.voice.channelId) {
-            interactionEditMessages(interaction, buttonInteraction.message.id, {
-              content: 'もう一度、再生したい場合はコマンドで再度入力してください。',
-              components: [],
-            });
-            return;
-          }
-
-          // メッセージを削除
-          if (interaction.channel?.messages.fetch(replyMessageId))
-            await interactionEditMessages(interaction, replyMessageId, '');
-
-          // 再生/一時停止ボタン押下時
-          if (buttonInteraction.customId === `stopPlayMusicButton_${uniqueId}`) {
-            if (player.state.status === AudioPlayerStatus.Playing) {
-              player.pause();
-              stopPlayMusicButton.setLabel('再生').setEmoji('▶');
-            } else if (player.state.status === AudioPlayerStatus.Paused) {
-              player.unpause();
-              stopPlayMusicButton.setLabel('停止').setEmoji('⏸');
-            }
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-            return;
-          }
-          // リピートボタン押下時
-          if (buttonInteraction.customId === `repeatSingleButton_${uniqueId}`) {
-            repeatFlag = !repeatFlag;
-            repeatSingleButton.setLabel(repeatFlag ? 'リピート中' : 'リピート').setEmoji('🔂');
-            interactionEditMessages(interaction, replyMessageId, { components: [buttonRow] });
-            return;
-          }
-          return;
-        } catch (error) {
-          if (error instanceof Error) {
-            Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました : ${error}`);
-            if (
-              (replyMessageId === buttonInteraction.message.id && isHttpError(error) && error.status === 400) ||
-              (isHttpError(error) && error.status === 404)
-            ) {
-              Logger.LogSystemError(error.message);
-              await interactionEditMessages(interaction, replyMessageId, 'ボタンをもう一度押してください');
-              return;
-            }
-          }
-        }
-      }, 500)
-    );
-
     // 音楽情報のメッセージ作成、送信
     const embed = musicInfoMessage(musicInfo, [buttonRow]);
     await interaction.editReply(embed);
@@ -149,7 +78,7 @@ export const singleMusicMainLogic = async (
     do {
       // BOTに音楽を流す
       await playMusicStream(player, musicInfo);
-    } while (repeatFlag);
+    } while (getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 1);
 
     // 再生完了した際メッセージを送信
     const embeds = donePlayerMessage();
@@ -181,7 +110,7 @@ const createButtonRow = (uniqueId: string) => {
     .setCustomId(`repeatSingleButton_${uniqueId}`)
     .setStyle(ButtonStyle.Secondary)
     .setLabel('リピート')
-    .setEmoji('🔂');
+    .setEmoji('🔁');
 
   // ボタンをActionRowに追加
   const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -191,7 +120,5 @@ const createButtonRow = (uniqueId: string) => {
 
   return {
     buttonRow,
-    stopPlayMusicButton,
-    repeatSingleButton,
   };
 };
