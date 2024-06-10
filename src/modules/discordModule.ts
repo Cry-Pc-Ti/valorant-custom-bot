@@ -9,7 +9,12 @@ const TOKEN = process.env.DISCORD_TOKEN as string;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID as string;
 
 const discord = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessages,
+  ],
   closeTimeout: 60000,
 });
 

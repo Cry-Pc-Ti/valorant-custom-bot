@@ -11,6 +11,7 @@ import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
+import { musicservser } from './events/admin/serverInfo';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -19,7 +20,6 @@ const commands = {
   [mainMusicCommand.data.name]: mainMusicCommand,
   [helpCommand.data.name]: helpCommand,
 };
-
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
@@ -113,6 +113,26 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     interaction.channel?.send(
       'エラーが発生したので再度コマンドの入力をお願いいたします。それでも解決しない場合はサーバーを一度蹴ってウィングマン君を招待してください。'
     );
+  }
+});
+// 登録するユーザーID
+const allowedUserIds = [
+  '695536234373709865', // りゅまPC
+  '420558464184614923', // りゅまけいたい
+  '472019916007145487', // ame
+  '484390835639812106', // ぺこめいん
+  '884320451306864651', // ぺこさぶ
+  '607110949249482753', // ゆずき
+  '903315439319408670', // もかお
+];
+// 隠しコマンド
+discord.on('messageCreate', async (message) => {
+  // 特定のユーザーIDのメッセージだけを拾う
+  if (!allowedUserIds.includes(message.author.id)) return;
+
+  // メッセージ内容をチェックして反応する
+  if (message.content === '!admin server') {
+    await musicservser(message, discord.guilds.cache.size);
   }
 });
 // voiceチャンネルでアクションが発生時に実行
