@@ -1,7 +1,8 @@
 export interface AgentData {
   name: string;
-  id: string;
-  role: string;
+  nameId: string;
+  roleName: string;
+  roleId: string;
   abilities?: AbilitiesData[];
 }
 

@@ -20,7 +20,7 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
 
       // ロールが指定されている場合は、そのロールのエージェントからランダムに選択
     } else {
-      const filteredAgents: AgentData[] = valorantAgents.filter((agent) => agent.role === agentRole);
+      const filteredAgents: AgentData[] = valorantAgents.filter((agent) => agent.roleId === agentRole);
       randomAgent = filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
     }
 
