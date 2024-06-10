@@ -5,7 +5,7 @@ import { numberCommandMainEvent } from './mainEvent/numberCommandMainEvent';
 export const mainDiceCommand = {
   data: new SlashCommandBuilder()
     .setName('dice')
-    .setDescription('音楽関連のコマンドです。')
+    .setDescription('神様じゃないのでをサイコロふります')
     .addSubcommand((subcommand) =>
       subcommand
         .setName('chinchiro')
