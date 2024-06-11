@@ -1,6 +1,6 @@
 import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../../types/valorantData';
-import { MemberAllocationData } from '../../types/memberData';
+import { TeamData } from '../../types/memberData';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
@@ -147,11 +147,7 @@ export const mapMessage = (map: MapData) => {
 };
 
 // teamコマンドのメッセージを作成
-export const teamMessage = (
-  memberAllocation: MemberAllocationData,
-  attackerChannelName: string,
-  defenderChannelName: string
-) => {
+export const teamMessage = (memberAllocation: TeamData, attackerChannelName: string, defenderChannelName: string) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setAuthor({ name: '抽選結果', iconURL: 'attachment://surprised_penguin.png' })

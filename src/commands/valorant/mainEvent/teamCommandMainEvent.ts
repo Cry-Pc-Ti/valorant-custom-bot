@@ -7,7 +7,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { MemberAllocationData, MemberData } from '../../../types/memberData';
+import { TeamData, MemberData } from '../../../types/memberData';
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
 import { teamMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
@@ -17,38 +17,31 @@ import { COMMAND_NAME_VALORANT } from '../mainValorantCommand';
 
 export const teamCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
-    const { options } = interaction;
+    const { options, guildId, guild } = interaction;
+    if (!options || !guildId || !guild) return;
 
     // コマンドで指定されたチャンネルIDを取得
     const attackerChannelId = options.getChannel('attacker')?.id;
     const defenderChannelId = options.getChannel('defender')?.id;
 
-    // チャンネルIDからチャンネル情報を取得
-    if (!attackerChannelId) {
+    // チャンネルIDが取得できない場合はエラーを返す
+    if (!attackerChannelId || !defenderChannelId) {
       await interaction.editReply('ボイスチャンネルが取得できませんでした');
       return;
     }
 
-    if (!defenderChannelId) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
-    }
-
+    // チャンネルを取得
     const attackerChannel = await interaction.guild?.channels.fetch(attackerChannelId);
-    if (!attackerChannel) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
-    }
-
-    const attackerChannelName = attackerChannel.name;
-
     const defenderChannel = await interaction.guild?.channels.fetch(defenderChannelId);
 
-    if (!defenderChannel) {
+    // チャンネルが取得できない場合はエラーを返す
+    if (!attackerChannel || !defenderChannel) {
       await interaction.editReply('ボイスチャンネルが取得できませんでした');
       return;
     }
 
+    // チャンネル名を取得
+    const attackerChannelName = attackerChannel.name;
     const defenderChannelName = defenderChannel.name;
 
     // コマンドを発火したメンバーが参加しているVCを取得
@@ -57,19 +50,6 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
 
     // メンバーがいない場合は処理を終了
     if (!membersInVC) return interaction.editReply('VCに参加してください');
-
-    const { options, guildId, guild } = interaction;
-    if (!options || !guildId || !guild) return;
-
-    // メンバーがいる場合は処理を続行
-    const attackerChannelId = options.getChannel('attacker')?.id;
-    const defenderChannelId = options.getChannel('defender')?.id;
-
-    // チャンネルが取得できない場合はエラーを返す
-    if (!attackerChannelId || !defenderChannelId) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
-    }
 
     // セレクトメニューを作成
     const memberSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -121,7 +101,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       }
 
       // チーム分け用のオブジェクトを作成
-      const teams: MemberAllocationData = {
+      const teams: TeamData = {
         attack: [],
         defense: [],
       };
@@ -189,9 +169,10 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
         valorantCommandInfo: {
           attackerChannelId: attackerChannelId,
           defenderChannelId: defenderChannelId,
-          teamAllocation: teamAllocation,
+          teams: teams,
         },
       });
+
       // ボタンを送信
       await interaction.followUp({ components: [buttonRow], ephemeral: true });
 

@@ -4,7 +4,7 @@ export interface MemberData {
   avatarImg: string | null;
 }
 
-export interface MemberAllocationData {
+export interface TeamData {
   attack: MemberData[];
   defense: MemberData[];
 }
