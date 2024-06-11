@@ -25,5 +25,5 @@ interface MusicCommandInfo {
 interface ValorantCommandInfo {
   attackerChannelId: string;
   defenderChannelId: string;
-  teamAllocation: MemberAllocationData;
+  teams: TeamData;
 }

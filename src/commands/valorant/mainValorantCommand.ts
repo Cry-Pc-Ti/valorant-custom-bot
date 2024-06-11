@@ -3,7 +3,7 @@ import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'd
 import { mapCommandMainEvent } from './mainEvent/mapCommandMainEvent';
 import { agentCommandMainEvent } from './mainEvent/agentCommandMainEvent';
 import { compositionCommandMainEvent } from './mainEvent/compositionCommandMainEvent';
-import { randomteamsCommandMainEvent } from './mainEvent/randomteamsCommandMainEvent';
+import { teamCommandMainEvent } from './mainEvent/teamCommandMainEvent';
 
 export const COMMAND_NAME_VALORANT: string = 'valo';
 
@@ -93,7 +93,7 @@ export const mainValorantCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName('randomteams')
+        .setName('team')
         .setDescription('メンバーをランダムでチーム分けします。')
         .addChannelOption((option) =>
           option
@@ -114,21 +114,21 @@ export const mainValorantCommand = {
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-    // mapcommand
+    // map command
     if (interaction.options.getSubcommand() === 'map') {
       await mapCommandMainEvent(interaction);
     }
-    // agentcommand
+    // agent command
     if (interaction.options.getSubcommand() === 'agent') {
       await agentCommandMainEvent(interaction);
     }
-    // compositioncommand
+    // composition command
     if (interaction.options.getSubcommand() === 'composition') {
       await compositionCommandMainEvent(interaction);
     }
-    // randomteamscommand
-    if (interaction.options.getSubcommand() === 'randomteams') {
-      await randomteamsCommandMainEvent(interaction);
+    // team command
+    if (interaction.options.getSubcommand() === 'team') {
+      await teamCommandMainEvent(interaction);
     }
   },
 };

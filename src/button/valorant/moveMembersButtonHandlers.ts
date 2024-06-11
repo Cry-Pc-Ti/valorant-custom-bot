@@ -17,7 +17,7 @@ export const moveAttackersToChannel = async (interaction: ButtonInteraction) => 
 
   if (targetVoiceChannel) {
     if (targetVoiceChannel.isVoiceBased()) {
-      for (const member of valorantCommandInfo.teamAllocation.attack) {
+      for (const member of valorantCommandInfo.teams.attack) {
         const targetMember = await interaction.guild?.members.fetch(member.id);
         await targetMember?.voice.setChannel(targetVoiceChannel);
       }
@@ -40,7 +40,7 @@ export const moveDefendersToChannel = async (interaction: ButtonInteraction) => 
 
   if (targetVoiceChannel) {
     if (targetVoiceChannel.isVoiceBased()) {
-      for (const member of valorantCommandInfo.teamAllocation.defense) {
+      for (const member of valorantCommandInfo.teams.defense) {
         const targetMember = await interaction.guild?.members.fetch(member.id);
         await targetMember?.voice.setChannel(targetVoiceChannel);
       }
