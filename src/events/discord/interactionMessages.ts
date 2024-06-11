@@ -1,5 +1,7 @@
 import { ButtonInteraction, ChatInputCommandInteraction, MessageEditOptions, MessagePayload } from 'discord.js';
 import { donePlayerMessage, terminateMidwayPlayerMessage } from './embedMessage';
+import { getInteractionIdStates } from '../../store/guildCommandStates';
+import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 // メッセージを編集する
 export const interactionEditMessages = async (
@@ -30,5 +32,9 @@ export const terminateMidwayInteractionEditMessages = async (
   messageId: string
 ) => {
   const embeds = terminateMidwayPlayerMessage();
-  interaction.channel?.messages.edit(messageId, embeds).catch(async () => await interaction.channel?.send(embeds));
+  interaction.channel?.messages.edit(messageId, embeds).catch(async () => {
+    if (getInteractionIdStates(interaction?.guildId ?? '', COMMAND_NAME_MUSIC).id) {
+      await interaction.channel?.send(embeds);
+    }
+  });
 };

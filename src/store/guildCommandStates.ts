@@ -65,6 +65,11 @@ export const getReplyMessageIdStates = (guildId: string, commandName: string) =>
   return states?.replyMessageId ?? '';
 };
 
+export const getInteractionIdStates = (guildId: string, commandName: string) => {
+  const states = getCommandStates(guildId, commandName);
+  return states?.interaction ?? '';
+};
+
 // SongIndexをset
 export const setRepeatModeStates = (guildId: string, commandName: string, repeatMode: number) => {
   if (!guildCommandStates.has(guildId)) {

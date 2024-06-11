@@ -6,7 +6,7 @@ import { Logger } from '../common/log';
 import { isHttpError } from '../common/errorUtils';
 import { v4 as uuidv4 } from 'uuid';
 import { getChannelThumbnails } from './getMusicInfo';
-import { getCommandStates, setGuildCommandStates, stopPreviousInteraction } from '../../store/guildCommandStates';
+import { setGuildCommandStates } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 // 音楽再生
@@ -65,12 +65,12 @@ export const playListMusicMainLogic = async (
       },
     });
 
-    buttonCollector.on('end', async () => {
-      const state = getCommandStates(guildId, COMMAND_NAME_MUSIC);
-      if (state && state.buttonCollector === buttonCollector) {
-        stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
-      }
-    });
+    // buttonCollector.on('end', async () => {
+    //   const state = getCommandStates(guildId, COMMAND_NAME_MUSIC);
+    //   if (state && state.buttonCollector === buttonCollector) {
+    //     stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+    //   }
+    // });
 
     //
     await streamPlaylist(guildId, 0, false);
