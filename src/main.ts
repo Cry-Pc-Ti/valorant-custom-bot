@@ -12,6 +12,7 @@ import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
 import { musicservser } from './events/admin/serverInfo';
+import { getBannedUsers, loadBannedUsers, saveBannedUsers, saveBannedUsersList } from './events/common/readBanJsonData';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -42,6 +43,7 @@ discord.on('ready', () => {
     status: 'online',
   });
   Logger.initialize();
+  loadBannedUsers();
 });
 // クールダウンのコレクション
 const cooldowns = new Collection<string, Collection<string, number>>();
@@ -79,6 +81,17 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       }
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
+
+      const bannedUsers: string[] = getBannedUsers();
+
+      // BANされているユーザーかどうかチェック
+      if (bannedUsers.includes(interaction.user.id)) {
+        interaction.reply(
+          `下のドキュメントに記載されているお問い合わせ先から運営にご連絡してください\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
+        );
+        Logger.LogAccessInfo(`【${guild?.name}(${guild?.id})】${user.username}(${user.id})はBANされています。`);
+        return;
+      }
 
       try {
         // サブコマンドがないときのデータ収集ログ
@@ -127,9 +140,36 @@ discord.on('messageCreate', async (message) => {
   // 特定のユーザーIDのメッセージだけを拾う
   if (!allowedUserIds.includes(message.author.id)) return;
 
+  const args = message.content.split(' ');
+
   // メッセージ内容をチェックして反応する
-  if (message.content === '!admin server') {
+  if (args[0] + ' ' + args[1] === '!admin server') {
     await musicservser(message, discord.guilds.cache.size);
+    return;
+  }
+  // メッセージ内容をチェックして反応する
+  if (args[0] + ' ' + args[1] === '!admin ban' && args[2]) {
+    const userIdToBan = args[2];
+    const bannedUsers: string[] = getBannedUsers();
+    if (!bannedUsers.includes(userIdToBan)) {
+      saveBannedUsers(userIdToBan);
+      await message.reply(`${userIdToBan}をBANしました`);
+    } else {
+      await message.reply(`すでに${userIdToBan}はBANしています。`);
+    }
+    return;
+  }
+  if (args[0] + ' ' + args[1] === '!admin unban' && args[2]) {
+    const userIdToUnBan = args[2];
+    let bannedUsers: string[] = getBannedUsers();
+    if (bannedUsers.includes(userIdToUnBan)) {
+      bannedUsers = bannedUsers.filter((id) => id !== userIdToUnBan);
+      saveBannedUsersList(bannedUsers);
+      await message.reply(`${userIdToUnBan}のBANを解除しました`);
+    } else {
+      await message.reply(`すでに${userIdToUnBan}は解除されています`);
+    }
+    return;
   }
 });
 // voiceチャンネルでアクションが発生時に実行
