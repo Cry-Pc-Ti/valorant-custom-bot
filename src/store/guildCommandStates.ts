@@ -106,3 +106,14 @@ export const getMusicCommandInfo = (guildId: string, commandName: string) => {
 export const deleteGuildCommandStates = (guildId: string, commandName: string) => {
   guildCommandStates.get(guildId)?.delete(commandName);
 };
+
+// 音楽のじょうほうの数だけ返す
+export const getTotalMusicCommandCount = (): number => {
+  let count = 0;
+  guildCommandStates.forEach((guildState) => {
+    if (guildState.has('music')) {
+      count++;
+    }
+  });
+  return count;
+};

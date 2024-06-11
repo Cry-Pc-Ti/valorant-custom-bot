@@ -10,21 +10,23 @@ import { Logger } from './events/common/log';
 import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
+import { helpCommand } from './commands/help/helpCommand';
+import { musicservser } from './events/admin/serverInfo';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
   [mainValorantCommand.data.name]: mainValorantCommand,
   [mainMusicCommand.data.name]: mainMusicCommand,
+  [helpCommand.data.name]: helpCommand,
 };
-
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
   try {
     console.log('サーバーにコマンドを登録中...');
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data],
+      body: [mainDiceCommand.data, mainValorantCommand.data, mainMusicCommand.data, helpCommand.data],
     });
     console.log('コマンドの登録が完了しました');
   } catch (error) {
@@ -78,19 +80,24 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
 
-      // データ収集
-      Logger.LogAccessInfo(
-        `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
-      );
+      try {
+        // サブコマンドがないときのデータ収集ログ
+        Logger.LogAccessInfo(
+          `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
+        );
+      } catch (error) {
+        // サブコマンドがないときのデータ収集ログ
+        Logger.LogAccessInfo(
+          `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName}コマンドを実行`
+        );
+      }
+
       // マップからコマンドを取得
       const command = commands[commandName];
 
       // コマンドが存在すれば実行
       if (command) command.execute(interaction);
     } else if (interaction.isButton()) {
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.deferUpdate();
-      }
       // ボタン処理
       await buttonHandlers(interaction);
     }
@@ -103,6 +110,26 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     interaction.channel?.send(
       'エラーが発生したので再度コマンドの入力をお願いいたします。それでも解決しない場合はサーバーを一度蹴ってウィングマン君を招待してください。'
     );
+  }
+});
+// 登録するユーザーID
+const allowedUserIds = [
+  '695536234373709865', // りゅまPC
+  '420558464184614923', // りゅまけいたい
+  '472019916007145487', // ame
+  '484390835639812106', // ぺこめいん
+  '884320451306864651', // ぺこさぶ
+  '607110949249482753', // ゆずき
+  '903315439319408670', // もかお
+];
+// 隠しコマンド
+discord.on('messageCreate', async (message) => {
+  // 特定のユーザーIDのメッセージだけを拾う
+  if (!allowedUserIds.includes(message.author.id)) return;
+
+  // メッセージ内容をチェックして反応する
+  if (message.content === '!admin server') {
+    await musicservser(message, discord.guilds.cache.size);
   }
 });
 // voiceチャンネルでアクションが発生時に実行

@@ -5,9 +5,11 @@ import { agentCommandMainEvent } from './mainEvent/agentCommandMainEvent';
 import { compositionCommandMainEvent } from './mainEvent/compositionCommandMainEvent';
 import { teamCommandMainEvent } from './mainEvent/teamCommandMainEvent';
 
+export const COMMAND_NAME_VALORANT: string = 'valo';
+
 export const mainValorantCommand = {
   data: new SlashCommandBuilder()
-    .setName('valo')
+    .setName(COMMAND_NAME_VALORANT)
     .setDescription('valorant用のコマンドです。')
     .addSubcommand((subcommand) => subcommand.setName('map').setDescription('マップをランダムに選択します'))
     .addSubcommand((subcommand) =>

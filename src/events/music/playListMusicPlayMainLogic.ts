@@ -49,15 +49,15 @@ export const playListMusicMainLogic = async (
 
     setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: buttonCollector,
+      buttonRowArray: [buttonRow, buttonRow2],
+      uniqueId: uniqueId,
       interaction: interaction,
       replyMessageId: (await interaction.fetchReply()).id,
       musicCommandInfo: {
         player: player,
         commandFlg: commandFlg,
-        buttonRowArray: [buttonRow, buttonRow2],
         playListInfo: playListInfo,
         playListFlag: true,
-        uniqueId: uniqueId,
         channelThumbnails: channelThumbnails,
         stopToStartFlag: false,
         songIndex: 0,
