@@ -40,10 +40,6 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       return;
     }
 
-    // チャンネル名を取得
-    const attackerChannelName = attackerChannel.name;
-    const defenderChannelName = defenderChannel.name;
-
     // コマンドを発火したメンバーが参加しているVCを取得
     const targetMember = await interaction.guild?.members.fetch(interaction.user.id);
     const membersInVC = targetMember?.voice.channel?.members.map((member) => member.user);
@@ -131,7 +127,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       }
 
       // メッセージを作成
-      const embed = teamMessage(teams, attackerChannelName, defenderChannelName);
+      const embed = teamMessage(teams, attackerChannelId, defenderChannelId, guildId);
 
       // メッセージを送信
       await interaction.editReply(embed);

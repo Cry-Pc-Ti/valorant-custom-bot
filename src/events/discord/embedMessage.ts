@@ -147,7 +147,12 @@ export const mapMessage = (map: MapData) => {
 };
 
 // teamコマンドのメッセージを作成
-export const teamMessage = (memberAllocation: TeamData, attackerChannelName: string, defenderChannelName: string) => {
+export const teamMessage = (
+  memberAllocation: TeamData,
+  attackerChannelId: string,
+  defenderChannelId: string,
+  guildId: string
+) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
     .setAuthor({ name: '抽選結果', iconURL: 'attachment://surprised_penguin.png' })
@@ -164,10 +169,10 @@ export const teamMessage = (memberAllocation: TeamData, attackerChannelName: str
     for (const member of memberAllocation.attack) {
       attack.push(`:white_small_square:<@${member.id}>`);
     }
-
     embeds.addFields({
-      name: `アタッカーサイド [${attackerChannelName}]`,
+      name: `【アタッカーサイド】\nVC：https://discord.com/channels/${guildId}/${attackerChannelId}`,
       value: attack.join(`\n`),
+      inline: true,
     });
   }
 
@@ -177,8 +182,9 @@ export const teamMessage = (memberAllocation: TeamData, attackerChannelName: str
       defense.push(`:white_small_square:<@${member.id}>`);
     }
     embeds.addFields({
-      name: `ディフェンダーサイド [${defenderChannelName}]`,
+      name: `【ディフェンダーサイド】 \nVC：https://discord.com/channels/${guildId}/${defenderChannelId}`,
       value: defense.join(`\n`),
+      inline: true,
     });
   }
 
