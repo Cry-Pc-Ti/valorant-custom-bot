@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 import { mapCommandMainEvent } from './mainEvent/mapCommandMainEvent';
 import { agentCommandMainEvent } from './mainEvent/agentCommandMainEvent';
 import { compositionCommandMainEvent } from './mainEvent/compositionCommandMainEvent';
-import { randomteamsCommandMainEvent } from './mainEvent/randomteamsCommandMainEvent';
+import { teamCommandMainEvent } from './mainEvent/teamCommandMainEvent';
 
 export const mainValorantCommand = {
   data: new SlashCommandBuilder()
@@ -89,42 +89,44 @@ export const mainValorantCommand = {
             .addChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
     )
-    .addSubcommand(
-      (subcommand) => subcommand.setName('randomteams').setDescription('メンバーをランダムでチーム分けします。')
-      // .addChannelOption((option) =>
-      //   option
-      //     .setName('attacker')
-      //     .setDescription('アタッカーのボイスチャンネルを指定してください')
-      //     .addChannelTypes(ChannelType.GuildVoice)
-      //     .setRequired(true)
-      // )
-      // .addChannelOption((option) =>
-      //   option
-      //     .setName('defender')
-      //     .setDescription('ディフェンダーのボイスチャンネルを指定してください')
-      //     .addChannelTypes(ChannelType.GuildVoice)
-      //     .setRequired(true)
-      // )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('team')
+        .setDescription('メンバーをランダムでチーム分けします。')
+        .addChannelOption((option) =>
+          option
+            .setName('attacker')
+            .setDescription('アタッカーのボイスチャンネルを指定してください')
+            .addChannelTypes(ChannelType.GuildVoice)
+            .setRequired(true)
+        )
+        .addChannelOption((option) =>
+          option
+            .setName('defender')
+            .setDescription('ディフェンダーのボイスチャンネルを指定してください')
+            .addChannelTypes(ChannelType.GuildVoice)
+            .setRequired(true)
+        )
     )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-    // mapcommand
+    // map command
     if (interaction.options.getSubcommand() === 'map') {
       await mapCommandMainEvent(interaction);
     }
-    // agentcommand
+    // agent command
     if (interaction.options.getSubcommand() === 'agent') {
       await agentCommandMainEvent(interaction);
     }
-    // compositioncommand
+    // composition command
     if (interaction.options.getSubcommand() === 'composition') {
       await compositionCommandMainEvent(interaction);
     }
-    // randomteamscommand
-    if (interaction.options.getSubcommand() === 'randomteams') {
-      await randomteamsCommandMainEvent(interaction);
+    // team command
+    if (interaction.options.getSubcommand() === 'team') {
+      await teamCommandMainEvent(interaction);
     }
   },
 };

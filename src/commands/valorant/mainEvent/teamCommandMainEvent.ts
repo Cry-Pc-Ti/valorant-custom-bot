@@ -7,11 +7,45 @@ import {
 } from 'discord.js';
 import { MemberAllocationData, MemberData } from '../../../types/memberData';
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
-import { memberAllocationMessage } from '../../../events/discord/embedMessage';
+import { teamMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
 
-export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
+export const teamCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
+    const { options } = interaction;
+
+    // コマンドで指定されたチャンネルIDを取得
+    const attackerChannelId = options.getChannel('attacker')?.id;
+    const defenderChannelId = options.getChannel('defender')?.id;
+
+    // チャンネルIDからチャンネル情報を取得
+    if (!attackerChannelId) {
+      await interaction.editReply('ボイスチャンネルが取得できませんでした');
+      return;
+    }
+
+    if (!defenderChannelId) {
+      await interaction.editReply('ボイスチャンネルが取得できませんでした');
+      return;
+    }
+
+    const attackerChannel = await interaction.guild?.channels.fetch(attackerChannelId);
+    if (!attackerChannel) {
+      await interaction.editReply('ボイスチャンネルが取得できませんでした');
+      return;
+    }
+
+    const attackerChannelName = attackerChannel.name;
+
+    const defenderChannel = await interaction.guild?.channels.fetch(defenderChannelId);
+
+    if (!defenderChannel) {
+      await interaction.editReply('ボイスチャンネルが取得できませんでした');
+      return;
+    }
+
+    const defenderChannelName = defenderChannel.name;
+
     // コマンドを発火したメンバーが参加しているVCを取得
     const targetMember = await interaction.guild?.members.fetch(interaction.user.id);
     const membersInVC = targetMember?.voice.channel?.members.map((member) => member.user);
@@ -80,7 +114,7 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
       }
 
       // チーム分け用のオブジェクトを作成
-      const teamAllocation: MemberAllocationData = {
+      const teams: MemberAllocationData = {
         attack: [],
         defense: [],
       };
@@ -98,25 +132,22 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
         const randomNumber = generateRandomNum(0, 1);
 
         if (randomNumber === 0 && attackCount < maxAttackMembers) {
-          teamAllocation.attack.push(member);
+          teams.attack.push(member);
           attackCount++;
         } else if (defenseCount < maxDefenseMembers) {
-          teamAllocation.defense.push(member);
+          teams.defense.push(member);
           defenseCount++;
         } else {
-          teamAllocation.attack.push(member);
+          teams.attack.push(member);
           attackCount++;
         }
       }
 
-      // メッセージを作成・送信
-      const message = memberAllocationMessage(teamAllocation);
+      // メッセージを作成
+      const embed = teamMessage(teams, attackerChannelName, defenderChannelName);
 
-      await interaction.editReply({
-        embeds: [message.embeds],
-        files: [message.fotterAttachment],
-        components: [],
-      });
+      // メッセージを送信
+      await interaction.editReply(embed);
 
       // // ボタンを作成
       // const uniqueId = Date.now();
@@ -192,7 +223,7 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
       // });
     });
   } catch (error) {
-    Logger.LogSystemError(`randomteamsCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogSystemError(`teamCommandMainEventでエラーが発生しました : ${error}`);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };

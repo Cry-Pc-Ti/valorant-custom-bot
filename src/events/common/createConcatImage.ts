@@ -5,7 +5,7 @@ import { Logger } from './log';
 // 画像を連結し1枚の画像にまとめる
 export const createConcatImage = async (imagePaths: string[], userId: string): Promise<void> => {
   try {
-    const outputImagePath = `./static/img/generate_image/${userId}.png`;
+    const outputImagePath = `./static/img/generated/${userId}.png`;
     // 既存の画像を削除
     if (fs.existsSync(outputImagePath)) {
       await fs.promises.unlink(outputImagePath);

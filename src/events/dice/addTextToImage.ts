@@ -7,7 +7,7 @@ registerFont('./static/fonts/Yomogi-Regular.ttf', { family: 'Yomogi' });
 
 export const addTextToImage = async (num: number, userId: string): Promise<void> => {
   try {
-    const outputImagePath = `./static/img/generate_image/${userId}.png`;
+    const outputImagePath = `./static/img/generated/${userId}.png`;
 
     // 既存の画像を削除
     if (fs.existsSync(outputImagePath)) {

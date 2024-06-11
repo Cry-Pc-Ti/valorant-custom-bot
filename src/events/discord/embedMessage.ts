@@ -4,14 +4,17 @@ import { MemberAllocationData } from '../../types/memberData';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
-const agentWebURL: string = 'https://playvalorant.com/ja-jp/agents/';
+const agentWebUrl: string = 'https://playvalorant.com/ja-jp/agents/';
 
-// 「/agent」コマンドのメッセージを作成
+// agentコマンドのメッセージを作成
 export const agentMessage = (agent: AgentData) => {
   const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Agent')
-    .setDescription(`今回のエージェントは[${agent.name}](${agentWebURL}${agent.nameId})です`)
+    .setAuthor({
+      name: '抽選結果',
+      iconURL: 'attachment://surprised_penguin.png',
+    })
+    .setDescription(`今回のエージェントは**[${agent.name}](${agentWebUrl}${agent.nameId})**です`)
     .setThumbnail(`attachment://${agent.nameId}_icon.png`)
     .addFields({
       name: 'ロール',
@@ -23,20 +26,24 @@ export const agentMessage = (agent: AgentData) => {
     })
     .setTimestamp();
 
+  const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
   const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.nameId}_icon.png`);
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return {
     embeds: [embedMessage],
-    files: [thumbnailAttachment, fotterAttachment],
+    files: [authorAttachment, thumbnailAttachment, fotterAttachment],
   };
 };
 
-// 「/composition」コマンドのメッセージを作成
+// compositionコマンドのメッセージを作成
 export const compositionMessage = (composition: CompositionData, banAgents: AgentData[], userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Composition')
+    .setAuthor({
+      name: '抽選結果',
+      iconURL: 'attachment://surprised_penguin.png',
+    })
     .setDescription('今回の構成はこちらです')
     .setImage(`attachment://${userId}.png`)
     .setFooter({
@@ -49,7 +56,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.duelist.length) {
     const duelists: string[] = [];
     for (const agent of composition.duelist) {
-      duelists.push(`[${agent.name}](${agentWebURL}${agent.nameId})`);
+      duelists.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
     }
     embed.addFields({
       name: 'デュエリスト',
@@ -61,7 +68,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.initiator.length) {
     const initiators: string[] = [];
     for (const agent of composition.initiator) {
-      initiators.push(`[${agent.name}](${agentWebURL}${agent.nameId})`);
+      initiators.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
     }
     embed.addFields({
       name: 'イニシエーター',
@@ -73,7 +80,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.controller.length) {
     const controllers: string[] = [];
     for (const agent of composition.controller) {
-      controllers.push(`[${agent.name}](${agentWebURL}${agent.nameId})`);
+      controllers.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
     }
     embed.addFields({
       name: 'コントローラー',
@@ -85,7 +92,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.sentinel.length) {
     const sentinels: string[] = [];
     for (const agent of composition.sentinel) {
-      sentinels.push(`[${agent.name}](${agentWebURL}${agent.nameId})`);
+      sentinels.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
     }
     embed.addFields({
       name: 'センチネル',
@@ -105,22 +112,26 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
     });
   }
 
-  const concatImageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+  const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
+  const concatImageAttachment = new AttachmentBuilder(`static/img/generated/${userId}.png`);
+  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return {
     embeds: [embed],
-    files: [concatImageAttachment, fotterAttachment],
+    files: [authorAttachment, concatImageAttachment, fotterAttachment],
     components: [],
   };
 };
 
-// 「/map」コマンドのメッセージを作成
+// mapコマンドのメッセージを作成
 export const mapMessage = (map: MapData) => {
   const embedMessage = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Map')
-    .setDescription(`今回のマップは${map.name}です`)
+    .setAuthor({
+      name: '抽選結果',
+      iconURL: 'attachment://surprised_penguin.png',
+    })
+    .setDescription(`今回のマップは**${map.name}**です`)
     .setThumbnail(map.displayIcon)
     .setImage(map.mapThumbnail)
     .setFooter({
@@ -128,17 +139,24 @@ export const mapMessage = (map: MapData) => {
       iconURL: 'attachment://valorant_icon.png',
     })
     .setTimestamp();
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
-  return { embeds: [embedMessage], files: [fotterAttachment] };
+  const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
+  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
+
+  return { embeds: [embedMessage], files: [authorAttachment, fotterAttachment], components: [] };
 };
 
-//「/member」コマンドのメッセージを作成
-export const memberAllocationMessage = (memberAllocation: MemberAllocationData) => {
+// teamコマンドのメッセージを作成
+export const teamMessage = (
+  memberAllocation: MemberAllocationData,
+  attackerChannelName: string,
+  defenderChannelName: string
+) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
-    .setTitle('Random Team')
+    .setAuthor({ name: '抽選結果', iconURL: 'attachment://surprised_penguin.png' })
     .setDescription('今回のチームはこちらです')
+    .setThumbnail('https://www.streetfighter.com/6/assets/images/character/jamie/jamie.png')
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
@@ -152,7 +170,7 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
     }
 
     embeds.addFields({
-      name: 'アタッカーサイド',
+      name: `アタッカーサイド [${attackerChannelName}]`,
       value: attack.join(`\n`),
     });
   }
@@ -163,17 +181,18 @@ export const memberAllocationMessage = (memberAllocation: MemberAllocationData) 
       defense.push(`:white_small_square:<@${member.id}>`);
     }
     embeds.addFields({
-      name: 'ディフェンダーサイド',
+      name: `ディフェンダーサイド [${defenderChannelName}]`,
       value: defense.join(`\n`),
     });
   }
 
-  const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
+  const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
+  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
-  return { embeds, fotterAttachment };
+  return { embeds: [embeds], files: [authorAttachment, fotterAttachment], components: [] };
 };
 
-//「/dice」コマンドのメッセージを作成
+// diceコマンドのメッセージを作成
 export const diceMessage = (message: string, number: number, userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
@@ -187,17 +206,18 @@ export const diceMessage = (message: string, number: number, userId: string) => 
     .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
-  const imageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
+  const imageAttachment = new AttachmentBuilder(`static/img/generated/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
-//「/chinchiro」コマンドのメッセージを作成
+// chinchiroコマンドのメッセージを作成
+// イカサマなしの場合
 export const chinchiroMessage = (result: string, userId: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
-    .setAuthor({ name: 'チンチロバトルじゃ！', iconURL: 'attachment://radianite_box.png' })
+    .setAuthor({ name: 'チンチロバトルじゃ！', iconURL: 'attachment://go_again.png' })
     .setFields({
       name: 'ざわ…ざわ…',
       value: `${result}`,
@@ -209,13 +229,14 @@ export const chinchiroMessage = (result: string, userId: string) => {
     })
     .setTimestamp();
 
-  const authorAttachment = new AttachmentBuilder('static/img/dice/radianite_box.png');
-  const imageAttachment = new AttachmentBuilder(`static/img/generate_image/${userId}.png`);
+  const authorAttachment = new AttachmentBuilder('static/img/icon/go_again.png');
+  const imageAttachment = new AttachmentBuilder(`static/img/generated/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
 
+// イカサマありの場合
 export const chinchiro456Message = (result: string) => {
   const embed = new EmbedBuilder()
     .setColor('#fd4556')
@@ -231,13 +252,14 @@ export const chinchiro456Message = (result: string) => {
     })
     .setTimestamp();
 
-  const authorAttachment = new AttachmentBuilder('static/img/dice/radianite_box.png');
+  const authorAttachment = new AttachmentBuilder('static/img/icon/radianite_box.png');
   const imageAttachment = new AttachmentBuilder('static/img/dice/456dice.png');
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 
   return { embeds: [embed], files: [authorAttachment, imageAttachment, fotterAttachment] };
 };
-//「/play」コマンドのメッセージを作成
+
+// playコマンドのメッセージを作成
 export const musicInfoMessage = (musicInfo: MusicInfo, buttonRowList: ActionRowBuilder<ButtonBuilder>[]) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
@@ -265,7 +287,8 @@ export const musicInfoMessage = (musicInfo: MusicInfo, buttonRowList: ActionRowB
 
   return { embeds: [embeds], files: [fotterAttachment], components: buttonRowList };
 };
-//「/playList」コマンドのメッセージを作成
+
+// playListコマンドのメッセージを作成
 export const musicInfoPlayListMessage = (
   playListInfo: PlayListInfo,
   buttonRowList: ActionRowBuilder<ButtonBuilder>[],
@@ -276,7 +299,7 @@ export const musicInfoPlayListMessage = (
 ) => {
   const embeds = new EmbedBuilder().setColor('#fd4556');
 
-  // playCommand
+  // play
   if (commandFlg === 0) {
     embeds.addFields({
       name: 'プレイリスト',
@@ -291,7 +314,7 @@ export const musicInfoPlayListMessage = (
       });
     }
 
-    // searchCommand
+    // search
   } else if (commandFlg === 1) {
     embeds.addFields(
       {
@@ -305,6 +328,7 @@ export const musicInfoPlayListMessage = (
         inline: true,
       }
     );
+
     // recommend
   } else if (commandFlg === 2) {
     embeds.addFields(
@@ -318,6 +342,7 @@ export const musicInfoPlayListMessage = (
         inline: true,
       }
     );
+
     // hitsong
   } else if (commandFlg === 3) {
     embeds.addFields({
@@ -347,6 +372,7 @@ export const musicInfoPlayListMessage = (
       value: `[${playListInfo.musicInfo[musicCount].title}](${playListInfo.musicInfo[musicCount].url})`,
     });
   }
+
   const embeds2 = new EmbedBuilder()
     .setColor('#fd4556')
     .setTitle(playListInfo.musicInfo[musicCount - 1].title)
@@ -373,6 +399,7 @@ export const musicInfoPlayListMessage = (
 
   return { embeds: [embeds, embeds2], files: [fotterAttachment], components: buttonRowList };
 };
+
 // playList再生準備中のメッセージを作成(play)
 export const playListPlayMusicMessage = () => {
   const embeds = new EmbedBuilder()
@@ -389,7 +416,7 @@ export const playListPlayMusicMessage = () => {
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
 
-// 再生準備中のメッセージを作成(レコメンド)
+// 再生準備中のメッセージを作成(recommend)
 export const preparingPlayerMessage = () => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
@@ -405,7 +432,7 @@ export const preparingPlayerMessage = () => {
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
 
-// 再生準備中のメッセージを作成(ヒットソング)
+// 再生準備中のメッセージを作成(hitsong)
 export const hitSongsPreparingPlayerMessage = (spotifyPlaylistInfo: SpotifyPlaylistInfo) => {
   const embeds = new EmbedBuilder()
     .setColor('#fd4556')
