@@ -1,5 +1,7 @@
 import {
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   ChatInputCommandInteraction,
   ComponentType,
   StringSelectMenuBuilder,
@@ -9,6 +11,9 @@ import { MemberAllocationData, MemberData } from '../../../types/memberData';
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
 import { memberAllocationMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
+import { setGuildCommandStates } from '../../../store/guildCommandStates';
+import { v4 as uuidv4 } from 'uuid';
+import { COMMAND_NAME_VALORANT } from '../mainValorantCommand';
 
 export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -19,16 +24,18 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
     // メンバーがいない場合は処理を終了
     if (!membersInVC) return interaction.editReply('VCに参加してください');
 
+    const { options, guildId, guild } = interaction;
+    if (!options || !guildId || !guild) return;
+
     // メンバーがいる場合は処理を続行
+    const attackerChannelId = options.getChannel('attacker')?.id;
+    const defenderChannelId = options.getChannel('defender')?.id;
 
-    // const attackerChannelId = options.getChannel('attacker')?.id;
-    // const defenderChannelId = options.getChannel('defender')?.id;
-
-    // // チャンネルが取得できない場合はエラーを返す
-    // if (!attackerChannelId || !defenderChannelId) {
-    //   await interaction.editReply('ボイスチャンネルが取得できませんでした');
-    //   return;
-    // }
+    // チャンネルが取得できない場合はエラーを返す
+    if (!attackerChannelId || !defenderChannelId) {
+      await interaction.editReply('ボイスチャンネルが取得できませんでした');
+      return;
+    }
 
     // セレクトメニューを作成
     const memberSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -66,7 +73,7 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
 
       for (const userId of memberIds) {
         // ユーザIDからユーザ情報を取得
-        const user = await interaction.guild?.members.fetch(userId);
+        const user = await guild.members.fetch(userId);
 
         // ユーザがいない場合はスキップ
         if (!user) continue;
@@ -118,78 +125,48 @@ export const randomteamsCommandMainEvent = async (interaction: ChatInputCommandI
         components: [],
       });
 
-      // // ボタンを作成
-      // const uniqueId = Date.now();
-      // const attackerVCButton = new ButtonBuilder()
-      //   .setCustomId(`attacker_${uniqueId}`)
-      //   .setLabel('Attacker VC')
-      //   .setStyle(ButtonStyle.Danger);
+      // ボタンを作成
+      const uniqueId = uuidv4();
+      const attackerVCButton = new ButtonBuilder()
+        .setCustomId(`attacker_${uniqueId}`)
+        .setLabel('Attacker VC')
+        .setStyle(ButtonStyle.Danger);
 
-      // const difenderVCButton = new ButtonBuilder()
-      //   .setCustomId(`difender_${uniqueId}`)
-      //   .setLabel('Defender VC')
-      //   .setStyle(ButtonStyle.Primary);
+      const difenderVCButton = new ButtonBuilder()
+        .setCustomId(`difender_${uniqueId}`)
+        .setLabel('Defender VC')
+        .setStyle(ButtonStyle.Primary);
 
-      // // ボタンをActionRowに追加
-      // const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      //   attackerVCButton,
-      //   difenderVCButton
-      // );
+      // ボタンをActionRowに追加
+      const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        attackerVCButton,
+        difenderVCButton
+      );
 
-      // // ボタンを送信
-      // await interaction.followUp({ components: [buttonRow], ephemeral: true });
+      const buttonCollector = interaction.channel?.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+      });
 
-      // const buttonCollector = interaction.channel?.createMessageComponentCollector({
-      //   componentType: ComponentType.Button,
-      // });
+      if (!buttonCollector) return;
 
-      // if (!buttonCollector) return;
+      setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
+        buttonCollector: buttonCollector,
+        buttonRowArray: [buttonRow],
+        uniqueId: uniqueId,
+        interaction: interaction,
+        replyMessageId: (await interaction.fetchReply()).id,
+        valorantCommandInfo: {
+          attackerChannelId: attackerChannelId,
+          defenderChannelId: defenderChannelId,
+          teamAllocation: teamAllocation,
+        },
+      });
+      // ボタンを送信
+      await interaction.followUp({ components: [buttonRow], ephemeral: true });
 
-      // // ボタンが押された時の処理
-      // buttonCollector.on('collect', async (buttonInteraction: ButtonInteraction<CacheType>) => {
-      //   try {
-      //     if (!buttonInteraction.replied && !buttonInteraction.deferred) {
-      //       await buttonInteraction.deferUpdate();
-      //     }
-
-      //     // アタッカーのメンバーをメインのボイスチャンネルに移動
-      //     if (buttonInteraction.customId === `attacker_${uniqueId}`) {
-      //       const targetVoiceChannel = await interaction.guild?.channels.fetch(attackerChannelId);
-
-      //       if (targetVoiceChannel) {
-      //         if (targetVoiceChannel.isVoiceBased()) {
-      //           for (const member of teamAllocation.attack) {
-      //             const targetMember = await interaction.guild?.members.fetch(member.id);
-      //             await targetMember?.voice.setChannel(targetVoiceChannel);
-      //           }
-      //         }
-      //       }
-      //     }
-
-      //     // ディフェンダーのメンバーをサブのボイスチャンネルに移動
-      //     if (buttonInteraction.customId === `difender_${uniqueId}`) {
-      //       const targetVoiceChannel = await interaction.guild?.channels.fetch(defenderChannelId);
-
-      //       if (targetVoiceChannel) {
-      //         if (targetVoiceChannel.isVoiceBased()) {
-      //           for (const member of teamAllocation.defense) {
-      //             const targetMember = await interaction.guild?.members.fetch(member.id);
-      //             await targetMember?.voice.setChannel(targetVoiceChannel);
-      //           }
-      //         }
-      //       }
-      //     }
-      //   } catch (error) {
-      //     console.error(error);
-      //     await interaction.followUp({
-      //       content: 'ボタンの処理中にエラーが発生しました。再度ボタンを押してください。',
-      //       ephemeral: true,
-      //     });
-      //   }
-      // });
-      // buttonCollector.on('end', () => {
-      //   buttonCollector.stop();
-      // });
+      buttonCollector.on('end', () => {
+        buttonCollector.stop();
+      });
     });
   } catch (error) {
     Logger.LogSystemError(`randomteamsCommandMainEventでエラーが発生しました : ${error}`);

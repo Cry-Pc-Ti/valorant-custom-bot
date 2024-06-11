@@ -1,14 +1,16 @@
 export interface CommandInfo {
   buttonCollector: InteractionCollector<ButtonInteraction<CacheType>>;
+  buttonRowArray: ActionRowBuilder<ButtonBuilder>[];
+  uniqueId: string;
   interaction: ChatInputCommandInteraction;
   replyMessageId: string;
   musicCommandInfo?: MusicCommandInfo;
+  valorantCommandInfo?: ValorantCommandInfo;
 }
 
 interface MusicCommandInfo {
   player: AudioPlayer;
   commandFlg: number;
-  buttonRowArray: ActionRowBuilder<ButtonBuilder>[];
   playListInfo?: PlayListInfo;
   musicInfo?: MusicInfo[];
   playListFlag: boolean;
@@ -16,7 +18,12 @@ interface MusicCommandInfo {
     [key: string]: string;
   };
   stopToStartFlag: boolean;
-  uniqueId: string;
   songIndex: number;
   repeatMode: number;
+}
+
+interface ValorantCommandInfo {
+  attackerChannelId: string;
+  defenderChannelId: string;
+  teamAllocation: MemberAllocationData;
 }

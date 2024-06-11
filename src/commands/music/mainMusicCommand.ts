@@ -11,7 +11,7 @@ export const COMMAND_NAME_MUSIC: string = 'music';
 export const mainMusicCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
-    .setName('music')
+    .setName(COMMAND_NAME_MUSIC)
     .setDescription('音楽関連のコマンドです。')
     .addSubcommand((subcommand) =>
       subcommand

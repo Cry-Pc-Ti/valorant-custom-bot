@@ -54,15 +54,15 @@ export const singleMusicMainLogic = async (
 
     setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: buttonCollector,
+      buttonRowArray: [buttonRow],
+      uniqueId: uniqueId,
       interaction: interaction,
       replyMessageId: replyMessageId,
       musicCommandInfo: {
         player: player,
-        buttonRowArray: [buttonRow],
         commandFlg: commandFlg ?? 1,
         musicInfo: [musicInfo],
         playListFlag: false,
-        uniqueId: uniqueId,
         stopToStartFlag: false,
         songIndex: 0,
         repeatMode: 0,

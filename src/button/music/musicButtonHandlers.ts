@@ -53,23 +53,22 @@ export const stopPlayMusicButton = async (interaction: ButtonInteraction) => {
   if (!guildId) return;
 
   const commandStates = getCommandStates(guildId, COMMAND_NAME_MUSIC);
-  const musicCommandInfo = commandStates?.musicCommandInfo;
-  if (!commandStates || !musicCommandInfo) return;
+  if (!commandStates) return;
 
   if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Playing) {
     commandStates.musicCommandInfo?.player.pause();
-    musicCommandInfo.buttonRowArray[0].components[1].setLabel('再生');
-    musicCommandInfo.buttonRowArray[0].components[1].setEmoji('▶');
+    commandStates.buttonRowArray[0].components[1].setLabel('再生');
+    commandStates.buttonRowArray[0].components[1].setEmoji('▶');
     setStopToStartFlagStates(guildId, COMMAND_NAME_MUSIC, true);
   } else if (commandStates.musicCommandInfo?.player.state.status === AudioPlayerStatus.Paused) {
     commandStates.musicCommandInfo?.player.unpause();
-    musicCommandInfo.buttonRowArray[0].components[1].setLabel('停止');
-    musicCommandInfo.buttonRowArray[0].components[1].setEmoji('⏸');
+    commandStates.buttonRowArray[0].components[1].setLabel('停止');
+    commandStates.buttonRowArray[0].components[1].setEmoji('⏸');
     setStopToStartFlagStates(guildId, COMMAND_NAME_MUSIC, false);
   }
   // メッセージ送信
   interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, {
-    components: musicCommandInfo.buttonRowArray,
+    components: commandStates.buttonRowArray,
   });
   return;
 };
@@ -96,22 +95,24 @@ export const repeatSingleButton = async (interaction: ButtonInteraction) => {
     if (musicCommandInfo.repeatMode >= 3) musicCommandInfo.repeatMode = 0;
 
     const { label, emoji } = labelsAndEmojis[musicCommandInfo.repeatMode];
-    musicCommandInfo.buttonRowArray[1].components[0].setLabel(label);
-    musicCommandInfo.buttonRowArray[1].components[0].setEmoji(emoji);
+    commandStates.buttonRowArray[1].components[0].setLabel(label);
+    commandStates.buttonRowArray[1].components[0].setEmoji(emoji);
   } else {
     if (musicCommandInfo.repeatMode >= 2) musicCommandInfo.repeatMode = 0;
 
-    musicCommandInfo.buttonRowArray[0].components[0]
+    commandStates.buttonRowArray[0].components[0]
       .setLabel(labelsAndEmojis[musicCommandInfo.repeatMode].label)
       .setEmoji(labelsAndEmojis[musicCommandInfo.repeatMode].emoji);
   }
   // メッセージ送信
   interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, {
-    components: musicCommandInfo.buttonRowArray,
+    components: commandStates.buttonRowArray,
   });
   // データを再度セット
   setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
     buttonCollector: commandStates.buttonCollector,
+    buttonRowArray: commandStates.buttonRowArray,
+    uniqueId: commandStates.uniqueId,
     interaction: commandStates.interaction,
     replyMessageId: commandStates.replyMessageId,
     musicCommandInfo: musicCommandInfo,

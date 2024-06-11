@@ -98,9 +98,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       // コマンドが存在すれば実行
       if (command) command.execute(interaction);
     } else if (interaction.isButton()) {
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.deferUpdate();
-      }
       // ボタン処理
       await buttonHandlers(interaction);
     }

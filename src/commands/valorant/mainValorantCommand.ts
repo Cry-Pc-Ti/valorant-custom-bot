@@ -1,13 +1,15 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 import { mapCommandMainEvent } from './mainEvent/mapCommandMainEvent';
 import { agentCommandMainEvent } from './mainEvent/agentCommandMainEvent';
 import { compositionCommandMainEvent } from './mainEvent/compositionCommandMainEvent';
 import { randomteamsCommandMainEvent } from './mainEvent/randomteamsCommandMainEvent';
 
+export const COMMAND_NAME_VALORANT: string = 'valo';
+
 export const mainValorantCommand = {
   data: new SlashCommandBuilder()
-    .setName('valo')
+    .setName(COMMAND_NAME_VALORANT)
     .setDescription('valorant用のコマンドです。')
     .addSubcommand((subcommand) => subcommand.setName('map').setDescription('マップをランダムに選択します'))
     .addSubcommand((subcommand) =>
@@ -89,22 +91,24 @@ export const mainValorantCommand = {
             .addChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
     )
-    .addSubcommand(
-      (subcommand) => subcommand.setName('randomteams').setDescription('メンバーをランダムでチーム分けします。')
-      // .addChannelOption((option) =>
-      //   option
-      //     .setName('attacker')
-      //     .setDescription('アタッカーのボイスチャンネルを指定してください')
-      //     .addChannelTypes(ChannelType.GuildVoice)
-      //     .setRequired(true)
-      // )
-      // .addChannelOption((option) =>
-      //   option
-      //     .setName('defender')
-      //     .setDescription('ディフェンダーのボイスチャンネルを指定してください')
-      //     .addChannelTypes(ChannelType.GuildVoice)
-      //     .setRequired(true)
-      // )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('randomteams')
+        .setDescription('メンバーをランダムでチーム分けします。')
+        .addChannelOption((option) =>
+          option
+            .setName('attacker')
+            .setDescription('アタッカーのボイスチャンネルを指定してください')
+            .addChannelTypes(ChannelType.GuildVoice)
+            .setRequired(true)
+        )
+        .addChannelOption((option) =>
+          option
+            .setName('defender')
+            .setDescription('ディフェンダーのボイスチャンネルを指定してください')
+            .addChannelTypes(ChannelType.GuildVoice)
+            .setRequired(true)
+        )
     )
     .toJSON(),
 

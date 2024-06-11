@@ -55,34 +55,34 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
     deletePlayerInfo(musicCommandInfo.player);
 
     if (musicCommandInfo.stopToStartFlag) {
-      musicCommandInfo.buttonRowArray[0].components[1].setLabel('停止');
-      musicCommandInfo.buttonRowArray[0].components[1].setEmoji('⏸');
+      commandStates.buttonRowArray[0].components[1].setLabel('停止');
+      commandStates.buttonRowArray[0].components[1].setEmoji('⏸');
     }
     if (musicCommandInfo.repeatMode === 1) {
       // ボタンがリピート中ボタンだった時リピートボタンに変更
       setRepeatModeStates(guildId, COMMAND_NAME_MUSIC, 0);
-      musicCommandInfo.buttonRowArray[1].components[0].setLabel('リピート');
-      musicCommandInfo.buttonRowArray[1].components[0].setEmoji('🔁');
+      commandStates.buttonRowArray[1].components[0].setLabel('リピート');
+      commandStates.buttonRowArray[1].components[0].setEmoji('🔁');
     }
   }
 
   do {
     // 次へと前へのボタンの制御
     if (musicCommandInfo?.songIndex === 0 && musicCommandInfo.playListInfo.musicInfo.length === 1) {
-      musicCommandInfo.buttonRowArray[0].components[0].setDisabled(true);
-      musicCommandInfo.buttonRowArray[0].components[2].setDisabled(true);
+      commandStates.buttonRowArray[0].components[0].setDisabled(true);
+      commandStates.buttonRowArray[0].components[2].setDisabled(true);
     } else if (musicCommandInfo?.songIndex === 0 && musicCommandInfo.playListInfo.musicInfo.length > 1) {
-      musicCommandInfo.buttonRowArray[0].components[0].setDisabled(true);
-      musicCommandInfo.buttonRowArray[0].components[2].setDisabled(false);
+      commandStates.buttonRowArray[0].components[0].setDisabled(true);
+      commandStates.buttonRowArray[0].components[2].setDisabled(false);
     } else if (
       musicCommandInfo?.songIndex !== 0 &&
       musicCommandInfo.playListInfo.musicInfo.length - 1 === musicCommandInfo?.songIndex
     ) {
-      musicCommandInfo.buttonRowArray[0].components[0].setDisabled(false);
-      musicCommandInfo.buttonRowArray[0].components[2].setDisabled(true);
+      commandStates.buttonRowArray[0].components[0].setDisabled(false);
+      commandStates.buttonRowArray[0].components[2].setDisabled(true);
     } else {
-      musicCommandInfo.buttonRowArray[0].components[0].setDisabled(false);
-      musicCommandInfo.buttonRowArray[0].components[2].setDisabled(false);
+      commandStates.buttonRowArray[0].components[0].setDisabled(false);
+      commandStates.buttonRowArray[0].components[2].setDisabled(false);
     }
 
     // 音楽情報を取得
@@ -91,7 +91,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
     // 音楽メッセージを作成
     const embed = musicInfoPlayListMessage(
       musicCommandInfo.playListInfo,
-      musicCommandInfo.buttonRowArray,
+      commandStates.buttonRowArray,
       musicCommandInfo.songIndex + 1,
       musicCommandInfo.channelThumbnails?.[musicInfo.id],
       musicCommandInfo.commandFlg
@@ -105,6 +105,8 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
     // データをstatesに登録
     setGuildCommandStates(guildId, COMMAND_NAME_MUSIC, {
       buttonCollector: commandStates.buttonCollector,
+      buttonRowArray: commandStates.buttonRowArray,
+      uniqueId: commandStates.uniqueId,
       interaction: commandStates.interaction,
       replyMessageId: commandStates.replyMessageId,
       musicCommandInfo: musicCommandInfo,
