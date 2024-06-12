@@ -7,7 +7,7 @@ export const countAgentsByRole = (role: string) => {
 
 export const countBanAgentsByRole = (role: string, banedAgentIds: string[]) => {
   const roleByBanedAgentsNum = valorantAgents.filter(
-    (agent) => agent.roleId === role && banedAgentIds.includes(agent.nameId)
+    (agent) => agent.roleId === role && banedAgentIds.includes(agent.id)
   ).length;
   return roleByBanedAgentsNum;
 };

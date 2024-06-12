@@ -90,7 +90,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       for (const agentRole in composition) {
         if (agentRole !== 'ban') {
           for (const agent of composition[agentRole as keyof CompositionData]) {
-            imagePaths.push(`static/img/valorant_agents/${agent.nameId}_icon.png`);
+            imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
           }
         }
       }
@@ -117,7 +117,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
         .addOptions(
           valorantAgents.map((agent) => ({
             label: agent.name,
-            value: agent.nameId,
+            value: agent.id,
           }))
         );
 
@@ -141,10 +141,10 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
           const banAgentIds: string[] = selectMenuInteraction.values;
 
           // BANされたエージェントをcompositionに格納
-          banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.nameId));
+          banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.id));
 
           // ValorantAgentsからBAN対象とされたエージェントを排除
-          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.nameId));
+          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.id));
 
           // ValorantAgentsのroleから各ロールの人数を取得
           const allDuelistNum = countAgentsByRole('duelist');
@@ -244,7 +244,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
           for (const agentRole in composition) {
             if (agentRole !== 'ban') {
               for (const agent of composition[agentRole as keyof CompositionData]) {
-                imagePaths.push(`static/img/valorant_agents/${agent.nameId}_icon.png`);
+                imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
               }
             }
           }

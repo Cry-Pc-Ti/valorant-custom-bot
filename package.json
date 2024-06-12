@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "test": "ts-node src/events/notion/fetchAdminUserId.ts"
+    "test": "ts-node src/service/valorant.service.ts"
   },
   "keywords": [],
   "author": "",

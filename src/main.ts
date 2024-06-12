@@ -15,12 +15,6 @@ import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJson
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 
-// 管理者ユーザーIDを取得
-let adminUserIds: string[] = [];
-(async () => {
-  adminUserIds = await fetchAdminUserId();
-})();
-
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
@@ -28,13 +22,6 @@ const commands = {
   [mainMusicCommand.data.name]: mainMusicCommand,
   [helpCommand.data.name]: helpCommand,
 };
-
-// 管理者ユーザーIDを取得
-let adminUserIds: string[] = [];
-(async () => {
-  adminUserIds = await fetchAdminUserId();
-  console.log(adminUserIds);
-})();
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -48,6 +35,12 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   } catch (error) {
     console.error(`コマンドの登録中にエラーが発生しました : ${error}`);
   }
+})();
+
+// 管理者ユーザーIDを取得
+let adminUserIds: string[] = [];
+(async () => {
+  adminUserIds = await fetchAdminUserId();
 })();
 
 // クライアントオブジェクトが準備完了時に実行

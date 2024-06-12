@@ -1,10 +1,12 @@
+import fs from 'fs';
 import { Message } from 'discord.js';
 import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
 import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/common/readBanUserJsonData';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
+import { fetchAgentsData } from '../../service/valorant.service';
 
-export const adminCommand = async (message: Message, command: string, userId: string | null) => {
+export const adminCommand = async (message: Message, command: string, option: string | null) => {
   // serverコマンド
   if (command === 'server') {
     // guildIdを取得
@@ -30,6 +32,8 @@ export const adminCommand = async (message: Message, command: string, userId: st
 
   // banコマンド
   if (command === 'ban') {
+    const userId = option;
+
     // BANするユーザが指定されていない場合はエラーを返却
     if (!userId) {
       await message.reply('BANするユーザーIDを指定してください');
@@ -50,6 +54,9 @@ export const adminCommand = async (message: Message, command: string, userId: st
 
   // unbanコマンド
   if (command === 'unban') {
+    const userId = option;
+
+    // BAN解除するユーザが指定されていない場合はエラーを返却
     if (!userId) {
       await message.reply('BAN解除するユーザーIDを指定してください');
       return;
@@ -65,6 +72,21 @@ export const adminCommand = async (message: Message, command: string, userId: st
       await message.reply(`${userId}のBANを解除しました`);
     } else {
       await message.reply(`すでに${userId}は解除されています`);
+    }
+    return;
+  }
+
+  if (command === 'refresh') {
+    const target = option;
+
+    if (target === 'valorant') {
+      // Valorantのエージェント情報を取得
+      const agents = await fetchAgentsData();
+
+      // JSONにエージェント情報を出力
+      fs.writeFileSync('./static/data/valorantAgentsData.json', JSON.stringify(agents));
+
+      await message.reply('エージェント情報を更新しました');
     }
     return;
   }

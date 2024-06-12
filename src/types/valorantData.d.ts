@@ -1,23 +1,23 @@
 export interface AgentData {
   name: string;
-  nameId: string;
-  roleName: string;
+  id: string;
+  role: string;
   roleId: string;
-  abilities?: AbilitiesData[];
-}
-
-export interface RoleData {
   uuid: string;
-  displayName: string;
-  description: string;
-  displayIcon: string;
+  iconUrl: string;
 }
 
-export interface AbilitiesData {
-  slot: string;
-  displayName: string;
-  description: string;
-  displayIcon: string;
+export interface AgentData_JP {
+  name: string;
+  role: string;
+  uuid: string;
+  iconUrl: string;
+}
+
+export interface AgentData_EN {
+  id: string;
+  roleId: string;
+  uuid: string;
 }
 
 export interface CompositionData {

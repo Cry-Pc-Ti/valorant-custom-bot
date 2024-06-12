@@ -14,11 +14,11 @@ export const agentMessage = (agent: AgentData) => {
       name: '抽選結果',
       iconURL: 'attachment://surprised_penguin.png',
     })
-    .setDescription(`今回のエージェントは**[${agent.name}](${agentWebUrl}${agent.nameId})**です`)
-    .setThumbnail(`attachment://${agent.nameId}_icon.png`)
+    .setDescription(`今回のエージェントは**[${agent.name}](${agentWebUrl}${agent.id})**です`)
+    .setThumbnail(`attachment://${agent.id}_icon.png`)
     .addFields({
       name: 'ロール',
-      value: agent.roleName,
+      value: agent.role,
     })
     .setFooter({
       text: 'VALORANT',
@@ -27,7 +27,7 @@ export const agentMessage = (agent: AgentData) => {
     .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
-  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.nameId}_icon.png`);
+  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
   const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return {
@@ -56,7 +56,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.duelist.length) {
     const duelists: string[] = [];
     for (const agent of composition.duelist) {
-      duelists.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
+      duelists.push(`[${agent.name}](${agentWebUrl}${agent.id})`);
     }
     embed.addFields({
       name: 'デュエリスト',
@@ -68,7 +68,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.initiator.length) {
     const initiators: string[] = [];
     for (const agent of composition.initiator) {
-      initiators.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
+      initiators.push(`[${agent.name}](${agentWebUrl}${agent.id})`);
     }
     embed.addFields({
       name: 'イニシエーター',
@@ -80,7 +80,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.controller.length) {
     const controllers: string[] = [];
     for (const agent of composition.controller) {
-      controllers.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
+      controllers.push(`[${agent.name}](${agentWebUrl}${agent.id})`);
     }
     embed.addFields({
       name: 'コントローラー',
@@ -92,7 +92,7 @@ export const compositionMessage = (composition: CompositionData, banAgents: Agen
   if (composition.sentinel.length) {
     const sentinels: string[] = [];
     for (const agent of composition.sentinel) {
-      sentinels.push(`[${agent.name}](${agentWebUrl}${agent.nameId})`);
+      sentinels.push(`[${agent.name}](${agentWebUrl}${agent.id})`);
     }
     embed.addFields({
       name: 'センチネル',

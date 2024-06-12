@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { MapData } from '../../../types/valorantData';
-import { getMapInfo } from '../../../service/valorant.service';
+import { fetchMapsData } from '../../../service/valorant.service';
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
 import { mapMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
@@ -8,7 +8,7 @@ import { Logger } from '../../../events/common/log';
 export const mapCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     // valorant-apiからMAP情報を取得
-    const mapInfo: MapData[] = await getMapInfo();
+    const mapInfo: MapData[] = await fetchMapsData();
 
     // マップをランダムに選択
     const randomMap: MapData = mapInfo[generateRandomNum(0, mapInfo.length - 1)];

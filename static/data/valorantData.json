@@ -2,189 +2,189 @@
   "agents": [
     {
       "name": "ジェット",
-      "nameId": "jett",
-      "roleName": "デュエリスト",
+      "id": "jett",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "フェニックス",
-      "nameId": "phoenix",
-      "roleName": "デュエリスト",
+      "id": "phoenix",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "ネオン",
-      "nameId": "neon",
-      "roleName": "デュエリスト",
+      "id": "neon",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "ヨル",
-      "nameId": "yoru",
-      "roleName": "デュエリスト",
+      "id": "yoru",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "レイズ",
-      "nameId": "raze",
-      "roleName": "デュエリスト",
+      "id": "raze",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "レイナ",
-      "nameId": "reyna",
-      "roleName": "デュエリスト",
+      "id": "reyna",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "アイソ",
-      "nameId": "iso",
-      "roleName": "デュエリスト",
+      "id": "iso",
+      "role": "デュエリスト",
       "roleId": "duelist"
     },
     {
       "name": "ソーヴァ",
-      "nameId": "sova",
-      "roleName": "イニシエーター",
+      "id": "sova",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "KAY/O",
-      "nameId": "kay-o",
-      "roleName": "イニシエーター",
+      "id": "kay-o",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "スカイ",
-      "nameId": "skye",
-      "roleName": "イニシエーター",
+      "id": "skye",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "フェイド",
-      "nameId": "fade",
-      "roleName": "イニシエーター",
+      "id": "fade",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "ブリーチ",
-      "nameId": "breach",
-      "roleName": "イニシエーター",
+      "id": "breach",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "ゲッコー",
-      "nameId": "gekko",
-      "roleName": "イニシエーター",
+      "id": "gekko",
+      "role": "イニシエーター",
       "roleId": "initiator"
     },
     {
       "name": "ブリムストーン",
-      "nameId": "brimstone",
-      "roleName": "コントローラー",
+      "id": "brimstone",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "アストラ",
-      "nameId": "astra",
-      "roleName": "コントローラー",
+      "id": "astra",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "ヴァイパー",
-      "nameId": "viper",
-      "roleName": "コントローラー",
+      "id": "viper",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "オーメン",
-      "nameId": "omen",
-      "roleName": "コントローラー",
+      "id": "omen",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "ハーバー",
-      "nameId": "harbor",
-      "roleName": "コントローラー",
+      "id": "harbor",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "クローヴ",
-      "nameId": "clove",
-      "roleName": "コントローラー",
+      "id": "clove",
+      "role": "コントローラー",
       "roleId": "controller"
     },
     {
       "name": "セージ",
-      "nameId": "sage",
-      "roleName": "センチネル",
+      "id": "sage",
+      "role": "センチネル",
       "roleId": "sentinel"
     },
     {
       "name": "キルジョイ",
-      "nameId": "killjoy",
-      "roleName": "センチネル",
+      "id": "killjoy",
+      "role": "センチネル",
       "roleId": "sentinel"
     },
     {
       "name": "サイファー",
-      "nameId": "cypher",
-      "roleName": "センチネル",
+      "id": "cypher",
+      "role": "センチネル",
       "roleId": "sentinel"
     },
     {
       "name": "チェンバー",
-      "nameId": "chamber",
-      "roleName": "センチネル",
+      "id": "chamber",
+      "role": "センチネル",
       "roleId": "sentinel"
     },
     {
       "name": "デッドロック",
-      "nameId": "deadlock",
-      "roleName": "センチネル",
+      "id": "deadlock",
+      "role": "センチネル",
       "roleId": "sentinel"
     }
   ],
   "maps": [
     {
       "name": "アセント",
-      "nameId": "ascent"
+      "id": "ascent"
     },
     {
       "name": "バインド",
-      "nameId": "bind"
+      "id": "bind"
     },
     {
       "name": "ブリーズ",
-      "nameId": "breeze"
+      "id": "breeze"
     },
     {
       "name": "フラクチャー",
-      "nameId": "fracture"
+      "id": "fracture"
     },
     {
       "name": "ヘイブン",
-      "nameId": "haven"
+      "id": "haven"
     },
     {
       "name": "アイスボックス",
-      "nameId": "icebox"
+      "id": "icebox"
     },
     {
       "name": "ロータス",
-      "nameId": "lotus"
+      "id": "lotus"
     },
     {
       "name": "パール",
-      "nameId": "pearl"
+      "id": "pearl"
     },
     {
       "name": "スプリット",
-      "nameId": "split"
+      "id": "split"
     },
     {
       "name": "サンセット",
-      "nameId": "sunset"
+      "id": "sunset"
     }
   ]
 }
