@@ -1,5 +1,5 @@
 import { terminateMidwayInteractionEditMessages } from '../events/discord/interactionMessages';
-import { CommandInfo } from '../types/guildStatesDta';
+import { CommandInfo } from '../types/guildStatesData';
 
 // 保存しておく場所
 const guildCommandStates = new Map<string, Map<string, CommandInfo>>();
@@ -112,7 +112,7 @@ export const deleteGuildCommandStates = (guildId: string, commandName: string) =
   guildCommandStates.get(guildId)?.delete(commandName);
 };
 
-// 音楽のじょうほうの数だけ返す
+// 音楽コマンドを使用しているインスタンス数を取得
 export const getTotalMusicCommandCount = (): number => {
   let count = 0;
   guildCommandStates.forEach((guildState) => {

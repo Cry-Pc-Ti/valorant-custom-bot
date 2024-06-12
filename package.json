@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "test": "ts-node src/test.ts"
+    "test": "ts-node src/events/notion/fetchAdminUserId.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@discordjs/voice": "^0.16.1",
+    "@notionhq/client": "^2.2.15",
     "@types/log4js": "^2.3.5",
     "axios": "^1.7.2",
     "canvas": "^2.11.2",
