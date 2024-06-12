@@ -29,6 +29,13 @@ const commands = {
   [helpCommand.data.name]: helpCommand,
 };
 
+// 管理者ユーザーIDを取得
+let adminUserIds: string[] = [];
+(async () => {
+  adminUserIds = await fetchAdminUserId();
+  console.log(adminUserIds);
+})();
+
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
