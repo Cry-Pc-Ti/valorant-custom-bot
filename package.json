@@ -1,6 +1,5 @@
 {
-  "name": "valorant-custom-bot",
-  "version": "1.0.0",
+  "name": "wingman-kun-bot",
   "description": "",
   "main": "main.ts",
   "type": "module",
