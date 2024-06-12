@@ -15,6 +15,12 @@ import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJson
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 
+// 管理者ユーザーIDを取得
+let adminUserIds: string[] = [];
+(async () => {
+  adminUserIds = await fetchAdminUserId();
+})();
+
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
@@ -135,8 +141,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
 // 管理者コマンドが発生時に実行
 discord.on('messageCreate', async (message) => {
-  const adminUserIds = await fetchAdminUserId();
-
   // 特定のユーザーIDのメッセージだけを拾う
   if (!adminUserIds.includes(message.author.id)) return;
   // メッセージがBotもしくは、コマンドでない場合は処理を終了
