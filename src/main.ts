@@ -23,6 +23,13 @@ const commands = {
   [helpCommand.data.name]: helpCommand,
 };
 
+// 管理者ユーザーIDを取得
+let adminUserIds: string[] = [];
+(async () => {
+  adminUserIds = await fetchAdminUserId();
+  console.log(adminUserIds);
+})();
+
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
@@ -135,8 +142,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
 // 管理者コマンドが発生時に実行
 discord.on('messageCreate', async (message) => {
-  const adminUserIds = await fetchAdminUserId();
-
   // 特定のユーザーIDのメッセージだけを拾う
   if (!adminUserIds.includes(message.author.id)) return;
   // メッセージがBotもしくは、コマンドでない場合は処理を終了
