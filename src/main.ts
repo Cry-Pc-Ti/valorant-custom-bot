@@ -11,8 +11,9 @@ import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
-import { musicservser } from './events/admin/serverInfo';
-import { getBannedUsers, loadBannedUsers, saveBannedUsers, saveBannedUsersList } from './events/common/readBanJsonData';
+import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJsonData';
+import { adminCommand } from './commands/admin/adminCommand';
+import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -21,6 +22,7 @@ const commands = {
   [mainMusicCommand.data.name]: mainMusicCommand,
   [helpCommand.data.name]: helpCommand,
 };
+
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
@@ -45,6 +47,7 @@ discord.on('ready', () => {
   Logger.initialize();
   loadBannedUsers();
 });
+
 // クールダウンのコレクション
 const cooldowns = new Collection<string, Collection<string, number>>();
 
@@ -66,22 +69,26 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
         cooldowns.set(commandName, new Collection());
       }
 
+      // クールダウン処理
       const now = Date.now();
       const timestamps = cooldowns.get(commandName);
       const cooldownAmount = commandCooldowns.get(commandName) || 0;
 
+      // クールダウン中の場合はエラーメッセージを返す
       if (timestamps?.has(user.id)) {
         const expirationTime = (timestamps.get(user.id) as number) + cooldownAmount;
 
         if (now < expirationTime) {
           const timeLeft = (expirationTime - now) / 1000;
-          await interaction.reply(`コマンドが連打されています。あと${timeLeft.toFixed(1)}秒お待ちください。`);
+          await interaction.reply(`コマンドが連続で使用されています。\nあと${timeLeft.toFixed(1)}秒お待ちください。`);
           return;
         }
       }
+
       timestamps?.set(user.id, now);
       setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
 
+      // BANされているユーザーを取得
       const bannedUsers: string[] = getBannedUsers();
 
       // BANされているユーザーかどうかチェック
@@ -94,12 +101,12 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       }
 
       try {
-        // サブコマンドがないときのデータ収集ログ
+        // サブコマンドがある場合は、各サブコマンドの処理内でログを出力
         Logger.LogAccessInfo(
           `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName} ${interaction.options.getSubcommand()}コマンドを実行`
         );
       } catch (error) {
-        // サブコマンドがないときのデータ収集ログ
+        // サブコマンドがない場合はエラーが発生するので、その場合はコマンド名のみをログに出力
         Logger.LogAccessInfo(
           `【${guild?.name}(${guild?.id})】${user.username}(${user.id})${commandName}コマンドを実行`
         );
@@ -125,53 +132,27 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     );
   }
 });
-// 登録するユーザーID
-const allowedUserIds = [
-  '695536234373709865', // りゅまPC
-  '420558464184614923', // りゅまけいたい
-  '472019916007145487', // ame
-  '484390835639812106', // ぺこめいん
-  '884320451306864651', // ぺこさぶ
-  '607110949249482753', // ゆずき
-  '903315439319408670', // もかお
-];
-// 隠しコマンド
+
+// 管理者コマンドが発生時に実行
 discord.on('messageCreate', async (message) => {
+  const adminUserIds = await fetchAdminUserId();
+
   // 特定のユーザーIDのメッセージだけを拾う
-  if (!allowedUserIds.includes(message.author.id)) return;
+  if (!adminUserIds.includes(message.author.id)) return;
+  // メッセージがBotもしくは、コマンドでない場合は処理を終了
+  if (message.author.bot || !message.content.startsWith('!admin')) return;
 
+  // コマンドを取得
   const args = message.content.split(' ');
+  if (args.length < 2) return;
 
-  // メッセージ内容をチェックして反応する
-  if (args[0] + ' ' + args[1] === '!admin server') {
-    await musicservser(message, discord.guilds.cache.size);
-    return;
-  }
-  // メッセージ内容をチェックして反応する
-  if (args[0] + ' ' + args[1] === '!admin ban' && args[2]) {
-    const userIdToBan = args[2];
-    const bannedUsers: string[] = getBannedUsers();
-    if (!bannedUsers.includes(userIdToBan)) {
-      saveBannedUsers(userIdToBan);
-      await message.reply(`${userIdToBan}をBANしました`);
-    } else {
-      await message.reply(`すでに${userIdToBan}はBANしています。`);
-    }
-    return;
-  }
-  if (args[0] + ' ' + args[1] === '!admin unban' && args[2]) {
-    const userIdToUnBan = args[2];
-    let bannedUsers: string[] = getBannedUsers();
-    if (bannedUsers.includes(userIdToUnBan)) {
-      bannedUsers = bannedUsers.filter((id) => id !== userIdToUnBan);
-      saveBannedUsersList(bannedUsers);
-      await message.reply(`${userIdToUnBan}のBANを解除しました`);
-    } else {
-      await message.reply(`すでに${userIdToUnBan}は解除されています`);
-    }
-    return;
-  }
+  const command = args[1];
+  const userId = args[2] || null;
+
+  // 管理者コマンドを実行
+  adminCommand(message, command, userId);
 });
+
 // voiceチャンネルでアクションが発生時に実行
 discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
   try {

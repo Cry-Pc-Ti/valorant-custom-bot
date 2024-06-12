@@ -9,8 +9,6 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
     // エージェントロールを取得
     const agentRole: string | null = interaction.options.getString('role');
 
-    // エージェントデータを取得
-
     // ランダムに選択されたエージェントのデータを格納する変数
     let randomAgent: AgentData;
 
