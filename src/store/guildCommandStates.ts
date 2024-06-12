@@ -1,3 +1,4 @@
+import { COMMAND_NAME_MUSIC } from '../commands/music/mainMusicCommand';
 import { terminateMidwayInteractionEditMessages } from '../events/discord/interactionMessages';
 import { CommandInfo } from '../types/guildStatesData';
 
@@ -116,7 +117,7 @@ export const deleteGuildCommandStates = (guildId: string, commandName: string) =
 export const getTotalMusicCommandCount = (): number => {
   let count = 0;
   guildCommandStates.forEach((guildState) => {
-    if (guildState.has('music')) {
+    if (guildState.has(COMMAND_NAME_MUSIC)) {
       count++;
     }
   });

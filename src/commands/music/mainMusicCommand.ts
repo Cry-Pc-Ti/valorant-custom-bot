@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { playCommandMainEvent } from './mainEvent/playCommandMainEvent';
 import { hitSongsCommandMainEvent } from './mainEvent/hitSongsCommandMainEvent';
-import { spotifyPlaylistId } from '../../events/common/readJsonData';
 import { disconnectCommandMainEvent } from './mainEvent/disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './mainEvent/searchCommandMainEvent';
 import { recommendCommandMainEvent } from './mainEvent/recommendCommandMainEvent';
@@ -57,27 +56,7 @@ export const mainMusicCommand = {
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName('hitsongs')
-        .setDescription('ヒットソングを再生します。')
-        .addNumberOption((option) =>
-          option
-            .setName('genre')
-            .setDescription('ジャンルを選択してください')
-            .setRequired(true)
-            .setChoices(
-              ...Object.values(
-                spotifyPlaylistId.map((item, index) => {
-                  return {
-                    name: item.name,
-                    value: index,
-                  };
-                })
-              )
-            )
-        )
-    )
+    .addSubcommand((subcommand) => subcommand.setName('hitsongs').setDescription('ヒットソングを再生します。'))
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {

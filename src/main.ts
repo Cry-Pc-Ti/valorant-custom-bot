@@ -15,12 +15,6 @@ import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJson
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 
-// 管理者ユーザーIDを取得
-let adminUserIds: string[] = [];
-(async () => {
-  adminUserIds = await fetchAdminUserId();
-})();
-
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
   [mainDiceCommand.data.name]: mainDiceCommand,
@@ -33,7 +27,6 @@ const commands = {
 let adminUserIds: string[] = [];
 (async () => {
   adminUserIds = await fetchAdminUserId();
-  console.log(adminUserIds);
 })();
 
 // サーバーにコマンドを登録
