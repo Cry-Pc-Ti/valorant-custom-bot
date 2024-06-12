@@ -15,7 +15,7 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
     if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
 
     const url = interaction.options.getString('url');
-    const shuffleFlag: boolean = interaction.options.getBoolean('shuffle') ?? false;
+    const shuffleFlag: boolean = interaction.options.getString('shuffle') === 'true';
 
     if (!url) return interaction.editReply('設定値が不正です。');
 

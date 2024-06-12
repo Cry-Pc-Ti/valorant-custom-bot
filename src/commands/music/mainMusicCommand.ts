@@ -17,11 +17,12 @@ export const mainMusicCommand = {
       subcommand
         .setName('play')
         .setDescription('VCで音楽を流します。')
-        .addBooleanOption((option) =>
+        .addStringOption((option) =>
           option
             .setName('shuffle')
             .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
             .setRequired(true)
+            .setChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
         .addStringOption((option) =>
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)

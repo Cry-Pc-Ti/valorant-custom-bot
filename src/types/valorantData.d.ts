@@ -33,3 +33,11 @@ export interface MapData {
   displayIcon: string;
   mapThumbnail: string;
 }
+
+interface APIMapDetail {
+  tacticalDescription: string | null;
+  uuid: string;
+  displayName: string;
+  displayIcon: string;
+  splash: string;
+}
