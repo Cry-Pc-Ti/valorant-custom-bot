@@ -1,4 +1,4 @@
-import { ButtonInteraction } from 'discord.js';
+import { ButtonInteraction, Collection } from 'discord.js';
 import { getCommandStates } from '../store/guildCommandStates';
 import {
   nextPlayMusicButton,
@@ -15,16 +15,49 @@ import { Logger } from '../events/common/log';
 import { COMMAND_NAME_VALORANT } from '../commands/valorant/mainValorantCommand';
 import { moveAttackersToChannel, moveDefendersToChannel } from './valorant/moveMembersButtonHandlers';
 
+// クールダウンのコレクション
+const cooldowns = new Collection<string, Collection<string, number>>();
+
+// コマンドごとのクールダウン時間（ミリ秒）
+const commandCooldowns = new Map<string, number>([
+  [COMMAND_NAME_MUSIC, 10 * 1000], // 6秒
+  [COMMAND_NAME_VALORANT, 1 * 1000], // 2秒
+]);
+
 export const buttonHandlers = async (interaction: ButtonInteraction) => {
   if (!interaction.replied && !interaction.deferred) {
     await interaction.deferUpdate();
   }
   const { customId, guildId } = interaction;
-  if (!guildId) return;
 
+  if (!guildId) return;
   try {
     //  customIdからcommandNameを取得
     const commandName = determineCommandName(customId);
+    const commandStates = getCommandStates(guildId, commandName);
+
+    // スパム対策
+    if (!cooldowns.has(commandName)) {
+      cooldowns.set(commandName, new Collection());
+    }
+
+    // クールダウン処理
+    const now = Date.now();
+    const timestamps = cooldowns.get(commandName);
+    const cooldownAmount = commandCooldowns.get(commandName) || 0;
+
+    // クールダウン中の場合はエラーメッセージを返す
+    if (timestamps?.has(commandStates?.uniqueId ?? '')) {
+      const expirationTime = (timestamps.get(commandStates?.uniqueId ?? '') as number) + cooldownAmount;
+
+      if (now < expirationTime) {
+        commandStates?.interaction.channel?.messages.edit(commandStates.replyMessageId, '時間を開けてから押して下さい');
+        return;
+      }
+    }
+
+    timestamps?.set(commandStates?.uniqueId ?? '', now);
+    setTimeout(() => timestamps?.delete(commandStates?.uniqueId ?? ''), cooldownAmount);
 
     if (commandName === COMMAND_NAME_MUSIC) {
       // 音楽用のボタンでBOTがVCにいない場合処理しない
@@ -36,8 +69,6 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
         return;
       }
     }
-
-    const commandStates = getCommandStates(guildId, commandName);
 
     if (!commandStates) return;
 
@@ -104,7 +135,6 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       }
       return;
     }
-    console.log(error);
     Logger.LogSystemError(`buttonHandlersでエラーが発生しました :${error}`);
     await interactionEditMessages(interaction, commandStates.replyMessageId, {
       content: '処理中にエラーが発生しました。再度コマンドを入力してください。',

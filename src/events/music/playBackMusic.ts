@@ -36,7 +36,6 @@ export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo)
     await entersState(player, AudioPlayerStatus.Playing, 10 * 1000);
     await entersState(player, AudioPlayerStatus.Idle, 24 * 60 * 60 * 1000);
   } catch (error) {
-    console.log('aaaa');
     return;
   }
 };

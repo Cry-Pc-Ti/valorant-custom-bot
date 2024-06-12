@@ -1,0 +1,13 @@
+{
+  "entryPoints": ["src"], // srcディレクトリ以下の全てのファイルを対象にします
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "exclude": ["**/*.spec.ts"],
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "plugin": ["typedoc-theme-hierarchy"],
+  "theme": "hierarchy",
+  "tsconfig": "./tsconfig.json",
+  "name": "wing-man kun"
+}

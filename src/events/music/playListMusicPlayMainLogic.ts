@@ -65,14 +65,6 @@ export const playListMusicMainLogic = async (
       },
     });
 
-    // buttonCollector.on('end', async () => {
-    //   const state = getCommandStates(guildId, COMMAND_NAME_MUSIC);
-    //   if (state && state.buttonCollector === buttonCollector) {
-    //     stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
-    //   }
-    // });
-
-    //
     await streamPlaylist(guildId, 0, false);
 
     // BOTをdiscordから切断

@@ -2,7 +2,10 @@ import { notion, spotifyDbId } from '../../modules/notionModule';
 import { isFullPage } from '@notionhq/client';
 import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
-// NotionからspotifeのplayListIDを取得する
+/**
+ * @description NotionからspotifyのplayListIDを取得し加工して返す
+ * @return spotifyPlaylist - 期間とdisplayflgでfiltersしたSpotifyPlaylistInfoの配列
+ */
 export const getSpotifyPlayList = async (): Promise<SpotifyPlaylistInfo[]> => {
   try {
     // DBからページIDを取得
