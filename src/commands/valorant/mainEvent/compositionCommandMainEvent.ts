@@ -26,10 +26,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
     let sentinelNum: number = options.getNumber('sentinel') ?? 0;
 
     // BAN機能の有無を取得
-    const ban: string | null = options.getString('ban');
-
-    // BAN機能が有効かどうかを判定
-    const isBan: boolean = ban === 'true';
+    const isBan: boolean = options.getString('ban') === 'true';
 
     // 構成を格納するオブジェクトを宣言
     const composition: CompositionData = {
@@ -129,6 +126,16 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       const selectResponse = await interaction.editReply({
         components: [row],
       });
+      // 5分後にセレクトメニューを削除するタイマーをセット
+      const timeoutId = setTimeout(
+        async () => {
+          await selectResponse.edit({
+            content: '選択されませんでした。再度コマンドを入力してください',
+            components: [],
+          });
+        },
+        5 * 60 * 1000
+      );
 
       // セレクトメニューで選択された値を取得
       const collector = selectResponse.createMessageComponentCollector({
@@ -138,6 +145,8 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
         try {
+          // タイマーを削除
+          clearTimeout(timeoutId);
           // BANされたエージェントを取得
           const banAgentIds: string[] = selectMenuInteraction.values;
 

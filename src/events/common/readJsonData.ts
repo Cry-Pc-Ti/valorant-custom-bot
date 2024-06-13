@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { AgentData, MapData } from '../../types/valorantData';
-import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
 // JSONファイルのパス
 const valorantJsonFilePath = './static/data/valorantData.json';

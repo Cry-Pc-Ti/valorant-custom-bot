@@ -33,3 +33,11 @@ export interface MapData {
   miniMapUrl: string;
   thumbnailUrl: string;
 }
+
+interface APIMapDetail {
+  tacticalDescription: string | null;
+  uuid: string;
+  displayName: string;
+  displayIcon: string;
+  splash: string;
+}

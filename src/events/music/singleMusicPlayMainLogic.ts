@@ -12,7 +12,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { deleteGuildCommandStates, getRepeatModeStates, setGuildCommandStates } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
-// シングル再生
+/**
+ * シングル再生のメインロジック
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ * @param voiceChannelId - ボイスチャンネルID
+ * @param musicInfo - 音楽情報
+ * @param commandFlg - コマンドフラグ
+ */
 export const singleMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
   voiceChannelId: string,
@@ -96,7 +103,12 @@ export const singleMusicMainLogic = async (
   }
 };
 
-// ボタンを作成
+/**
+ * ボタンを作成する関数
+ *
+ * @param uniqueId - 一意なID
+ * @returns ボタン
+ */
 const createButtonRow = (uniqueId: string) => {
   // 「一時停止」ボタン
   const stopPlayMusicButton = new ButtonBuilder()

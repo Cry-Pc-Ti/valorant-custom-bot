@@ -1,13 +1,15 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { playCommandMainEvent } from './mainEvent/playCommandMainEvent';
 import { hitSongsCommandMainEvent } from './mainEvent/hitSongsCommandMainEvent';
-import { spotifyPlaylistId } from '../../events/common/readJsonData';
 import { disconnectCommandMainEvent } from './mainEvent/disconnectCommandMainEvent';
 import { searchCommandMainEvent } from './mainEvent/searchCommandMainEvent';
 import { recommendCommandMainEvent } from './mainEvent/recommendCommandMainEvent';
 
 export const COMMAND_NAME_MUSIC: string = 'music';
 
+/**
+ * 音楽関連のコマンドを管理するオブジェクト
+ */
 export const mainMusicCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
@@ -17,11 +19,12 @@ export const mainMusicCommand = {
       subcommand
         .setName('play')
         .setDescription('VCで音楽を流します。')
-        .addBooleanOption((option) =>
+        .addStringOption((option) =>
           option
             .setName('shuffle')
             .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
             .setRequired(true)
+            .setChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
         .addStringOption((option) =>
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
@@ -56,29 +59,14 @@ export const mainMusicCommand = {
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName('hitsongs')
-        .setDescription('ヒットソングを再生します。')
-        .addNumberOption((option) =>
-          option
-            .setName('genre')
-            .setDescription('ジャンルを選択してください')
-            .setRequired(true)
-            .setChoices(
-              ...Object.values(
-                spotifyPlaylistId.map((item, index) => {
-                  return {
-                    name: item.name,
-                    value: index,
-                  };
-                })
-              )
-            )
-        )
-    )
+    .addSubcommand((subcommand) => subcommand.setName('hitsongs').setDescription('ヒットソングを再生します。'))
     .toJSON(),
 
+  /**
+   * コマンドを実行する関数
+   *
+   * @param interaction - チャット入力コマンドのインタラクション
+   */
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
 

@@ -1,5 +1,5 @@
 // モジュールをインポート
-import { Collection, Interaction, REST, Routes, VoiceState } from 'discord.js';
+import { Interaction, REST, Routes, VoiceState } from 'discord.js';
 import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
@@ -14,6 +14,7 @@ import { helpCommand } from './commands/help/helpCommand';
 import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJsonData';
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
+import { getCooldownTimeLeft, isCooldownActive, setCooldown } from './events/common/cooldowns';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -54,9 +55,6 @@ discord.on('ready', () => {
   loadBannedUsers();
 });
 
-// クールダウンのコレクション
-const cooldowns = new Collection<string, Collection<string, number>>();
-
 // コマンドごとのクールダウン時間（ミリ秒）
 const commandCooldowns = new Map<string, number>([
   ['music', 6 * 1000], // 6秒
@@ -70,30 +68,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     if (interaction.isChatInputCommand()) {
       const { commandName, user, guild } = interaction;
 
-      // スパム対策
-      if (!cooldowns.has(commandName)) {
-        cooldowns.set(commandName, new Collection());
-      }
-
-      // クールダウン処理
-      const now = Date.now();
-      const timestamps = cooldowns.get(commandName);
-      const cooldownAmount = commandCooldowns.get(commandName) || 0;
-
-      // クールダウン中の場合はエラーメッセージを返す
-      if (timestamps?.has(user.id)) {
-        const expirationTime = (timestamps.get(user.id) as number) + cooldownAmount;
-
-        if (now < expirationTime) {
-          const timeLeft = (expirationTime - now) / 1000;
-          await interaction.reply(`コマンドが連続で使用されています。\nあと${timeLeft.toFixed(1)}秒お待ちください。`);
-          return;
-        }
-      }
-
-      timestamps?.set(user.id, now);
-      setTimeout(() => timestamps?.delete(user.id), cooldownAmount);
-
       // BANされているユーザーを取得
       const bannedUsers: string[] = getBannedUsers();
 
@@ -105,6 +79,16 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
         Logger.LogAccessInfo(`【${guild?.name}(${guild?.id})】${user.username}(${user.id})はBANされています。`);
         return;
       }
+
+      // スパム対策
+      if (isCooldownActive(commandName, user.id, commandCooldowns)) {
+        const timeLeft = getCooldownTimeLeft(commandName, user.id, commandCooldowns);
+        return await interaction.reply(
+          `コマンドが連続で使用されています。\nあと${timeLeft.toFixed(1)}秒お待ちください。`
+        );
+      }
+
+      setCooldown(commandName, user.id, commandCooldowns);
 
       try {
         // サブコマンドがある場合は、各サブコマンドの処理内でログを出力

@@ -2,6 +2,11 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { CLIENT_ID } from '../../../modules/discordModule';
 import { Logger } from '../../../events/common/log';
 
+/**
+ * BOTをボイスチャンネルから切断するコマンドのメインイベント
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ */
 export const disconnectCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const botJoinVoiceChannelId = await interaction.guild?.members.fetch(CLIENT_ID);
