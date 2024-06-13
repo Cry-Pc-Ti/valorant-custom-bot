@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
-import { fetchBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/notion/fetchBanUser';
+import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/admin/readBanUserJsonData';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
 
 export const adminCommand = async (message: Message, command: string, option: string | null) => {
@@ -40,7 +40,7 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    const bannedUsers: string[] = fetchBannedUsers();
+    const bannedUsers: string[] = getBannedUsers();
 
     // BANするユーザーがBANされていない場合のみBANする
     if (!bannedUsers.includes(userId)) {
@@ -65,7 +65,7 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    let bannedUsers: string[] = fetchBannedUsers();
+    let bannedUsers: string[] = getBannedUsers();
 
     // BANするユーザーがBANされている場合のみBAN解除する
     if (bannedUsers.includes(userId)) {
