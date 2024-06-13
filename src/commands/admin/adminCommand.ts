@@ -4,7 +4,6 @@ import { discord } from '../../modules/discordModule';
 import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/admin/readBanUserJsonData';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
 
-// test
 export const adminCommand = async (message: Message, command: string, option: string | null) => {
   // serverコマンド
   if (command === 'server') {
