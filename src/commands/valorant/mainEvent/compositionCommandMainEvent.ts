@@ -48,7 +48,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       return;
     }
 
-    // BAN機能が無効の場合
+    //* BAN機能が無効の場合
     if (!isBan) {
       // 指定人数が5人未満の場合、不足分のロールをランダムに選択
       if (duelistNum + initiatorNum + controllerNum + sentinelNum < 5) {
@@ -90,10 +90,11 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       for (const agentRole in composition) {
         if (agentRole !== 'ban') {
           for (const agent of composition[agentRole as keyof CompositionData]) {
-            imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
+            imagePaths.push(`https://media.valorant-api.com/agents/${agent.uuid}/displayicon.png`);
           }
         }
       }
+
       // 画像を作成
       await createConcatImage(imagePaths, user.id);
 
@@ -106,7 +107,7 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       // メッセージを送信
       await interaction.editReply(embedMessage);
 
-      // BAN機能が有効の場合、SelectMenuでBAN対象のエージェントを選択
+      //* BAN機能が有効の場合
     } else {
       // セレクトメニューを作成
       const banSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -244,10 +245,11 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
           for (const agentRole in composition) {
             if (agentRole !== 'ban') {
               for (const agent of composition[agentRole as keyof CompositionData]) {
-                imagePaths.push(`static/img/valorant_agents/${agent.id}_icon.png`);
+                imagePaths.push(`https://media.valorant-api.com/agents/${agent.uuid}/displayicon.png`);
               }
             }
           }
+
           // 画像を作成
           await createConcatImage(imagePaths, user.id);
 

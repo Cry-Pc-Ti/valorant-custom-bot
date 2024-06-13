@@ -28,6 +28,7 @@ export const selectAgentsByRole = (
 
     // compositionにエージェントを格納
     composition[agentRole as keyof CompositionData] = randomAgents;
+
     return composition;
   } catch (error) {
     Logger.LogSystemError(`selectAgentsByRoleでエラーが発生しました: ${error}`);

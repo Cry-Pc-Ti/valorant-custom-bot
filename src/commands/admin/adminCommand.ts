@@ -4,7 +4,7 @@ import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
 import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/common/readBanUserJsonData';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
-import { fetchAgentsData } from '../../service/valorant.service';
+import { fetchAgentsData, fetchMapsData } from '../../service/valorant.service';
 
 export const adminCommand = async (message: Message, command: string, option: string | null) => {
   // serverコマンド
@@ -76,17 +76,21 @@ export const adminCommand = async (message: Message, command: string, option: st
     return;
   }
 
-  if (command === 'refresh') {
-    const target = option;
-
-    if (target === 'valorant') {
-      // Valorantのエージェント情報を取得
+  if (command === 'valo') {
+    try {
+      // Valorantのエージェント情報とマップ情報を取得
       const agents = await fetchAgentsData();
+      const maps = await fetchMapsData();
 
-      // JSONにエージェント情報を出力
+      // JSONにエージェント情報とマップ情報を出力
       fs.writeFileSync('./static/data/valorantAgentsData.json', JSON.stringify(agents));
+      fs.writeFileSync('./static/data/valorantMapsData.json', JSON.stringify(maps));
 
-      await message.reply('エージェント情報を更新しました');
+      // メッセージを送信
+      await message.reply('Valorantデータを更新しました');
+    } catch (error) {
+      console.error(error);
+      await message.reply('Valorantデータの更新に失敗しました');
     }
     return;
   }

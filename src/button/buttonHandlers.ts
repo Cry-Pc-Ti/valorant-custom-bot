@@ -104,7 +104,8 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       }
       return;
     }
-    console.log(error);
+    console.error(error);
+
     Logger.LogSystemError(`buttonHandlersでエラーが発生しました :${error}`);
     await interactionEditMessages(interaction, commandStates.replyMessageId, {
       content: '処理中にエラーが発生しました。再度コマンドを入力してください。',

@@ -30,6 +30,6 @@ export interface CompositionData {
 export interface MapData {
   name: string;
   id: string;
-  displayIcon: string;
-  mapThumbnail: string;
+  miniMapUrl: string;
+  thumbnailUrl: string;
 }
