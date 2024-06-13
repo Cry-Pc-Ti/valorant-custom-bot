@@ -16,6 +16,11 @@ import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 import { getSpotifyPlayList } from '../../../events/notion/getSpotifyPlayList';
 import { SpotifyPlaylistInfo } from '../../../types/spotifyData';
 
+/**
+ * ヒットソング再生コマンドのメインイベント
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ */
 export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   // 修正するメッセージのIDを取得
   const replyMessageId: string = (await interaction.fetchReply()).id;

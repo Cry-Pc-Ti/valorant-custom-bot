@@ -11,6 +11,11 @@ import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 const MAX_PLAYLIST_NUM = 15;
 const BATCH_SIZE = 5;
 
+/**
+ * おすすめ音楽再生コマンドのメインイベント
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ */
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const guildId = interaction.guildId;
@@ -110,6 +115,13 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
   }
 };
 
+/**
+ * 関連音楽情報のIDを取得する関数
+ *
+ * @param musicInfoList - 音楽情報のIDリスト
+ * @param playListNum - プレイリストの番号
+ * @returns 関連音楽情報の配列
+ */
 const fetchRelatedMusicInfoBatch = async (musicInfoList: string[], playListNum: number): Promise<MusicInfo[]> => {
   const relatedPlayListInfo: MusicInfo[] = [];
   for (let i = 0; i < musicInfoList.length; i += BATCH_SIZE) {

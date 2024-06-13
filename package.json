@@ -2,7 +2,6 @@
   "name": "wingman-kun-bot",
   "description": "",
   "main": "main.ts",
-  "type": "module",
   "scripts": {
     "start": "ts-node src/main.ts",
     "test": "ts-node src/events/notion/fetchAdminUserId.ts",

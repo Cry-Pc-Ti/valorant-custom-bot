@@ -9,7 +9,14 @@ import { getChannelThumbnails } from './getMusicInfo';
 import { setGuildCommandStates } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
-// 音楽再生
+/**
+ * プレイリストの音楽を再生するメインロジック
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ * @param voiceChannelId - ボイスチャンネルID
+ * @param playListInfo - プレイリスト情報
+ * @param commandFlg - コマンドフラグ
+ */
 export const playListMusicMainLogic = async (
   interaction: ChatInputCommandInteraction,
   voiceChannelId: string,
@@ -80,7 +87,12 @@ export const playListMusicMainLogic = async (
     await interaction.channel?.send('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };
-// ボタンを作成
+/**
+ * ボタンを作成する関数
+ *
+ * @param uniqueId - 一意なID
+ * @returns ボタン
+ */
 export const createButtonRow = (uniqueId: string) => {
   const stopPlayMusicButton = new ButtonBuilder()
     .setCustomId(`stopPlayMusicButton_${uniqueId}`)

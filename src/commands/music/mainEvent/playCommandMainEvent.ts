@@ -8,7 +8,11 @@ import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainL
 import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 
-// playCommand
+/**
+ * 音楽再生コマンドのメインイベント
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ */
 export const playCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const guildId = interaction.guildId;

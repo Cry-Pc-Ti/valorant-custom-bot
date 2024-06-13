@@ -17,6 +17,11 @@ import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainL
 import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 
+/**
+ * 検索コマンドのメインイベント
+ *
+ * @param interaction - チャット入力コマンドのインタラクション
+ */
 export const searchCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   // 修正するメッセージのIDを取得
   const replyMessageId: string = (await interaction.fetchReply()).id;

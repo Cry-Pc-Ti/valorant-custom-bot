@@ -7,6 +7,9 @@ import { recommendCommandMainEvent } from './mainEvent/recommendCommandMainEvent
 
 export const COMMAND_NAME_MUSIC: string = 'music';
 
+/**
+ * 音楽関連のコマンドを管理するオブジェクト
+ */
 export const mainMusicCommand = {
   // コマンドの設定
   data: new SlashCommandBuilder()
@@ -59,6 +62,11 @@ export const mainMusicCommand = {
     .addSubcommand((subcommand) => subcommand.setName('hitsongs').setDescription('ヒットソングを再生します。'))
     .toJSON(),
 
+  /**
+   * コマンドを実行する関数
+   *
+   * @param interaction - チャット入力コマンドのインタラクション
+   */
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
 

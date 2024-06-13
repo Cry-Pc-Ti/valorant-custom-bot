@@ -15,7 +15,12 @@ import { musicInfoPlayListMessage } from '../discord/embedMessage';
 import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
 import { Logger } from '../common/log';
 
-// 音楽情報をエンコードしdiscordへ流す
+/**
+ * 音楽情報をエンコードしDiscordへストリーミングする関数
+ *
+ * @param player - オーディオプレイヤー
+ * @param musicInfo - 音楽情報
+ */
 export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo) => {
   try {
     const stream = ytdl(musicInfo.id, {
@@ -40,14 +45,24 @@ export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo)
   }
 };
 
-// playerとListenerを削除する
+/**
+ * プレイヤーとリスナーを削除する関数
+ *
+ * @param player - オーディオプレイヤー
+ */
 export const deletePlayerInfo = (player: AudioPlayer) => {
   if (player) {
     player.stop();
     player.removeAllListeners();
   }
 };
-
+/**
+ * プレイリストをストリーミングする関数
+ *
+ * @param guildId - ギルドID
+ * @param songIndex - 曲のインデックス
+ * @param buttonFlag - ボタンフラグ
+ */
 export const streamPlaylist = async (guildId: string, songIndex: number, buttonFlag: boolean) => {
   try {
     setSongIndexStates(guildId, COMMAND_NAME_MUSIC, songIndex);
