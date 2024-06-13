@@ -64,6 +64,16 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       const selectResponse = await interaction.editReply({
         components: [row],
       });
+      // 2分後にセレクトメニューを削除するタイマーをセット
+      const timeoutId = setTimeout(
+        async () => {
+          await selectResponse.edit({
+            content: '選択されませんでした。再度コマンドを入力してください',
+            components: [],
+          });
+        },
+        2 * 60 * 1000
+      );
 
       // セレクトメニューで選択された値を取得
       const collector = selectResponse.createMessageComponentCollector({
@@ -73,6 +83,8 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
         try {
+          // タイマーを削除
+          clearTimeout(timeoutId);
           selectMenuInteraction.deferUpdate();
 
           // URLからプレイリスト情報を取得
@@ -117,6 +129,18 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       const selectResponse = await interaction.editReply({
         components: [row],
       });
+
+      // 2分後にセレクトメニューを削除するタイマーをセット
+      const timeoutId = setTimeout(
+        async () => {
+          await selectResponse.edit({
+            content: '選択されませんでした。再度コマンドを入力してください',
+            components: [],
+          });
+        },
+        2 * 60 * 1000
+      );
+
       // セレクトメニューで選択された値を取得
       const collector = selectResponse.createMessageComponentCollector({
         componentType: ComponentType.StringSelect,
@@ -125,6 +149,8 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
 
       collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
         try {
+          // タイマーを削除
+          clearTimeout(timeoutId);
           selectMenuInteraction.deferUpdate();
 
           await singleMusicMainLogic(

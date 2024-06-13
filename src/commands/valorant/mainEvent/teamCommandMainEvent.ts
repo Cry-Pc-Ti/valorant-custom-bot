@@ -68,6 +68,17 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       components: [row],
     });
 
+    // 5分後にセレクトメニューを削除するタイマーをセット
+    const timeoutId = setTimeout(
+      async () => {
+        await selectResponse.edit({
+          content: '選択されませんでした。再度コマンドを入力してください',
+          components: [],
+        });
+      },
+      5 * 60 * 1000
+    );
+
     // セレクトメニューで選択された値を取得
     const selectMenuCollector = selectResponse.createMessageComponentCollector({
       componentType: ComponentType.StringSelect,
@@ -75,6 +86,8 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
     });
 
     selectMenuCollector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
+      // タイマーを削除
+      clearTimeout(timeoutId);
       // メンバーIDを取得
       const memberIds = selectMenuInteraction.values;
 

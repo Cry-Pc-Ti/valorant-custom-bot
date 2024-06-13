@@ -56,6 +56,17 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
       components: [row],
     });
 
+    // 2分後にセレクトメニューを削除するタイマーをセット
+    const timeoutId = setTimeout(
+      async () => {
+        await selectResponse.edit({
+          content: '選択されませんでした。再度コマンドを入力してください',
+          components: [],
+        });
+      },
+      2 * 60 * 1000
+    );
+
     // セレクトメニューで選択された値を取得
     const collector = selectResponse.createMessageComponentCollector({
       componentType: ComponentType.StringSelect,
@@ -64,7 +75,10 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
     collector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
       try {
+        // タイマーを削除
+        clearTimeout(timeoutId);
         selectMenuInteraction.deferUpdate();
+
         const spotifyPlaylistInfo = spotifyPlaylists[Number(selectMenuInteraction.values)];
 
         // データ収集
