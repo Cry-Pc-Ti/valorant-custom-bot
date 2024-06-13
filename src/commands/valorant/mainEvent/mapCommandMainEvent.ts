@@ -12,7 +12,6 @@ export const mapCommandMainEvent = async (interaction: ChatInputCommandInteracti
 
     // マップをランダムに選択
     const randomMap: MapData = mapInfo[generateRandomNum(0, mapInfo.length - 1)];
-    // const randomMap: MapData = valorantMaps[generateRandomNum(0, valorantMaps.length - 1)]
 
     // メッセージを作成
     const embed = mapMessage(randomMap);

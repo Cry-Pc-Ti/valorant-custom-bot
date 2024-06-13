@@ -1,10 +1,8 @@
-import fs from 'fs';
 import { Message } from 'discord.js';
 import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
-import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/common/readBanUserJsonData';
+import { fetchBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/notion/fetchBanUser';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
-import { fetchAgentsData, fetchMapsData } from '../../service/valorant.service';
 
 export const adminCommand = async (message: Message, command: string, option: string | null) => {
   // serverコマンド
@@ -26,6 +24,7 @@ export const adminCommand = async (message: Message, command: string, option: st
     // メッセージを作成
     const embed = await createServerMessage(guildCount, serverCount);
 
+    // メッセージを送信
     message.reply({ embeds: [embed] });
     return;
   }
@@ -41,10 +40,13 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    const bannedUsers: string[] = getBannedUsers();
+    const bannedUsers: string[] = fetchBannedUsers();
+
     // BANするユーザーがBANされていない場合のみBANする
     if (!bannedUsers.includes(userId)) {
       saveBannedUser(userId);
+
+      // メッセージを送信
       await message.reply(`${userId}をBANしました`);
     } else {
       await message.reply(`すでに${userId}はBANしています。`);
@@ -63,7 +65,7 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    let bannedUsers: string[] = getBannedUsers();
+    let bannedUsers: string[] = fetchBannedUsers();
 
     // BANするユーザーがBANされている場合のみBAN解除する
     if (bannedUsers.includes(userId)) {
@@ -72,25 +74,6 @@ export const adminCommand = async (message: Message, command: string, option: st
       await message.reply(`${userId}のBANを解除しました`);
     } else {
       await message.reply(`すでに${userId}は解除されています`);
-    }
-    return;
-  }
-
-  if (command === 'valo') {
-    try {
-      // Valorantのエージェント情報とマップ情報を取得
-      const agents = await fetchAgentsData();
-      const maps = await fetchMapsData();
-
-      // JSONにエージェント情報とマップ情報を出力
-      fs.writeFileSync('./static/data/valorantAgentsData.json', JSON.stringify(agents));
-      fs.writeFileSync('./static/data/valorantMapsData.json', JSON.stringify(maps));
-
-      // メッセージを送信
-      await message.reply('Valorantデータを更新しました');
-    } catch (error) {
-      console.error(error);
-      await message.reply('Valorantデータの更新に失敗しました');
     }
     return;
   }

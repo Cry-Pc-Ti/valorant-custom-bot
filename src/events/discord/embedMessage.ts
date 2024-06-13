@@ -15,7 +15,7 @@ export const agentMessage = (agent: AgentData) => {
       iconURL: 'attachment://surprised_penguin.png',
     })
     .setDescription(`今回のエージェントは**[${agent.name}](${agentWebUrl}${agent.id})**です`)
-    .setThumbnail(`attachment://${agent.id}_icon.png`)
+    .setThumbnail(agent.iconUrl)
     .addFields({
       name: 'ロール',
       value: agent.role,
@@ -27,12 +27,11 @@ export const agentMessage = (agent: AgentData) => {
     .setTimestamp();
 
   const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
-  const thumbnailAttachment = new AttachmentBuilder(`static/img/valorant_agents/${agent.id}_icon.png`);
   const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return {
     embeds: [embedMessage],
-    files: [authorAttachment, thumbnailAttachment, fotterAttachment],
+    files: [authorAttachment, fotterAttachment],
   };
 };
 

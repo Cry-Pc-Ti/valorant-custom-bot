@@ -88,6 +88,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
     selectMenuCollector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
       // タイマーを削除
       clearTimeout(timeoutId);
+
       // メンバーIDを取得
       const memberIds = selectMenuInteraction.values;
 

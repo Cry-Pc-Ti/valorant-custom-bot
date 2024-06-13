@@ -11,7 +11,7 @@ import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
-import { getBannedUsers, loadBannedUsers } from './events/common/readBanUserJsonData';
+import { fetchBannedUsers, loadBannedUsers } from './events/notion/fetchBanUser';
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from './events/common/cooldowns';
@@ -69,7 +69,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       const { commandName, user, guild } = interaction;
 
       // BANされているユーザーを取得
-      const bannedUsers: string[] = getBannedUsers();
+      const bannedUsers: string[] = fetchBannedUsers();
 
       // BANされているユーザーかどうかチェック
       if (bannedUsers.includes(interaction.user.id)) {

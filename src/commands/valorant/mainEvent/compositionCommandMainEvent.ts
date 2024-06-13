@@ -11,9 +11,9 @@ import { AgentData, CompositionData } from '../../../types/valorantData';
 import { selectAgentsByRole } from '../../../events/valorant/selectAgentsByRole';
 import { createConcatImage } from '../../../events/common/createConcatImage';
 import { compositionMessage } from '../../../events/discord/embedMessage';
-import { valorantAgents } from '../../../events/common/readJsonData';
 import { countAgentsByRole, countBanAgentsByRole } from '../../../events/valorant/countAgentsNum';
 import { Logger } from '../../../events/common/log';
+import { fetchAgentsData } from '../../../service/valorant.service';
 
 export const compositionCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -27,6 +27,9 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
 
     // BAN機能の有無を取得
     const isBan: boolean = options.getString('ban') === 'true';
+
+    // valorant-apiからエージェント情報を取得
+    const agents: AgentData[] = await fetchAgentsData();
 
     // 構成を格納するオブジェクトを宣言
     const composition: CompositionData = {
@@ -69,10 +72,10 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
       }
 
       // 各クラスのエージェントを指定された人数分ランダムに選択
-      if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition, valorantAgents);
-      if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition, valorantAgents);
-      if (controllerNum) selectAgentsByRole('controller', controllerNum, composition, valorantAgents);
-      if (sentinelNum) selectAgentsByRole('sentinel', sentinelNum, composition, valorantAgents);
+      if (duelistNum) selectAgentsByRole('duelist', duelistNum, composition, agents);
+      if (initiatorNum) selectAgentsByRole('initiator', initiatorNum, composition, agents);
+      if (controllerNum) selectAgentsByRole('controller', controllerNum, composition, agents);
+      if (sentinelNum) selectAgentsByRole('sentinel', sentinelNum, composition, agents);
 
       // すべての値が空の場合はエラーを返却
       if (Object.values(composition).every((role) => role.length === 0)) {
@@ -111,9 +114,9 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
         .setCustomId('banAgent')
         .setPlaceholder('BANするエージェントを選択してください')
         .setMinValues(0)
-        .setMaxValues(valorantAgents.length - 5)
+        .setMaxValues(agents.length - 5)
         .addOptions(
-          valorantAgents.map((agent) => ({
+          agents.map((agent) => ({
             label: agent.name,
             value: agent.id,
           }))
@@ -147,26 +150,27 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
         try {
           // タイマーを削除
           clearTimeout(timeoutId);
+
           // BANされたエージェントを取得
           const banAgentIds: string[] = selectMenuInteraction.values;
 
           // BANされたエージェントをcompositionに格納
-          banAgents = valorantAgents.filter((agent) => banAgentIds.includes(agent.id));
+          banAgents = agents.filter((agent) => banAgentIds.includes(agent.id));
 
           // ValorantAgentsからBAN対象とされたエージェントを排除
-          const filteredValorantAgents = valorantAgents.filter((agent) => !banAgentIds.includes(agent.id));
+          const filteredValorantAgents = agents.filter((agent) => !banAgentIds.includes(agent.id));
 
           // ValorantAgentsのroleから各ロールの人数を取得
-          const allDuelistNum = countAgentsByRole('duelist');
-          const allInitiatorNum = countAgentsByRole('initiator');
-          const allControllerNum = countAgentsByRole('controller');
-          const allSentinelNum = countAgentsByRole('sentinel');
+          const allDuelistNum = countAgentsByRole(agents, 'duelist');
+          const allInitiatorNum = countAgentsByRole(agents, 'initiator');
+          const allControllerNum = countAgentsByRole(agents, 'controller');
+          const allSentinelNum = countAgentsByRole(agents, 'sentinel');
 
           // BANされたエージェントのロールを取得し、各ロールのBANされたエージェントの人数を取得
-          const banDuelistNum = countBanAgentsByRole('duelist', banAgentIds);
-          const banInitiatorNum = countBanAgentsByRole('initiator', banAgentIds);
-          const banControllerNum = countBanAgentsByRole('controller', banAgentIds);
-          const banSentinelNum = countBanAgentsByRole('sentinel', banAgentIds);
+          const banDuelistNum = countBanAgentsByRole(agents, 'duelist', banAgentIds);
+          const banInitiatorNum = countBanAgentsByRole(agents, 'initiator', banAgentIds);
+          const banControllerNum = countBanAgentsByRole(agents, 'controller', banAgentIds);
+          const banSentinelNum = countBanAgentsByRole(agents, 'sentinel', banAgentIds);
 
           // BANされたエージェントが各ロールの指定可能人数を超えているかどうか
           let isBanError = false;

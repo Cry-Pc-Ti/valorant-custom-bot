@@ -4,7 +4,7 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "test": "ts-node src/events/notion/fetchAdminUserId.ts",
+    "test": "ts-node src/events/notion/fetchBanUserId.ts",
     "docs": "node generate-docs.mjs"
   },
   "keywords": [],

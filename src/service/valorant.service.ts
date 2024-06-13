@@ -4,7 +4,7 @@ import { AgentData_JP, AgentData_EN, AgentData, MapData } from '../types/valoran
 const VALORANT_AGENTINFO_URL = 'https://valorant-api.com/v1/agents';
 const VALORANT_MAPINFO_URL = 'https://valorant-api.com/v1/maps';
 
-// エージェント情報をJSON形式で取得
+// Valorant-APIからエージェント情報を取得
 export const fetchAgentsData = async () => {
   // 日本語と英語のエージェント情報をそれぞれ取得
   const response_jp = await axios.get(VALORANT_AGENTINFO_URL + '?language=ja-JP');
@@ -48,6 +48,7 @@ export const fetchAgentsData = async () => {
         return {
           name: agent_jp.name,
           id: agent_en.id,
+          role: agent_jp.role,
           roleId: agent_en.roleId,
           uuid: agent_jp.uuid,
           iconUrl: agent_jp.iconUrl,
@@ -78,7 +79,7 @@ export const fetchAgentsData = async () => {
   return sortedAgents;
 };
 
-// MAP情報を取得
+// Valorant-APIからマップ情報を取得
 export const fetchMapsData = async () => {
   const response_jp = await axios.get(VALORANT_MAPINFO_URL + '?language=ja-JP');
 
