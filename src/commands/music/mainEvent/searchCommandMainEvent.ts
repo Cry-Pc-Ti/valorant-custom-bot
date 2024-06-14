@@ -64,6 +64,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       const selectResponse = await interaction.editReply({
         components: [row],
       });
+
       // 2分後にセレクトメニューを削除するタイマーをセット
       const timeoutId = setTimeout(
         async () => {
@@ -92,6 +93,8 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
             musicplayListInfo[Number(selectMenuInteraction.values)].url,
             false
           );
+
+          // 検索ワードを保存
           playListInfo.searchWord = words;
 
           // playList再生処理

@@ -14,6 +14,7 @@ import { Logger } from '../../../events/common/log';
 import { setGuildCommandStates } from '../../../store/guildCommandStates';
 import { v4 as uuidv4 } from 'uuid';
 import { COMMAND_NAME_VALORANT } from '../mainValorantCommand';
+import { interactionEditMessages } from '../../../events/discord/interactionMessages';
 
 export const teamCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -26,8 +27,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
 
     // チャンネルIDが取得できない場合はエラーを返す
     if (!attackerChannelId || !defenderChannelId) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
+      return await interaction.editReply('ボイスチャンネルが取得できませんでした');
     }
 
     // チャンネルを取得
@@ -36,8 +36,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
 
     // チャンネルが取得できない場合はエラーを返す
     if (!attackerChannel || !defenderChannel) {
-      await interaction.editReply('ボイスチャンネルが取得できませんでした');
-      return;
+      return await interaction.editReply('ボイスチャンネルが取得できませんでした');
     }
 
     // コマンドを発火したメンバーが参加しているVCを取得
@@ -46,6 +45,31 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
 
     // メンバーがいない場合は処理を終了
     if (!membersInVC) return interaction.editReply('VCに参加してください');
+
+    // ボタンを作成
+    const uniqueId = uuidv4();
+
+    const attackerVCButton = new ButtonBuilder()
+      .setCustomId(`attacker_${uniqueId}`)
+      .setLabel('Attacker VC')
+      .setStyle(ButtonStyle.Danger);
+
+    const difenderVCButton = new ButtonBuilder()
+      .setCustomId(`difender_${uniqueId}`)
+      .setLabel('Defender VC')
+      .setStyle(ButtonStyle.Primary);
+
+    // ボタンをActionRowに追加
+    const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      attackerVCButton,
+      difenderVCButton
+    );
+
+    const buttonCollector = interaction.channel?.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+    });
+
+    if (!buttonCollector) return;
 
     // セレクトメニューを作成
     const memberSelectMenu: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -86,8 +110,11 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
     });
 
     selectMenuCollector.on('collect', async (selectMenuInteraction: StringSelectMenuInteraction) => {
+      selectMenuInteraction.deferUpdate();
+
       // タイマーを削除
       clearTimeout(timeoutId);
+
       // メンバーIDを取得
       const memberIds = selectMenuInteraction.values;
 
@@ -139,42 +166,14 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
         }
       }
 
-      // メッセージを作成
-      const embed = teamMessage(teams, attackerChannelId, defenderChannelId, guildId);
-
-      // メッセージを送信
-      await interaction.editReply(embed);
-
-      // ボタンを作成
-      const uniqueId = uuidv4();
-      const attackerVCButton = new ButtonBuilder()
-        .setCustomId(`attacker_${uniqueId}`)
-        .setLabel('Attacker VC')
-        .setStyle(ButtonStyle.Danger);
-
-      const difenderVCButton = new ButtonBuilder()
-        .setCustomId(`difender_${uniqueId}`)
-        .setLabel('Defender VC')
-        .setStyle(ButtonStyle.Primary);
-
-      // ボタンをActionRowに追加
-      const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        attackerVCButton,
-        difenderVCButton
-      );
-
-      const buttonCollector = interaction.channel?.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-      });
-
-      if (!buttonCollector) return;
+      const replyMessageId = (await interaction.fetchReply()).id;
 
       setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
         buttonCollector: buttonCollector,
         buttonRowArray: [buttonRow],
         uniqueId: uniqueId,
         interaction: interaction,
-        replyMessageId: (await interaction.fetchReply()).id,
+        replyMessageId: replyMessageId,
         valorantCommandInfo: {
           attackerChannelId: attackerChannelId,
           defenderChannelId: defenderChannelId,
@@ -182,12 +181,14 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
         },
       });
 
-      // ボタンを送信
-      await interaction.followUp({ components: [buttonRow], ephemeral: true });
+      // メッセージを作成
+      const embed = teamMessage(teams, buttonRow, attackerChannelId, defenderChannelId, guildId);
 
-      buttonCollector.on('end', () => {
-        buttonCollector.stop();
-      });
+      // メッセージを送信
+      await interactionEditMessages(interaction, replyMessageId, embed);
+    });
+    selectMenuCollector.on('end', () => {
+      selectMenuCollector.stop();
     });
   } catch (error) {
     Logger.LogSystemError(`teamCommandMainEventでエラーが発生しました : ${error}`);

@@ -114,21 +114,22 @@ export const mainValorantCommand = {
 
   execute: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
+
     // map command
     if (interaction.options.getSubcommand() === 'map') {
-      await mapCommandMainEvent(interaction);
+      return await mapCommandMainEvent(interaction);
     }
     // agent command
     if (interaction.options.getSubcommand() === 'agent') {
-      await agentCommandMainEvent(interaction);
+      return await agentCommandMainEvent(interaction);
     }
     // composition command
     if (interaction.options.getSubcommand() === 'composition') {
-      await compositionCommandMainEvent(interaction);
+      return await compositionCommandMainEvent(interaction);
     }
     // team command
     if (interaction.options.getSubcommand() === 'team') {
-      await teamCommandMainEvent(interaction);
+      return await teamCommandMainEvent(interaction);
     }
   },
 };

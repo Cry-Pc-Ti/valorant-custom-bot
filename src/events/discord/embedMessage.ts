@@ -149,6 +149,7 @@ export const mapMessage = (map: MapData) => {
 // teamコマンドのメッセージを作成
 export const teamMessage = (
   memberAllocation: TeamData,
+  buttonRow: ActionRowBuilder<ButtonBuilder>,
   attackerChannelId: string,
   defenderChannelId: string,
   guildId: string
@@ -191,7 +192,7 @@ export const teamMessage = (
   const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
   const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
-  return { embeds: [embeds], files: [authorAttachment, fotterAttachment], components: [] };
+  return { embeds: [embeds], files: [authorAttachment, fotterAttachment], components: [buttonRow] };
 };
 
 // diceコマンドのメッセージを作成
@@ -478,6 +479,21 @@ export const donePlayerMessage = () => {
     .setTimestamp();
 
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/youtube_icon.png`);
+
+  return { embeds: [embeds], files: [fotterAttachment], components: [] };
+};
+// チームを振り分け中のメッセージを作成
+export const teamCommandMessage = () => {
+  const embeds = new EmbedBuilder()
+    .setColor('#fd4556')
+    .setTitle(`チームの振り分け中です。\n\n振り分け後は出てきたボタンを押すとVCにメンバーを飛ばせます。`)
+    .setFooter({
+      text: 'VALORANT',
+      iconURL: 'attachment://valorant_icon.png',
+    })
+    .setTimestamp();
+
+  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return { embeds: [embeds], files: [fotterAttachment], components: [] };
 };
