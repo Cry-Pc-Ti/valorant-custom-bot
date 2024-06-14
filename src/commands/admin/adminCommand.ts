@@ -1,8 +1,9 @@
 import { Message } from 'discord.js';
 import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
-import { getBannedUsers, saveBannedUser, saveBannedUsersList } from '../../events/admin/readBanUserJsonData';
+import { loadBannedUsers, saveBannedUser, unBanUser, updateBanUser } from '../../events/notion/manageBanUsers';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
+import { BanUserData } from '../../types/banUserData';
 
 export const adminCommand = async (message: Message, command: string, option: string | null) => {
   // serverコマンド
@@ -40,14 +41,23 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    const bannedUsers: string[] = getBannedUsers();
+    const bannedUsersData: BanUserData[] = loadBannedUsers();
 
-    // BANするユーザーがBANされていない場合のみBANする
-    if (!bannedUsers.includes(userId)) {
+    // BANするユーザーが登録されていない場合
+    if (!bannedUsersData.find((user) => user.id === userId)) {
+      // BANユーザーを登録
       saveBannedUser(userId);
 
-      // メッセージを送信
       await message.reply(`${userId}をBANしました`);
+
+      // BANユーザーは登録されているが、BANされていない場合
+    } else if (bannedUsersData.find((user) => user.id === userId && user.isBan === false)) {
+      // BANユーザーを更新
+      updateBanUser(userId);
+
+      await message.reply(`${userId}をBANしました`);
+
+      // すでにBANされている場合
     } else {
       await message.reply(`すでに${userId}はBANしています。`);
     }
@@ -65,16 +75,16 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    let bannedUsers: string[] = getBannedUsers();
+    const bannedUsers: BanUserData[] = loadBannedUsers();
 
     // BANするユーザーがBANされている場合のみBAN解除する
-    if (bannedUsers.includes(userId)) {
-      bannedUsers = bannedUsers.filter((id) => id !== userId);
-      saveBannedUsersList(bannedUsers);
+    if (bannedUsers.find((user) => user.id === userId && user.isBan === true)) {
+      // BANユーザーを更新
+      unBanUser(userId);
+
       await message.reply(`${userId}のBANを解除しました`);
     } else {
-      await message.reply(`すでに${userId}は解除されています`);
+      await message.reply(`${userId}はBANされていません`);
     }
-    return;
   }
 };

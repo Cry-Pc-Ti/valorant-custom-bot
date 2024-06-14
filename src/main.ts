@@ -11,10 +11,11 @@ import { stopPreviousInteraction } from './store/guildCommandStates';
 import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
-import { getBannedUsers, loadBannedUsers } from './events/admin/readBanUserJsonData';
 import { adminCommand } from './commands/admin/adminCommand';
-import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from './events/common/cooldowns';
+import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
+import { fetchBannedUsersData, loadBannedUsers } from './events/notion/manageBanUsers';
+import { BanUserData } from './types/banUserData';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -38,21 +39,15 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   }
 })();
 
-// 管理者ユーザーIDを取得
-let adminUserIds: string[] = [];
-(async () => {
-  adminUserIds = await fetchAdminUserId();
-})();
-
 // クライアントオブジェクトが準備完了時に実行
-discord.on('ready', () => {
+discord.on('ready', async () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
   discord.user?.setPresence({
     activities: [{ name: '今日も元気に働いています', type: 0 }],
     status: 'online',
   });
   Logger.initialize();
-  loadBannedUsers();
+  await fetchBannedUsersData();
 });
 
 // コマンドごとのクールダウン時間（ミリ秒）
@@ -69,10 +64,10 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       const { commandName, user, guild } = interaction;
 
       // BANされているユーザーを取得
-      const bannedUsers: string[] = getBannedUsers();
+      const bannedUsers: BanUserData[] = loadBannedUsers();
 
       // BANされているユーザーかどうかチェック
-      if (bannedUsers.includes(interaction.user.id)) {
+      if (bannedUsers.find((user) => user.id === user.id && user.isBan)) {
         interaction.reply(
           `下のドキュメントに記載されているお問い合わせ先から運営にご連絡してください\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
         );
@@ -125,20 +120,24 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
 // 管理者コマンドが発生時に実行
 discord.on('messageCreate', async (message) => {
-  // 特定のユーザーIDのメッセージだけを拾う
-  if (!adminUserIds.includes(message.author.id)) return;
   // メッセージがBotもしくは、コマンドでない場合は処理を終了
   if (message.author.bot || !message.content.startsWith('!admin')) return;
+
+  // 管理者ユーザーを取得
+  const adminUserIds = await fetchAdminUserId();
+
+  // 管理者ユーザーのメッセージだけを拾う
+  if (!adminUserIds.includes(message.author.id)) return;
 
   // コマンドを取得
   const args = message.content.split(' ');
   if (args.length < 2) return;
 
   const command = args[1];
-  const userId = args[2] || null;
+  const option = args[2] || null;
 
   // 管理者コマンドを実行
-  adminCommand(message, command, userId);
+  adminCommand(message, command, option);
 });
 
 // voiceチャンネルでアクションが発生時に実行
