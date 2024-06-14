@@ -47,7 +47,7 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       !interaction.customId.endsWith(`_${commandStates?.uniqueId}`)
     ) {
       return await interactionEditMessages(interaction, interaction.message.id, {
-        content: 'もう一度、再生したい場合はコマンドで再度入力してください。',
+        content: '再度コマンドを入力してください',
         components: [],
       });
     }

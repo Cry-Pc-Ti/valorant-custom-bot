@@ -8,7 +8,6 @@ import { mainDiceCommand } from './commands/dice/mainDiceCommand';
 import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { stopPreviousInteraction } from './store/guildCommandStates';
-import { isHttpError } from './events/common/errorUtils';
 import { buttonHandlers } from './button/buttonHandlers';
 import { helpCommand } from './commands/help/helpCommand';
 import { getBannedUsers, loadBannedUsers } from './events/admin/readBanUserJsonData';
@@ -121,12 +120,8 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
     }
   } catch (error) {
     Logger.LogAccessError(error);
-    if (isHttpError(error) && error.status === 403) {
-      interaction.channel?.send('コマンドの実行に必要な権限がありません。権限を付与してください。');
-      return;
-    }
     interaction.channel?.send(
-      'エラーが発生したので再度コマンドの入力をお願いいたします。それでも解決しない場合はサーバーを一度蹴ってウィングマン君を招待してください。'
+      `エラーが発生したので再度コマンドの入力をお願いいたします。\nそれでも解決しない場合は、一度蹴サーバから蹴って再度ウィングマンくんを招待してください。👇から招待ができます\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
     );
   }
 });
