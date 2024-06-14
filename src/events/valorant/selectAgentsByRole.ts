@@ -31,7 +31,7 @@ export const selectAgentsByRole = (
 
     return composition;
   } catch (error) {
-    Logger.LogSystemError(`selectAgentsByRoleでエラーが発生しました: ${error}`);
+    Logger.LogError(`selectAgentsByRoleでエラーが発生しました`, error);
     return composition;
   }
 };

@@ -1,6 +1,7 @@
 import { notion, spotifyDbId } from '../../modules/notionModule';
 import { isFullPage } from '@notionhq/client';
 import { SpotifyPlaylistInfo } from '../../types/spotifyData';
+import { Logger } from '../common/log';
 
 /**
  * @description NotionからspotifyのplayListIDを取得し加工して返す
@@ -94,7 +95,7 @@ export const getSpotifyPlayList = async (): Promise<SpotifyPlaylistInfo[]> => {
       return true; // start_dateまたはend_dateがNULLの場合は表示する
     });
   } catch (error) {
-    console.error('Error fetching Spotify playlist info from Notion:', error);
+    Logger.LogSystemError(`getSpotifyPlayListでエラーが発生しました`, error);
     throw error;
   }
 };

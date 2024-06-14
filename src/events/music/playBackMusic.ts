@@ -150,7 +150,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
             error.message === 'Invalid regular expression: missing /'
           )
             return;
-          Logger.LogSystemError(`playBackMusicでエラーが発生しました: ${error}`);
+          Logger.LogError(`【${guildId}】streamPlaylist・playMusicStream内でエラーが発生しました`, error);
           musicCommandInfo.player.stop();
         });
       } while (getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 1);
@@ -179,6 +179,6 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
 
     deleteGuildCommandStates(guildId, COMMAND_NAME_MUSIC);
   } catch (error) {
-    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${guildId}】streamPlaylistでエラーが発生しました`, error);
   }
 };

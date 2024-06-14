@@ -30,7 +30,7 @@ export const numberCommandMainEvent = async (interaction: ChatInputCommandIntera
     const embed = diceMessage(message, randomNum, userId);
     await interaction.editReply(embed);
   } catch (error) {
+    Logger.LogError(`【${interaction.guild?.id}】numberCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    Logger.LogSystemError(`numberCommandMainEventでエラーが発生しました : ${error}`);
   }
 };

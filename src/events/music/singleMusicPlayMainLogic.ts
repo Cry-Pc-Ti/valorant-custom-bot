@@ -26,15 +26,15 @@ export const singleMusicMainLogic = async (
   musicInfo: MusicInfo,
   commandFlg?: number
 ) => {
+  // guildIdを取得
+  const guildId = interaction.guildId;
+
   try {
     // 修正するメッセージのIDを取得
     const replyMessageId: string = (await interaction.fetchReply()).id;
 
     // uuidをuniqueIdとして取得
     const uniqueId = uuidv4();
-
-    // guildIdを取得
-    const guildId = interaction.guildId;
 
     // ボタンを作成
     const { buttonRow } = createButtonRow(uniqueId);
@@ -75,7 +75,6 @@ export const singleMusicMainLogic = async (
         repeatMode: 0,
       },
     });
-    // guildCommandStates.set(guildId, { player, buttonCollector, interaction, replyMessageId });
 
     // 音楽情報のメッセージ作成、送信
     const embed = musicInfoMessage(musicInfo, [buttonRow]);
@@ -99,7 +98,7 @@ export const singleMusicMainLogic = async (
     // BOTをdiscordから切断
     connection.destroy();
   } catch (error) {
-    Logger.LogSystemError(`singleMusicMainLogicでエラーが発生しました: ${error}`);
+    Logger.LogError(`【${guildId}】singleMusicMainLogicでエラーが発生しました`, error);
   }
 };
 

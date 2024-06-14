@@ -1,7 +1,6 @@
 import ytdl from 'ytdl-core';
 import YouTube from 'youtube-sr';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
-import { Logger } from '../common/log';
 import ytpl from 'ytpl';
 
 /**
@@ -67,31 +66,26 @@ export const getMusicPlayListInfo = async (url: string, shuffleFlag: boolean): P
  * @returns 音楽情報
  */
 export const getSingleMusicInfo = async (url: string, index: number = 0) => {
-  try {
-    // 音楽データを取得
-    const musicDetails = await ytdl.getBasicInfo(url);
+  // 音楽データを取得
+  const musicDetails = await ytdl.getBasicInfo(url);
 
-    // データ加工して返す
-    return {
-      songIndex: index + 1,
-      id: musicDetails.videoDetails.videoId,
-      url: musicDetails.videoDetails.video_url,
-      title: musicDetails.videoDetails.title,
-      musicImg: musicDetails.videoDetails.thumbnails?.[3]?.url ?? '',
-      durationFormatted: '', // 必要に応じてフォーマットする
-      author: {
-        url: musicDetails.videoDetails.author.channel_url,
-        channelID: musicDetails.videoDetails.author.id,
-        name: musicDetails.videoDetails.author.name,
-        channelThumbnail: musicDetails.videoDetails.author.thumbnails?.[0]?.url ?? '',
-      },
-      // 関連動画のIDリスト
-      relatedVideosIDlist: musicDetails.related_videos?.map((item) => item.id ?? '').filter((id) => id !== '') ?? [],
-    };
-  } catch (error) {
-    Logger.LogSystemError(`Failed to fetch music info from URL ${url}: ${error}`);
-    throw new Error('音楽情報の取得に失敗しました。');
-  }
+  // データ加工して返す
+  return {
+    songIndex: index + 1,
+    id: musicDetails.videoDetails.videoId,
+    url: musicDetails.videoDetails.video_url,
+    title: musicDetails.videoDetails.title,
+    musicImg: musicDetails.videoDetails.thumbnails?.[3]?.url ?? '',
+    durationFormatted: '', // 必要に応じてフォーマットする
+    author: {
+      url: musicDetails.videoDetails.author.channel_url,
+      channelID: musicDetails.videoDetails.author.id,
+      name: musicDetails.videoDetails.author.name,
+      channelThumbnail: musicDetails.videoDetails.author.thumbnails?.[0]?.url ?? '',
+    },
+    // 関連動画のIDリスト
+    relatedVideosIDlist: musicDetails.related_videos?.map((item) => item.id ?? '').filter((id) => id !== '') ?? [],
+  };
 };
 
 /**

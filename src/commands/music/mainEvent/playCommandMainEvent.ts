@@ -33,7 +33,9 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
       return interaction.editReply('こちらの音楽は再生できません。正しいURLを指定してください。');
 
     // データ収集
-    Logger.LogAccessInfo(`${interaction.user.username}(${interaction.user.id})さんが${url} を再生しています。`);
+    Logger.LogAccessInfo(
+      `【${interaction.guild?.name}(${interaction.guild?.id})】${interaction.user.username}(${interaction.user.id})さんが${url} を再生`
+    );
 
     // メッセージを作成
     const embed = playListPlayMusicMessage();
@@ -56,7 +58,7 @@ export const playCommandMainEvent = async (interaction: ChatInputCommandInteract
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(`playCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】playCommandMainEventでエラーが発生しました`, error);
 
     if (error.statusCode === 400)
       return await interaction.editReply('音楽情報のメッセージ存在しないため再生できません。');

@@ -100,7 +100,10 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
           // playList再生処理
           await playListMusicMainLogic(interaction, voiceChannelId, playListInfo, 1);
         } catch (error) {
-          Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+          Logger.LogError(
+            `【${interaction.guild?.id}】searchCommandMainEventt・selectMenuInteraction(playlist)でエラーが発生しました`,
+            error
+          );
           await interaction.channel?.messages.edit(replyMessageId, {
             content: `再度コマンドを入力してください`,
             files: [],
@@ -162,7 +165,10 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
             musicplayVideoList[Number(selectMenuInteraction.values)]
           );
         } catch (error) {
-          Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+          Logger.LogError(
+            `【${interaction.guild?.id}】searchCommandMainEventt・selectMenuInteraction(singl)でエラーが発生しました`,
+            error
+          );
           await interaction.channel?.messages.edit(replyMessageId, {
             content: `再度コマンドを入力してください`,
             files: [],
@@ -172,7 +178,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
       });
     }
   } catch (error) {
-    Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】searchCommandMainEventでエラーが発生しました`, error);
     await interaction.channel?.messages.edit(replyMessageId, {
       content: `再度コマンドを入力してください`,
       files: [],

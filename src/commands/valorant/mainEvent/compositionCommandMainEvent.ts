@@ -270,13 +270,16 @@ export const compositionCommandMainEvent = async (interaction: ChatInputCommandI
           const embed = compositionMessage(composition, banAgents, user.id);
           await interaction.editReply(embed);
         } catch (error) {
-          Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
+          Logger.LogError(
+            `【${interaction.guild?.id}】compositionCommandMainEventt・selectMenuInteractionでエラーが発生しました`,
+            error
+          );
           await interaction.editReply('処理中にエラーが発生しました。\n再度コマンドを入力してください。');
         }
       });
     }
   } catch (error) {
-    Logger.LogSystemError(`compositionCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】compositionCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply({
       content: '処理中にエラーが発生しました。\n再度コマンドを入力してください。',
       components: [],

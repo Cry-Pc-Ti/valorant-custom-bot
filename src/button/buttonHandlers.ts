@@ -131,15 +131,13 @@ const handleError = async (interaction: ButtonInteraction, guildId: string, erro
   const musicCommandInfo = commandStates?.musicCommandInfo;
   if (!commandStates || !musicCommandInfo) return;
 
+  Logger.LogError(`【${interaction.guild?.id}】buttonHandlersでエラーが発生しました`, error);
+
   if (error.statusCode === 410) return;
   if ((isHttpError(error) && error.status === 400) || (isHttpError(error) && error.status === 404)) {
     await interactionEditMessages(interaction, commandStates.replyMessageId, `ボタンをもう一度押してください`);
-    if (error instanceof Error) {
-      Logger.LogSystemError(error.message);
-    }
     return;
   }
-  Logger.LogSystemError(`buttonHandlersでエラーが発生しました :${error}`);
   await interactionEditMessages(interaction, commandStates.replyMessageId, {
     content: '処理中にエラーが発生しました。再度コマンドを入力してください。',
     components: [],

@@ -39,7 +39,7 @@ export const chinchiroCommandMainEvent = async (interaction: ChatInputCommandInt
       await interaction.editReply(embed);
     }
   } catch (error) {
+    Logger.LogError(`【${interaction.guild?.id}】chinchiroCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
-    Logger.LogSystemError(`chinchiroCommandMainEventでエラーが発生しました : ${error}`);
   }
 };

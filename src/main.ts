@@ -4,24 +4,17 @@ import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
 import { COMMAND_NAME_MUSIC, mainMusicCommand } from './commands/music/mainMusicCommand';
-import { mainDiceCommand } from './commands/dice/mainDiceCommand';
-import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { Logger } from './events/common/log';
 import { stopPreviousInteraction } from './store/guildCommandStates';
 import { buttonHandlers } from './button/buttonHandlers';
-import { helpCommand } from './commands/help/helpCommand';
 import { getBannedUsers, loadBannedUsers } from './events/admin/readBanUserJsonData';
 import { adminCommand } from './commands/admin/adminCommand';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from './events/common/cooldowns';
-
-// コマンド名とそれに対応するコマンドオブジェクトをマップに格納
-const commands = {
-  [mainDiceCommand.data.name]: mainDiceCommand,
-  [mainValorantCommand.data.name]: mainValorantCommand,
-  [mainMusicCommand.data.name]: mainMusicCommand,
-  [helpCommand.data.name]: helpCommand,
-};
+import { mainDiceCommand } from './commands/dice/mainDiceCommand';
+import { helpCommand } from './commands/help/helpCommand';
+import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
+import { commands } from './modules/commandsModule';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -37,13 +30,17 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   }
 })();
 
-// 管理者ユーザーIDを取得
+/**
+ * 管理者ユーザーIDを取得する非同期関数
+ */
 let adminUserIds: string[] = [];
 (async () => {
   adminUserIds = await fetchAdminUserId();
 })();
 
-// クライアントオブジェクトが準備完了時に実行
+/**
+ * クライアントオブジェクトが準備完了時に実行されるイベントリスナー
+ */
 discord.on('ready', () => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
   discord.user?.setPresence({
@@ -54,14 +51,11 @@ discord.on('ready', () => {
   loadBannedUsers();
 });
 
-// コマンドごとのクールダウン時間（ミリ秒）
-const commandCooldowns = new Map<string, number>([
-  ['music', 6 * 1000], // 6秒
-  ['dice', 2 * 1000], // 2秒
-  ['valo', 3 * 1000], // 3秒
-]);
-
-// インタラクションが発生時に実行
+/**
+ * インタラクションが発生時に実行されるイベントリスナー
+ *
+ * @param interaction - Discordインタラクションオブジェクト
+ */
 discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
     // BOTに管理者権限があるかどうかをチェック
@@ -86,6 +80,13 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
         Logger.LogAccessInfo(`${user.username}(${user.id})はBANされています。`);
         return;
       }
+
+      // コマンドごとのクールダウン時間（ミリ秒）
+      const commandCooldowns = new Map<string, number>([
+        ['music', 6 * 1000], // 6秒
+        ['dice', 2 * 1000], // 2秒
+        ['valo', 3 * 1000], // 3秒
+      ]);
 
       // スパム対策
       if (isCooldownActive(commandName, user.id, commandCooldowns)) {
@@ -119,14 +120,20 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       await buttonHandlers(interaction);
     }
   } catch (error) {
-    Logger.LogAccessError(error);
+    Logger.LogAccessError(`【${interaction.guild?.id}】interactionCreateでエラーが発生しました。`, error);
     interaction.channel?.send(
       `エラーが発生したので再度コマンドの入力をお願いいたします。\nそれでも解決しない場合は、一度蹴サーバから蹴って再度ウィングマンくんを招待してください。👇から招待ができます\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
     );
   }
 });
 
-// 管理者コマンドが発生時に実行
+/**
+ * メッセージが作成されたときに処理を行うイベントリスナー
+ *
+ * この関数は特定のユーザーIDのメッセージを処理し、管理者コマンドを実行します。
+ *
+ * @param message - Discordメッセージオブジェクト
+ */
 discord.on('messageCreate', async (message) => {
   // 特定のユーザーIDのメッセージだけを拾う
   if (!adminUserIds.includes(message.author.id)) return;
@@ -144,7 +151,14 @@ discord.on('messageCreate', async (message) => {
   adminCommand(message, command, userId);
 });
 
-// voiceチャンネルでアクションが発生時に実行
+/**
+ * ボイスチャンネルでアクションが発生したときに実行されるイベントリスナー
+ *
+ * @param oldState - 変更前のボイスステート
+ * @param newState - 変更後のボイスステート
+ *
+ * この関数は、ボットがボイスチャンネルから切断された場合や、ボットがいるチャンネルに一人だけ残った場合に特定の処理を実行します。
+ */
 discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
   try {
     if (oldState.member?.id === CLIENT_ID && !newState.channel) {
@@ -165,8 +179,9 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState
       botMember.voice.disconnect();
     }
   } catch (error) {
-    Logger.LogAccessError(error);
+    Logger.LogError(`【${oldState.guild.id}】voiceStateUpdateでエラーが発生しました。`, error);
   }
 });
 
+// Discordクライアントをログイン
 discord.login(TOKEN);

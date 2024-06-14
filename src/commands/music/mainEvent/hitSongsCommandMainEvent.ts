@@ -81,11 +81,6 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
         const spotifyPlaylistInfo = spotifyPlaylists[Number(selectMenuInteraction.values)];
 
-        // データ収集
-        Logger.LogAccessInfo(
-          `${interaction.user.username}(${interaction.user.id})さんが${spotifyPlaylistInfo.name} を選択しました。`
-        );
-
         // メッセージを作成
         const embed = hitSongsPreparingPlayerMessage(spotifyPlaylistInfo);
 
@@ -102,6 +97,11 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
         const videoResults = await Promise.all(videoPromises);
         const musicplayVideoList: MusicInfo[] = [...videoResults];
+
+        // データ収集
+        Logger.LogAccessInfo(
+          `【${interaction.guild?.name}(${interaction.guild?.id})】${interaction.user.username}(${interaction.user.id})さんが${spotifyPlaylistInfo.name} を選択しました。`
+        );
 
         // playList再生処理
         await playListMusicMainLogic(
@@ -120,7 +120,10 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
           3
         );
       } catch (error) {
-        Logger.LogSystemError(`searchCommandMainEventでエラーが発生しました : ${error}`);
+        Logger.LogError(
+          `【${interaction.guild?.id}】hitSongsCommandMainEvent・selectMenuInteractionでエラーが発生しました`,
+          error
+        );
         await interaction.channel?.messages.edit(replyMessageId, {
           content: `再度コマンドを入力してください`,
           files: [],
@@ -129,7 +132,7 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
       }
     });
   } catch (error) {
-    Logger.LogSystemError(`hitSongsCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】hitSongsCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply({
       embeds: [],
       files: [],

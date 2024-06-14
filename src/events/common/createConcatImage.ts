@@ -60,6 +60,6 @@ export const createConcatImage = async (imagePaths: string[], userId: string): P
       )
       .toFile(outputImagePath);
   } catch (error) {
-    Logger.LogSystemError(`画像の連結中にエラーが発生しました : ${error}`);
+    Logger.LogError(`【${userId}さん】createConcatImageでエラーが発生しました`, error);
   }
 };

@@ -19,7 +19,7 @@ export const mapCommandMainEvent = async (interaction: ChatInputCommandInteracti
     // メッセージを送信
     await interaction.editReply(embed);
   } catch (error) {
-    Logger.LogSystemError(`mapCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】mapCommandMainEventでエラーが発生しました`, error);
     interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };

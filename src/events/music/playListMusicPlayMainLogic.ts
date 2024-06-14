@@ -23,9 +23,8 @@ export const playListMusicMainLogic = async (
   playListInfo: PlayListInfo,
   commandFlg: number
 ) => {
+  const guildId = interaction.guildId;
   try {
-    const guildId = interaction.guildId;
-
     // uuidをuniqueIdとして取得
     const uniqueId = uuidv4();
 
@@ -78,7 +77,7 @@ export const playListMusicMainLogic = async (
     connection.destroy();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    Logger.LogSystemError(`playListMusicMainLogicでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${guildId}】playListMusicMainLogicでエラーが発生しました`, error);
     if (error.statusCode === 410)
       return await interaction.channel?.send('ポリシーに適していないものが含まれるため再生できません。');
     if (isHttpError(error) && error.status === 400)

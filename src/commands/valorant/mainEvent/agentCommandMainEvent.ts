@@ -31,7 +31,7 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
     // メッセージを送信
     await interaction.editReply(embed);
   } catch (error) {
-    Logger.LogSystemError(`agentCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】agentCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };

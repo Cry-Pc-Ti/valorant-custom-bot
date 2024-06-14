@@ -78,6 +78,6 @@ export const addTextToImage = async (num: number, userId: string): Promise<void>
       stream.on('error', reject);
     });
   } catch (error) {
-    Logger.LogSystemError(`addTextToImageでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${userId}さん】addTextToImageでエラーが発生しました`, error);
   }
 };

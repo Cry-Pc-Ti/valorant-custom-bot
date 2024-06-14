@@ -18,7 +18,7 @@ export const disconnectCommandMainEvent = async (interaction: ChatInputCommandIn
     await interaction.editReply('BOTがVCにいません。');
     return;
   } catch (error) {
-    Logger.LogSystemError(`disconnectCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】disconnectCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply({
       embeds: [],
       files: [],

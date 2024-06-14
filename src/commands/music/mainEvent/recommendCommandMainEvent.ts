@@ -106,7 +106,7 @@ export const recommendCommandMainEvent = async (interaction: ChatInputCommandInt
       2
     );
   } catch (error) {
-    Logger.LogSystemError(`recommendCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】recommendCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply({
       embeds: [],
       files: [],

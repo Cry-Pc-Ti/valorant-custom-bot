@@ -1,6 +1,14 @@
 import * as Log4js from 'log4js';
 
+/**
+ * ロガークラス
+ */
 export class Logger {
+  /**
+   * ロガーを初期化する関数
+   *
+   * この関数はアプリケーションが起動する際に一度だけ呼び出してください。
+   */
   public static initialize() {
     Log4js.configure({
       appenders: {
@@ -12,46 +20,71 @@ export class Logger {
     });
   }
 
+  /**
+   * アクセス情報をログに記録する関数
+   *
+   * @param message - ログに記録するメッセージ
+   *
+   * この関数はユーザーの操作やアクセスログを記録するために使用します。
+   * 例: ユーザーがシステムにログインした際や、特定の機能を利用した際のログを記録します。
+   */
   public static LogAccessInfo(message: string): void {
     const logger = Log4js.getLogger('access');
     logger.info(message);
   }
 
-  public static LogAccessWarning(message: string): void {
+  /**
+   * アクセスエラーをログに記録する関数
+   *
+   * @param error - ログに記録するエラー
+   *
+   * この関数はアクセスに関する重大な問題や例外を記録するために使用します。
+   * 例: ユーザーが存在しないページにアクセスした場合や、APIリクエストが失敗した場合など。
+   */
+  public static LogAccessError(message: string, error: unknown): void {
     const logger = Log4js.getLogger('access');
-    logger.warn(message);
+    logger.error(`${message}:`);
+    logger.error(error);
   }
 
-  public static LogAccessError(error: unknown): void {
-    const logger = Log4js.getLogger('access');
-    const message = Logger.extractErrorMessage(error);
-    logger.error(message);
-  }
-
+  /**
+   * システム情報をログに記録する関数
+   *
+   * @param message - ログに記録するメッセージ
+   *
+   * この関数はシステムの動作状況や一般的な操作ログを記録するために使用します。
+   * 例: システムの起動やシャットダウン時のログを記録します。
+   */
   public static LogSystemInfo(message: string): void {
     const logger = Log4js.getLogger('system');
     logger.info(message);
   }
 
-  public static LogSystemWarning(message: string): void {
+  /**
+   * システムエラーをログに記録する関数
+   *
+   * @param message - ログに記録するメッセージ
+   *
+   * この関数は重大なシステムエラーや例外を記録するために使用します。
+   * 例: データベース接続エラーやサーバーのクラッシュなど、システムに深刻な影響を与えるエラー。
+   */
+  public static LogSystemError(message: string, error: unknown): void {
     const logger = Log4js.getLogger('system');
-    logger.warn(message);
+    logger.error(`${message}:`);
+    logger.error(error);
   }
 
-  public static LogSystemError(message: string): void {
-    const logger = Log4js.getLogger('system');
-    logger.error(message);
-  }
-
-  public static LogError(message: string): void {
+  /**
+   * エラーをログに記録する関数
+   *
+   * @param message - ログに記録するメッセージ
+   *
+   * この関数はアクセスやシステム以外の一般的なエラーを記録するために使用します。
+   * 例: 特定のモジュールや機能に関するエラー、予期しない例外など。
+   */
+  public static LogError(message: string, error: unknown): void {
     const logger = Log4js.getLogger('error');
-    logger.error(message);
-  }
-
-  private static extractErrorMessage(error: unknown): string {
-    if (error instanceof Error) {
-      return error.message;
-    }
-    return String(error);
+    logger.error(`${message}:`);
+    logger.error(error);
   }
 }

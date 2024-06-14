@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../modules/spotifyModule';
+import { Logger } from '../events/common/log';
 
 export const getSpotifyToken = async () => {
   const token = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
@@ -13,7 +14,7 @@ export const getSpotifyToken = async () => {
     });
     return response.data.access_token;
   } catch (error) {
-    console.error('Error getting Spotify token', error);
+    Logger.LogAccessError(`getSpotifyTokenでエラーが発生しました`, error);
     throw error;
   }
 };
@@ -35,7 +36,7 @@ export const getTopSongs = async (accessToken: string, playlistId: string) => {
     });
     return songInfoList;
   } catch (error) {
-    console.error('Error fetching top songs', error);
+    Logger.LogAccessError(`getTopSongsでエラーが発生しました`, error);
     throw error;
   }
 };

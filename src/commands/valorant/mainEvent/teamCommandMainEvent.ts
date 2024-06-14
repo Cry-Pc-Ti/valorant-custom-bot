@@ -191,7 +191,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       selectMenuCollector.stop();
     });
   } catch (error) {
-    Logger.LogSystemError(`teamCommandMainEventでエラーが発生しました : ${error}`);
+    Logger.LogError(`【${interaction.guild?.id}】teamCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
   }
 };
