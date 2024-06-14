@@ -65,6 +65,14 @@ const commandCooldowns = new Map<string, number>([
 // インタラクションが発生時に実行
 discord.on('interactionCreate', async (interaction: Interaction) => {
   try {
+    // BOTに管理者権限があるかどうかをチェック
+    const botMember = interaction.guild?.members.cache.get(CLIENT_ID);
+    if (!botMember?.permissions.has('Administrator')) {
+      return await interaction.user.send({
+        content: `【${interaction.guild?.name}】にこのBOTの権限がありません。権限を付与してください。\n権限付与方法は👇をご覧ください\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`,
+      });
+    }
+
     if (interaction.isChatInputCommand()) {
       const { commandName, user, guild } = interaction;
 
@@ -76,7 +84,7 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
         interaction.reply(
           `下のドキュメントに記載されているお問い合わせ先から運営にご連絡してください\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
         );
-        Logger.LogAccessInfo(`【${guild?.name}(${guild?.id})】${user.username}(${user.id})はBANされています。`);
+        Logger.LogAccessInfo(`${user.username}(${user.id})はBANされています。`);
         return;
       }
 
