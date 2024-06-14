@@ -13,7 +13,7 @@ import { hitSongsPreparingPlayerMessage } from '../../../events/discord/embedMes
 import { Logger } from '../../../events/common/log';
 import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
-import { getSpotifyPlayList } from '../../../events/notion/getSpotifyPlayList';
+import { getSpotifyPlayList } from '../../../events/notion/fetchSpotifyPlayList';
 import { SpotifyPlaylistInfo } from '../../../types/spotifyData';
 
 /**

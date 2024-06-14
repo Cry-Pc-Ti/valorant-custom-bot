@@ -1,6 +1,17 @@
 import fs from 'fs';
 import sharp, { OverlayOptions } from 'sharp';
+import axios from 'axios';
 import { Logger } from './log';
+
+// URL から画像をダウンロードして Buffer を返す関数
+const downloadImage = async (url: string): Promise<Buffer> => {
+  const response = await axios({
+    url,
+    responseType: 'arraybuffer',
+  });
+
+  return Buffer.from(response.data, 'binary');
+};
 
 // 画像を連結し1枚の画像にまとめる
 export const createConcatImage = async (imagePaths: string[], userId: string): Promise<void> => {
@@ -11,8 +22,16 @@ export const createConcatImage = async (imagePaths: string[], userId: string): P
       await fs.promises.unlink(outputImagePath);
     }
 
-    // 画像を読み込む
-    const images = await Promise.all(imagePaths.map((path) => sharp(path).toBuffer()));
+    // URLまたはローカルパスから画像を読み込む
+    const images = await Promise.all(
+      imagePaths.map(async (path) => {
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+          return downloadImage(path);
+        } else {
+          return sharp(path).toBuffer();
+        }
+      })
+    );
 
     // 画像のメタデータを取得
     const metadataList = await Promise.all(images.map((image) => sharp(image).metadata()));

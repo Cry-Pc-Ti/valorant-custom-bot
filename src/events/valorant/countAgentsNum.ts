@@ -1,13 +1,13 @@
-import { valorantAgents } from '../common/readJsonData';
+import { AgentData } from '../../types/valorantData';
 
-export const countAgentsByRole = (role: string) => {
-  const roleByAgentsNum = valorantAgents.filter((agent) => agent.roleId === role).length;
+export const countAgentsByRole = (agents: AgentData[], role: string) => {
+  const roleByAgentsNum = agents.filter((agent) => agent.roleId === role).length;
   return roleByAgentsNum;
 };
 
-export const countBanAgentsByRole = (role: string, banedAgentIds: string[]) => {
-  const roleByBanedAgentsNum = valorantAgents.filter(
-    (agent) => agent.roleId === role && banedAgentIds.includes(agent.nameId)
+export const countBanAgentsByRole = (agents: AgentData[], role: string, banedAgentIds: string[]) => {
+  const roleByBanedAgentsNum = agents.filter(
+    (agent) => agent.roleId === role && banedAgentIds.includes(agent.id)
   ).length;
   return roleByBanedAgentsNum;
 };

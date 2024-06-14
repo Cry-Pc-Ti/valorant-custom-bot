@@ -1,24 +1,27 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { AgentData } from '../../../types/valorantData';
-import { valorantAgents } from '../../../events/common/readJsonData';
 import { agentMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
+import { fetchAgentsData } from '../../../service/valorant.service';
 
 export const agentCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     // エージェントロールを取得
     const agentRole: string | null = interaction.options.getString('role');
 
+    // valorant-apiからエージェント情報を取得
+    const agents: AgentData[] = await fetchAgentsData();
+
     // ランダムに選択されたエージェントのデータを格納する変数
     let randomAgent: AgentData;
 
     // ロールが指定されていない場合は、エージェント全体からランダムに選択
     if (!agentRole) {
-      randomAgent = valorantAgents[Math.floor(Math.random() * valorantAgents.length)];
+      randomAgent = agents[Math.floor(Math.random() * agents.length)];
 
       // ロールが指定されている場合は、そのロールのエージェントからランダムに選択
     } else {
-      const filteredAgents: AgentData[] = valorantAgents.filter((agent) => agent.roleId === agentRole);
+      const filteredAgents: AgentData[] = agents.filter((agent) => agent.roleId === agentRole);
       randomAgent = filteredAgents[Math.floor(Math.random() * filteredAgents.length)];
     }
 
