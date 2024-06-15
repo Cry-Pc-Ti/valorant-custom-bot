@@ -109,7 +109,7 @@ export const fetchMapsData = async () => {
           }
         }
       )
-      .filter((map: MapData): map is MapData => map !== null); // null を除外
+      .filter((map: MapData) => map);
 
     // マップ名で昇順に並び替え
     maps.sort((a, b) => {
