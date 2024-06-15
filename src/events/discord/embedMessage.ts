@@ -206,7 +206,7 @@ export const diceMessage = (message: string, number: number, userId: string) => 
     })
     .setTimestamp();
 
-  const authorAttachment = new AttachmentBuilder('static/img/valorant_agents/gekko_icon.png');
+  const authorAttachment = new AttachmentBuilder('static/img/icon/gekko_icon.png');
   const imageAttachment = new AttachmentBuilder(`static/img/generated/${userId}.png`);
   const fotterAttachment = new AttachmentBuilder(`static/img/icon/valorant_icon.png`);
 

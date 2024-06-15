@@ -64,7 +64,6 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
 
       // BANされているユーザーを取得
       const bannedUserIds = loadBannedUsers();
-      console.log(bannedUserIds);
 
       // BANされているユーザーかどうかチェック
       if (bannedUserIds.includes(user.id)) {
