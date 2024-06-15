@@ -14,6 +14,17 @@ export const interactionEditMessages = async (
   });
 };
 
+// メッセージがあるか確認
+export const interactionFetchMessages = async (
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
+  messageId: string
+) => {
+  return await interaction.channel?.messages
+    .fetch(messageId)
+    .then(() => true)
+    .catch(() => false);
+};
+
 // メッセージを編集する(音楽再生完了時)
 // TODO:再生した情報を出したい
 export const donePlayerInteractionEditMessages = async (

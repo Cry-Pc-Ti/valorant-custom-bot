@@ -7,7 +7,7 @@ import {
   showUrlButton,
   stopPlayMusicButton,
 } from './music/musicButtonHandlers';
-import { interactionEditMessages } from '../events/discord/interactionMessages';
+import { interactionEditMessages, interactionFetchMessages } from '../events/discord/interactionMessages';
 import { CLIENT_ID } from '../modules/discordModule';
 import { COMMAND_NAME_MUSIC } from '../commands/music/mainMusicCommand';
 import { isHttpError } from '../events/common/errorUtils';
@@ -16,21 +16,17 @@ import { COMMAND_NAME_VALORANT } from '../commands/valorant/mainValorantCommand'
 import { moveAttackersToChannel, moveDefendersToChannel } from './valorant/moveMembersButtonHandlers';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from '../events/common/cooldowns';
 
-// コマンドごとのクールダウン時間（ミリ秒）
-const commandCooldowns = new Map<string, number>([
-  [COMMAND_NAME_MUSIC, 3000], // 4秒
-  [COMMAND_NAME_VALORANT, 1000], // 1秒
-]);
-
 /**
  * ボタンのインタラクションを処理する関数
  *
  * @param interaction - ボタンインタラクション
  */
 export const buttonHandlers = async (interaction: ButtonInteraction) => {
-  if (!interaction.replied && !interaction.deferred) {
-    await interaction.deferUpdate();
-  }
+  // if (!interaction.replied && !interaction.deferred) {
+  //   await interaction.deferUpdate();
+  // }
+  await interaction.deferUpdate();
+
   const { customId, guildId } = interaction;
 
   if (!guildId) return;
@@ -52,6 +48,12 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
       });
     }
 
+    // コマンドごとのクールダウン時間（ミリ秒）
+    const commandCooldowns = new Map<string, number>([
+      [COMMAND_NAME_MUSIC, 3000], // 4秒
+      [COMMAND_NAME_VALORANT, 1000], // 1秒
+    ]);
+
     // スパム対策
     if (isCooldownActive(commandName, commandStates.uniqueId, commandCooldowns)) {
       const timeLeft = getCooldownTimeLeft(commandName, commandStates.uniqueId, commandCooldowns);
@@ -61,10 +63,10 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
     }
 
     setCooldown(commandName, commandStates.uniqueId, commandCooldowns);
+    const replyMessageIdFlg = await interactionFetchMessages(interaction, commandStates.replyMessageId);
 
     // メッセージを削除
-    if (interaction.channel?.messages.fetch(commandStates.replyMessageId))
-      await interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, '');
+    if (replyMessageIdFlg) await interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, '');
 
     await processButtonInteraction(customId, commandStates.uniqueId, interaction);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

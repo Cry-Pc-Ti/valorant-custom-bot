@@ -86,7 +86,6 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
         commandStates.buttonRowArray[1].components[0].setEmoji('🔁');
       }
     }
-
     do {
       // 次へと前へのボタンの制御
       if (musicCommandInfo?.songIndex === 0 && musicCommandInfo.playListInfo.musicInfo.length === 1) {
@@ -134,6 +133,7 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
         replyMessageId: commandStates.replyMessageId,
         musicCommandInfo: musicCommandInfo,
       });
+
       // リピートフラグがtrueの時曲を再生
       do {
         await playMusicStream(musicCommandInfo.player, musicInfo).catch(async (error) => {
