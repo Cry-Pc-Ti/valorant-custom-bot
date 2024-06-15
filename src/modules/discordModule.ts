@@ -11,9 +11,10 @@ const CLIENT_ID = process.env.DISCORD_CLIENT_ID as string;
 const discord = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
   ],
   closeTimeout: 60000,
 });
