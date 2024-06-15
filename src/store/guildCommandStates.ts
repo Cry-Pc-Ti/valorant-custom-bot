@@ -1,4 +1,5 @@
 import { COMMAND_NAME_MUSIC } from '../commands/music/mainMusicCommand';
+import { Logger } from '../events/common/log';
 import { terminateMidwayInteractionEditMessages } from '../events/discord/interactionMessages';
 import { CommandInfo } from '../types/guildStatesData';
 
@@ -91,6 +92,9 @@ export const stopPreviousInteraction = async (guildId: string, commandName: stri
     commandState.musicCommandInfo?.player.stop();
     commandState.musicCommandInfo?.player.removeAllListeners();
     commandState.buttonCollector.stop();
+    Logger.LogAccessInfo(
+      `【${commandState.interaction.guild?.name}(${commandState.interaction.guild?.id})】BOTがVCから切断`
+    );
 
     guildCommandStates.get(guildId)?.delete(commandName);
   }

@@ -96,6 +96,7 @@ export const getSpotifyPlayList = async (): Promise<SpotifyPlaylistInfo[]> => {
     });
   } catch (error) {
     Logger.LogSystemError(`getSpotifyPlayListでエラーが発生しました`, error);
-    throw error;
+    const spotifyPlaylist: SpotifyPlaylistInfo[] = [];
+    throw spotifyPlaylist;
   }
 };

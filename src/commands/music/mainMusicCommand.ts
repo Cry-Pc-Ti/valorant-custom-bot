@@ -22,7 +22,7 @@ export const mainMusicCommand = {
         .addStringOption((option) =>
           option
             .setName('shuffle')
-            .setDescription('プレイリストをランダムに再生したい場合はtrueを入れてください')
+            .setDescription('プレイリストをランダムに再生したい場合はするを入れてください')
             .setRequired(true)
             .setChoices({ name: 'する', value: 'true' }, { name: 'しない', value: 'false' })
         )
@@ -59,7 +59,9 @@ export const mainMusicCommand = {
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
-    .addSubcommand((subcommand) => subcommand.setName('hitsongs').setDescription('ヒットソングを再生します。'))
+    .addSubcommand((subcommand) =>
+      subcommand.setName('hitsongs').setDescription('今はやりの音楽をジャンルごとにご紹介！')
+    )
     .toJSON(),
 
   /**

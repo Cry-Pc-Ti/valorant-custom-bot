@@ -34,6 +34,7 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
     // Spotifyのプレイリスト情報を取得
     const spotifyPlaylists: SpotifyPlaylistInfo[] = await getSpotifyPlayList();
+    if (!spotifyPlaylists) return interaction.editReply('プレイリスト情報が取得できませんでした。再度選択してください');
 
     // セレクトメニューを作成
     const playListSelect: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -100,7 +101,7 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
 
         // データ収集
         Logger.LogAccessInfo(
-          `【${interaction.guild?.name}(${interaction.guild?.id})】${interaction.user.username}(${interaction.user.id})さんが${spotifyPlaylistInfo.name} を選択しました。`
+          `【${interaction.guild?.name}(${interaction.guild?.id})】${interaction.user.username}(${interaction.user.id})さんが${spotifyPlaylistInfo.name} を選択`
         );
 
         // playList再生処理
