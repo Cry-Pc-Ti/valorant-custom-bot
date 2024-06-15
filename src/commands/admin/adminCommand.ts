@@ -1,7 +1,14 @@
 import { Message } from 'discord.js';
 import { createServerMessage } from '../../events/admin/sendServerInfo';
 import { discord } from '../../modules/discordModule';
-import { loadBannedUsers, saveBannedUser, unBanUser, updateBanUser } from '../../events/notion/manageBanUsers';
+import {
+  checkUserBanStatus,
+  fetchBanUsersData,
+  loadBannedUsers,
+  saveBannedUser,
+  unBanUser,
+  updateBanUser,
+} from '../../events/notion/manageBanUsers';
 import { getTotalMusicCommandCount } from '../../store/guildCommandStates';
 import { BanUserData } from '../../types/banUserData';
 
@@ -40,8 +47,8 @@ export const adminCommand = async (message: Message, command: string, option: st
       return;
     }
 
-    // BANされているユーザーを取得
-    const bannedUsersData: BanUserData[] = loadBannedUsers();
+    // BANユーザーリストを取得
+    const bannedUsersData: BanUserData[] = await fetchBanUsersData();
 
     // BANするユーザーが登録されていない場合
     if (!bannedUsersData.find((user) => user.id === userId)) {
@@ -75,10 +82,17 @@ export const adminCommand = async (message: Message, command: string, option: st
     }
 
     // BANされているユーザーを取得
-    const bannedUsers: BanUserData[] = loadBannedUsers();
+    const bannedUsers = loadBannedUsers();
 
     // BANするユーザーがBANされている場合のみBAN解除する
-    if (bannedUsers.find((user) => user.id === userId && user.isBan === true)) {
+    if (bannedUsers.includes(userId)) {
+      const isBanned = await checkUserBanStatus(userId);
+
+      if (!isBanned) {
+        await message.reply(`${userId}はBANされていません`);
+        return;
+      }
+
       // BANユーザーを更新
       unBanUser(userId);
 

@@ -14,8 +14,7 @@ import { helpCommand } from './commands/help/helpCommand';
 import { adminCommand } from './commands/admin/adminCommand';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from './events/common/cooldowns';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
-import { fetchBannedUsersData, loadBannedUsers } from './events/notion/manageBanUsers';
-import { BanUserData } from './types/banUserData';
+import { fetchBannedUserIds, loadBannedUsers } from './events/notion/manageBanUsers';
 
 // コマンド名とそれに対応するコマンドオブジェクトをマップに格納
 const commands = {
@@ -47,7 +46,7 @@ discord.on('ready', async () => {
     status: 'online',
   });
   Logger.initialize();
-  await fetchBannedUsersData();
+  await fetchBannedUserIds();
 });
 
 // コマンドごとのクールダウン時間（ミリ秒）
@@ -64,10 +63,11 @@ discord.on('interactionCreate', async (interaction: Interaction) => {
       const { commandName, user, guild } = interaction;
 
       // BANされているユーザーを取得
-      const bannedUsers: BanUserData[] = loadBannedUsers();
+      const bannedUserIds = loadBannedUsers();
+      console.log(bannedUserIds);
 
       // BANされているユーザーかどうかチェック
-      if (bannedUsers.find((user) => user.id === user.id && user.isBan)) {
+      if (bannedUserIds.includes(user.id)) {
         interaction.reply(
           `下のドキュメントに記載されているお問い合わせ先から運営にご連絡してください\nhttps://wingman-kun.notion.site/Discord-Bot-b9b2f66d841b440f9a4e466aedc5fa49`
         );
