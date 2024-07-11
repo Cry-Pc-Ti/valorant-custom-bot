@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@discordjs/voice": "^0.16.1",
+    "@distube/ytdl-core": "^4.13.5",
     "@notionhq/client": "^2.2.15",
     "@types/log4js": "^2.3.5",
     "archiver": "^7.0.1",
@@ -41,6 +42,7 @@
     "genius-lyrics": "^4.4.7",
     "libsodium-wrappers": "^0.7.13",
     "log4js": "^6.9.1",
+    "miniget": "^4.2.3",
     "opusscript": "^0.0.8",
     "sharp": "^0.33.3",
     "typedoc": "^0.25.13",
