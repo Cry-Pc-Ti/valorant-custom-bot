@@ -72,9 +72,11 @@ export const playListMusicMainLogic = async (
     });
 
     await streamPlaylist(guildId, 0, false);
+    if (connection) {
+      // BOTをdiscordから切断
+      connection.destroy();
+    }
 
-    // BOTをdiscordから切断
-    connection.destroy();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     Logger.LogError(`【${guildId}】playListMusicMainLogicでエラーが発生しました`, error);

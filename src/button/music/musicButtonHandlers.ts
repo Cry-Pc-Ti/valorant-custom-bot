@@ -20,8 +20,10 @@ export const nextPlayMusicButton = async (interaction: ButtonInteraction) => {
   // playListを再生する処理
   await streamPlaylist(guildId, ++musicCommandInfo.songIndex, true);
 
-  // BOTをdiscordから切断
-  connection.destroy();
+  if (connection) {
+    // BOTをdiscordから切断
+    connection.destroy();
+  }
 
   return;
 };
@@ -40,8 +42,10 @@ export const prevPlayMusicButton = async (interaction: ButtonInteraction) => {
   // playListを再生する処理
   await streamPlaylist(guildId, --musicCommandInfo.songIndex, true);
 
-  // BOTをdiscordから切断
-  connection.destroy();
+  if (connection) {
+    // BOTをdiscordから切断
+    connection.destroy();
+  }
 
   return;
 };

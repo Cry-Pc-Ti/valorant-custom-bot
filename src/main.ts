@@ -156,7 +156,7 @@ discord.on('messageCreate', async (message) => {
 discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
   try {
     if (oldState.member?.id === CLIENT_ID && !newState.channel) {
-      await stopPreviousInteraction(oldState.guild.id, COMMAND_NAME_MUSIC);
+      await stopPreviousInteraction(oldState.guild.id, COMMAND_NAME_MUSIC, true);
     }
 
     // ボットがいるチャンネルであるかを確認
@@ -169,7 +169,7 @@ discord.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState
     // ボットがいるチャンネルで一人残った場合にのみ切断
     if (botChannel && botChannel.members.size === 1) {
       const guildId = oldState.guild.id;
-      if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+      if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, true);
       botMember.voice.disconnect();
     }
   } catch (error) {

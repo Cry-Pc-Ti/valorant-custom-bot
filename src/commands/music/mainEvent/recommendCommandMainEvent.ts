@@ -19,7 +19,7 @@ const BATCH_SIZE = 5;
 export const recommendCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const guildId = interaction.guildId;
-    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, true);
 
     const url = interaction.options.getString('url') ?? '';
 

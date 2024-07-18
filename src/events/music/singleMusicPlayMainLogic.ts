@@ -1,15 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
-
-import { interactionEditMessages } from '../discord/interactionMessages';
-
 import { createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
-
 import { Logger } from '../common/log';
-import { musicInfoMessage, donePlayerMessage } from '../discord/embedMessage';
-import { playMusicStream, deletePlayerInfo } from './playBackMusic';
+import { musicInfoMessage } from '../discord/embedMessage';
+import { playMusicStream } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 import { v4 as uuidv4 } from 'uuid';
-import { deleteGuildCommandStates, getRepeatModeStates, setGuildCommandStates } from '../../store/guildCommandStates';
+import { getRepeatModeStates, setGuildCommandStates, stopPreviousInteraction } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 
 /**
@@ -86,17 +82,13 @@ export const singleMusicMainLogic = async (
       await playMusicStream(player, musicInfo);
     } while (getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 1);
 
-    // 再生完了した際メッセージを送信
-    const embeds = donePlayerMessage();
-    interactionEditMessages(interaction, replyMessageId, embeds);
-
-    // PlayerとListenerを削除
-    deletePlayerInfo(player);
-
     // 情報を削除
-    deleteGuildCommandStates(guildId, COMMAND_NAME_MUSIC);
-    // BOTをdiscordから切断
-    connection.destroy();
+    await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, false);
+
+    if (connection) {
+      // BOTをdiscordから切断
+      connection.destroy();
+    }
   } catch (error) {
     Logger.LogError(`【${guildId}】singleMusicMainLogicでエラーが発生しました`, error);
   }

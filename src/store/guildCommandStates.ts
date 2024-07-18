@@ -1,6 +1,9 @@
 import { COMMAND_NAME_MUSIC } from '../commands/music/mainMusicCommand';
 import { Logger } from '../events/common/log';
-import { terminateMidwayInteractionEditMessages } from '../events/discord/interactionMessages';
+import {
+  donePlayerInteractionEditMessages,
+  terminateMidwayInteractionEditMessages,
+} from '../events/discord/interactionMessages';
 import { CommandInfo } from '../types/guildStatesData';
 
 /**
@@ -85,15 +88,22 @@ export const setGuildCommandStates = (guildId: string, commandName: string, comm
  * @param guildId - ギルドID
  * @param commandName - コマンド名
  */
-export const stopPreviousInteraction = async (guildId: string, commandName: string) => {
+export const stopPreviousInteraction = async (guildId: string, commandName: string, flag: boolean) => {
   const commandState = getCommandStates(guildId, commandName);
   if (commandState) {
-    await terminateMidwayInteractionEditMessages(commandState.interaction, commandState.replyMessageId);
+    if (flag) {
+      // 途中終了した際メッセージを送信
+      await terminateMidwayInteractionEditMessages(commandState.interaction, commandState.replyMessageId);
+    } else {
+      // 再生完了した際メッセージを送信
+      await donePlayerInteractionEditMessages(commandState.interaction, commandState.replyMessageId);
+    }
+
     commandState.musicCommandInfo?.player.stop();
     commandState.musicCommandInfo?.player.removeAllListeners();
     commandState.buttonCollector.stop();
     Logger.LogAccessInfo(
-      `【${commandState.interaction.guild?.name}(${commandState.interaction.guild?.id})】BOTがVCから切断`
+      `【${commandState.interaction.guild?.name}(${commandState.interaction.guild?.id})】インタラクションを削除`
     );
 
     guildCommandStates.get(guildId)?.delete(commandName);

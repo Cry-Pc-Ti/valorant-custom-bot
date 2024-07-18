@@ -9,6 +9,7 @@ import {
   setRepeatModeStates,
   setReplyMessageIdStates,
   setSongIndexStates,
+  stopPreviousInteraction,
 } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
 import { musicInfoPlayListMessage } from '../discord/embedMessage';
@@ -171,13 +172,8 @@ export const streamPlaylist = async (guildId: string, songIndex: number, buttonF
       getRepeatModeStates(guildId, COMMAND_NAME_MUSIC) === 2
     );
 
-    // PlayerとListenerを削除
-    deletePlayerInfo(musicCommandInfo.player);
-
-    // 再生完了した際メッセージを送信
-    await donePlayerInteractionEditMessages(commandStates.interaction, commandStates.replyMessageId);
-
-    deleteGuildCommandStates(guildId, COMMAND_NAME_MUSIC);
+    // 情報を削除
+    await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, false);
   } catch (error) {
     Logger.LogError(`【${guildId}】streamPlaylistでエラーが発生しました`, error);
   }

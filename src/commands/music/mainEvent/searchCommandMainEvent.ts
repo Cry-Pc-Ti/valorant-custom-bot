@@ -28,7 +28,7 @@ export const searchCommandMainEvent = async (interaction: ChatInputCommandIntera
 
   try {
     const guildId = interaction.guildId;
-    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, true);
 
     const words = interaction.options.getString('words');
     const type = interaction.options.getString('type');

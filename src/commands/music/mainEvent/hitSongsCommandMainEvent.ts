@@ -26,7 +26,7 @@ export const hitSongsCommandMainEvent = async (interaction: ChatInputCommandInte
   const replyMessageId: string = (await interaction.fetchReply()).id;
   try {
     const guildId = interaction.guildId;
-    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, true);
 
     // ボイスチャンネルにいない場合は処理しない
     const voiceChannelId = (await interaction.guild?.members.fetch(interaction.user.id))?.voice.channelId;

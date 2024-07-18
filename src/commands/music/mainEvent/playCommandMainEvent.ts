@@ -16,7 +16,7 @@ import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 export const playCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
     const guildId = interaction.guildId;
-    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC);
+    if (guildId) await stopPreviousInteraction(guildId, COMMAND_NAME_MUSIC, true);
 
     const url = interaction.options.getString('url');
     const shuffleFlag: boolean = interaction.options.getString('shuffle') === 'true';
