@@ -18,7 +18,7 @@ export const mainMusicCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('play')
-        .setDescription('VCで音楽を流します。')
+        .setDescription('【音楽】VCで音楽を流します。')
         .addStringOption((option) =>
           option
             .setName('shuffle')
@@ -30,11 +30,11 @@ export const mainMusicCommand = {
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
-    .addSubcommand((subcommand) => subcommand.setName('disconnect').setDescription('BOTをVCから切断します。'))
+    .addSubcommand((subcommand) => subcommand.setName('disconnect').setDescription('【音楽】BOTをVCから切断します。'))
     .addSubcommand((subcommand) =>
       subcommand
         .setName('search')
-        .setDescription('入力されたワードから検索して再生します')
+        .setDescription('【音楽】入力されたワードから検索して再生します')
         .addStringOption((option) =>
           option.setName('words').setDescription('検索したいワードを入力してください').setRequired(true)
         )
@@ -54,13 +54,13 @@ export const mainMusicCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('recommend')
-        .setDescription('指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
+        .setDescription('【音楽】指定されたURLから関連のある曲を再生します（新しい曲探しの旅に出たい方はどうぞ）')
         .addStringOption((option) =>
           option.setName('url').setDescription('再生したいURLを入力（プレイリストも可）').setRequired(true)
         )
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName('hitsongs').setDescription('今はやりの音楽をジャンルごとにご紹介！')
+      subcommand.setName('hitsongs').setDescription('【音楽】今はやりの音楽をジャンルごとにご紹介！')
     )
     .toJSON(),
 

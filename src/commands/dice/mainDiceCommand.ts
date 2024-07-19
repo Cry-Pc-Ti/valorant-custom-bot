@@ -9,7 +9,7 @@ export const mainDiceCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('chinchiro')
-        .setDescription('ざわ…ざわ…')
+        .setDescription('【ゲーム】ざわ…ざわ…（かいじネタです。すいません。）')
         .addStringOption((option) =>
           option
             .setName('cheat')
@@ -18,7 +18,7 @@ export const mainDiceCommand = {
         )
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName('number').setDescription('1から100までの数字をランダムに出します')
+      subcommand.setName('number').setDescription('【ゲーム】1から100までの数字をランダムに出します')
     )
     .toJSON(),
 

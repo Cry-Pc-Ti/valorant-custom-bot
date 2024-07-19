@@ -142,3 +142,13 @@ export const fetchMapsData = async () => {
     throw error;
   }
 };
+
+export const getValorantUserMmr = async (username: string, tag: string) => {
+  const encodedUsername = encodeURIComponent(username);
+  const encodedTag = encodeURIComponent(tag);
+  const VALORANT_VALORANTRANK_URL = `https://api.kyroskoh.xyz/valorant/v1/mmr/ap/${encodedUsername}/${encodedTag}`;
+
+  const valorantRank = await axios.get(VALORANT_VALORANTRANK_URL);
+
+  return valorantRank.data;
+};

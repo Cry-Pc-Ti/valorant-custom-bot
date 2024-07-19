@@ -4,6 +4,7 @@ import { mapCommandMainEvent } from './mainEvent/mapCommandMainEvent';
 import { agentCommandMainEvent } from './mainEvent/agentCommandMainEvent';
 import { compositionCommandMainEvent } from './mainEvent/compositionCommandMainEvent';
 import { teamCommandMainEvent } from './mainEvent/teamCommandMainEvent';
+import { registerCommandMainEvent } from './mainEvent/registerCommandMainEvent';
 
 export const COMMAND_NAME_VALORANT: string = 'valo';
 
@@ -11,11 +12,11 @@ export const mainValorantCommand = {
   data: new SlashCommandBuilder()
     .setName(COMMAND_NAME_VALORANT)
     .setDescription('valorant用のコマンドです。')
-    .addSubcommand((subcommand) => subcommand.setName('map').setDescription('マップをランダムに選択します'))
+    .addSubcommand((subcommand) => subcommand.setName('map').setDescription('【valorant】マップをランダムに選択します'))
     .addSubcommand((subcommand) =>
       subcommand
         .setName('agent')
-        .setDescription('エージェントをランダムに選択します (ロール指定可)')
+        .setDescription('【valorant】エージェントをランダムに選択します (ロール指定可)')
         .addStringOption((option) =>
           option
             .setName('role')
@@ -31,7 +32,7 @@ export const mainValorantCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('composition')
-        .setDescription('ランダムに構成を作成します')
+        .setDescription('【valorant】ランダムに構成を作成します')
         .addNumberOption((option) =>
           option
             .setName('duelist')
@@ -94,7 +95,7 @@ export const mainValorantCommand = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName('team')
-        .setDescription('メンバーをランダムでチーム分けします。')
+        .setDescription('【valorant】メンバーをランダムでチーム分けします。')
         .addChannelOption((option) =>
           option
             .setName('attacker')
@@ -110,6 +111,17 @@ export const mainValorantCommand = {
             .setRequired(true)
         )
     )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('rank')
+        .setDescription('【valorant】あなたのランクを表示・登録します。')
+        .addStringOption((option) =>
+          option.setName('name').setDescription('#の前のプレイヤーネームを入力してください。').setRequired(true)
+        )
+        .addStringOption((option) =>
+          option.setName('tag').setDescription('#の後のプレイヤーネームを入力してください。').setRequired(true)
+        )
+    )
     .toJSON(),
 
   execute: async (interaction: ChatInputCommandInteraction) => {
@@ -120,16 +132,20 @@ export const mainValorantCommand = {
       return await mapCommandMainEvent(interaction);
     }
     // agent command
-    if (interaction.options.getSubcommand() === 'agent') {
+    else if (interaction.options.getSubcommand() === 'agent') {
       return await agentCommandMainEvent(interaction);
     }
     // composition command
-    if (interaction.options.getSubcommand() === 'composition') {
+    else if (interaction.options.getSubcommand() === 'composition') {
       return await compositionCommandMainEvent(interaction);
     }
     // team command
-    if (interaction.options.getSubcommand() === 'team') {
+    else if (interaction.options.getSubcommand() === 'team') {
       return await teamCommandMainEvent(interaction);
+    }
+    // rank command
+    else if (interaction.options.getSubcommand() === 'rank') {
+      return await registerCommandMainEvent(interaction);
     }
   },
 };
