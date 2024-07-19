@@ -14,18 +14,34 @@ export const fetchAgentsData = async () => {
 
     // エージェント情報を整形
     const agents_jp: AgentData_JP[] = response_jp.data.data
-      .map((agent: { uuid: string; displayName: string; role: { displayName: string }; displayIcon: string }) => {
-        // 空のエージェント情報を除外
-        if (!agent.displayName || !agent.role || !agent.role.displayName) {
-          return null;
+      .map(
+        (agent: {
+          uuid: string;
+          displayName: string;
+          role: { displayName: string };
+          displayIcon: string;
+          description: string;
+          abilities: {
+            slot: string;
+            displayName: string;
+            description: string;
+            displayIcon: string;
+          };
+        }) => {
+          // 空のエージェント情報を除外
+          if (!agent.displayName || !agent.role || !agent.role.displayName) {
+            return null;
+          }
+          return {
+            uuid: agent.uuid,
+            name: agent.displayName,
+            role: agent.role.displayName,
+            iconUrl: agent.displayIcon,
+            description: agent.description,
+            abilities: agent.abilities,
+          };
         }
-        return {
-          uuid: agent.uuid,
-          name: agent.displayName,
-          role: agent.role.displayName,
-          iconUrl: agent.displayIcon,
-        };
-      })
+      )
       .filter((agent: AgentData_JP): agent is AgentData_JP => agent !== null); // null を除外
 
     const agents_en: AgentData_EN[] = response_en.data.data
@@ -54,6 +70,8 @@ export const fetchAgentsData = async () => {
             roleId: agent_en.roleId,
             uuid: agent_jp.uuid,
             iconUrl: agent_jp.iconUrl,
+            description: agent_jp.description,
+            abilities: agent_jp.abilities,
           };
         }
         return null;

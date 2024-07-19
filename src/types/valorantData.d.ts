@@ -5,6 +5,8 @@ export interface AgentData {
   roleId: string;
   uuid: string;
   iconUrl: string;
+  description: string;
+  abilities: abilities[];
 }
 
 export interface AgentData_JP {
@@ -12,6 +14,8 @@ export interface AgentData_JP {
   role: string;
   uuid: string;
   iconUrl: string;
+  description: string;
+  abilities: abilities[];
 }
 
 export interface AgentData_EN {
@@ -40,4 +44,11 @@ interface APIMapDetail {
   displayName: string;
   displayIcon: string;
   splash: string;
+}
+
+interface abilities {
+  slot: string;
+  displayName: string;
+  description: string;
+  displayIcon: string;
 }

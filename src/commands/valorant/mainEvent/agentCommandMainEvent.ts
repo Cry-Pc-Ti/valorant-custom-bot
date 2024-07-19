@@ -26,7 +26,7 @@ export const agentCommandMainEvent = async (interaction: ChatInputCommandInterac
     }
 
     // メッセージを作成
-    const embed = agentMessage(randomAgent);
+    const embed = agentMessage(randomAgent, Boolean(agentRole));
 
     // メッセージを送信
     await interaction.editReply(embed);
