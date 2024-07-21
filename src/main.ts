@@ -1,6 +1,6 @@
 // モジュールをインポート
-import { Interaction, REST, Routes, VoiceState } from 'discord.js';
-import { CLIENT_ID, discord, TOKEN } from '../src/modules/discordModule';
+import { Client, Interaction, REST, Routes, VoiceState } from 'discord.js';
+import { CLIENT_ID, discord, OFFICIAL_DCIORD_ID, TOKEN } from '../src/modules/discordModule';
 
 // コマンドをインポート
 import { COMMAND_NAME_MUSIC, mainMusicCommand } from './commands/music/mainMusicCommand';
@@ -15,6 +15,7 @@ import { mainValorantCommand } from './commands/valorant/mainValorantCommand';
 import { commands } from './modules/commandsModule';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 import { fetchBannedUserIds, loadBannedUsers } from './events/notion/manageBanUsers';
+import { loadEmojis } from './events/discord/getEmojis';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -31,14 +32,16 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 })();
 
 // クライアントオブジェクトが準備完了時に実行
-discord.on('ready', async () => {
+discord.on('ready', async (client: Client) => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
   discord.user?.setPresence({
-    activities: [{ name: '今日も元気に働いています', type: 0 }],
+    activities: [{ name: 'wingmankun ver2.1.0 /help', type: 0 }],
     status: 'online',
   });
   Logger.initialize();
   await fetchBannedUserIds();
+
+  loadEmojis(client, OFFICIAL_DCIORD_ID);
 });
 
 /**

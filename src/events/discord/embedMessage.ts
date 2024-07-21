@@ -139,8 +139,7 @@ export const mapMessage = (map: MapData) => {
     .setFooter({
       text: 'VALORANT',
       iconURL: 'attachment://valorant_icon.png',
-    })
-    .setTimestamp();
+    });
 
   const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
   const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');

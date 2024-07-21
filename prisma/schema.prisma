@@ -15,7 +15,10 @@ datasource db {
 
 model Valorant_User {
    id        String   @id
-   name      String
+   user_name      String
+   display_name      String
+   riot_id      String
+   riot_id_tag      String
    rank      String
    rank_num  Int?
    rank_rr  Int

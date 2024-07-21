@@ -1,8 +1,23 @@
 export interface ValorantUser {
   id: string;
-  name: string;
+  userName: string;
+  displayName: string;
   rank: string;
+  riotId: string;
+  riotIdTag: string;
   userIcon: string | null;
-  rank_num: number | null;
-  rank_rr: number;
+  rankNum: number | null;
+  rankRr: number;
+}
+
+export interface ValorantUserResponse {
+  id: string;
+  userName: string;
+  displayName: string;
+  rank: string;
+  riotId: string;
+  riotIdTag: string;
+  rankNum: number | null;
+  rankRr: number;
+  updateAt: Date;
 }

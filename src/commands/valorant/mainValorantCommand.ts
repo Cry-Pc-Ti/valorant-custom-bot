@@ -115,12 +115,7 @@ export const mainValorantCommand = {
       subcommand
         .setName('rank')
         .setDescription('【valorant】あなたのランクを表示・登録します。')
-        .addStringOption((option) =>
-          option.setName('name').setDescription('#の前のプレイヤーネームを入力してください。').setRequired(true)
-        )
-        .addStringOption((option) =>
-          option.setName('tag').setDescription('#の後のプレイヤーネームを入力してください。').setRequired(true)
-        )
+        .addStringOption((option) => option.setName('riot-id').setDescription('riot-idを入力してください。'))
     )
     .toJSON(),
 
