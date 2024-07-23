@@ -1,4 +1,9 @@
-import { createValorantUser, findOneValorantUser, updateOneValorantUser } from '../repositories/valorantUserRepository';
+import {
+  createValorantUser,
+  findManyValorantUser,
+  findOneValorantUser,
+  updateOneValorantUser,
+} from '../repositories/valorantUserRepository';
 import { ValorantUser, ValorantUserResponse } from '../types/valorantUserData';
 
 // ValorantのUser情報をDBに登録
@@ -27,4 +32,30 @@ export const getUniqueValorantUser = async (userID: string): Promise<ValorantUse
     rankRr: userInfo.rank_rr,
     updateAt: userInfo.updated_at,
   };
+};
+
+export const getValorantUsersRank = async (userIds: string[]) => {
+  const fetchedValorantUsersResponse = await findManyValorantUser(userIds);
+
+  const userRankMap = new Map<string, ValorantUserResponse>();
+
+  fetchedValorantUsersResponse.forEach((user) => {
+    userRankMap.set(user.id, {
+      id: user.id,
+      userName: user?.user_name,
+      displayName: user?.display_name,
+      riotId: user.riot_id,
+      riotIdTag: user.riot_id_tag,
+      rank: user.rank,
+      rankNum: user.rank_num ?? null,
+      rankRr: user.rank_rr,
+      updateAt: user.updated_at,
+    });
+  });
+  const defaultRankInfo = {
+    rank: 'Unrated',
+    rankNum: null,
+    rankRr: 0,
+  };
+  return userIds.map((userId) => userRankMap.get(userId) || { ...defaultRankInfo, id: userId });
 };

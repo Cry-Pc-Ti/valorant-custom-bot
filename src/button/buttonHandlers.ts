@@ -13,7 +13,11 @@ import { COMMAND_NAME_MUSIC } from '../commands/music/mainMusicCommand';
 import { isHttpError } from '../events/common/errorUtils';
 import { Logger } from '../events/common/log';
 import { COMMAND_NAME_VALORANT } from '../commands/valorant/mainValorantCommand';
-import { moveAttackersToChannel, moveDefendersToChannel } from './valorant/moveMembersButtonHandlers';
+import {
+  moveAttackersToChannel,
+  moveDefendersToChannel,
+  nextPatternMessage,
+} from './valorant/moveMembersButtonHandlers';
 import { getCooldownTimeLeft, isCooldownActive, setCooldown } from '../events/common/cooldowns';
 
 /**
@@ -22,9 +26,6 @@ import { getCooldownTimeLeft, isCooldownActive, setCooldown } from '../events/co
  * @param interaction - ボタンインタラクション
  */
 export const buttonHandlers = async (interaction: ButtonInteraction) => {
-  // if (!interaction.replied && !interaction.deferred) {
-  //   await interaction.deferUpdate();
-  // }
   await interaction.deferUpdate();
 
   const { customId, guildId } = interaction;
@@ -68,7 +69,7 @@ export const buttonHandlers = async (interaction: ButtonInteraction) => {
     // メッセージを削除
     if (replyMessageIdFlg) await interactionEditMessages(commandStates.interaction, commandStates.replyMessageId, '');
 
-    await processButtonInteraction(customId, commandStates.uniqueId, interaction);
+    return await processButtonInteraction(customId, commandStates.uniqueId, interaction);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     await handleError(interaction, guildId, error);
@@ -89,7 +90,7 @@ const determineCommandName = (customId: string): string => {
     customId.startsWith('showUrlButton')
   ) {
     return COMMAND_NAME_MUSIC;
-  } else if (customId.startsWith('attacker') || customId.startsWith('difender')) {
+  } else if (customId.startsWith('attacker') || customId.startsWith('difender') || customId.startsWith('nextPattern')) {
     return COMMAND_NAME_VALORANT;
   }
   return '';
@@ -104,19 +105,21 @@ const determineCommandName = (customId: string): string => {
  */
 const processButtonInteraction = async (customId: string, uniqueId: string, interaction: ButtonInteraction) => {
   if (customId === `nextPlayMusicButton_${uniqueId}`) {
-    await nextPlayMusicButton(interaction);
+    return await nextPlayMusicButton(interaction);
   } else if (customId === `prevPlayMusicButton_${uniqueId}`) {
-    await prevPlayMusicButton(interaction);
+    return await prevPlayMusicButton(interaction);
   } else if (customId === `stopPlayMusicButton_${uniqueId}`) {
-    await stopPlayMusicButton(interaction);
+    return await stopPlayMusicButton(interaction);
   } else if (customId === `repeatSingleButton_${uniqueId}`) {
-    await repeatSingleButton(interaction);
+    return await repeatSingleButton(interaction);
   } else if (customId === `showUrlButton_${uniqueId}`) {
-    await showUrlButton(interaction);
+    return await showUrlButton(interaction);
   } else if (customId === `attacker_${uniqueId}`) {
-    await moveAttackersToChannel(interaction);
+    return await moveAttackersToChannel(interaction);
   } else if (customId === `difender_${uniqueId}`) {
-    await moveDefendersToChannel(interaction);
+    return await moveDefendersToChannel(interaction);
+  } else if (customId === `nextPattern_${uniqueId}`) {
+    return await nextPatternMessage(interaction);
   }
 };
 

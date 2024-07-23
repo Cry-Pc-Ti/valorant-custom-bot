@@ -52,5 +52,7 @@ interface ValorantCommandInfo {
   /** ディフェンダーチャンネルのID */
   defenderChannelId: string;
   /** チームデータ */
-  teams: TeamData;
+  teamPattern: TeamPattern[];
+  /** 何番目を参照しているか */
+  patternIndex: number;
 }

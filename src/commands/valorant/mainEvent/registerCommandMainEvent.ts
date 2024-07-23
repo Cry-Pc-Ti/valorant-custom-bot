@@ -4,7 +4,11 @@ import { getValorantUserMmr } from '../../../service/valorant.service';
 import { ValorantUser, ValorantUserResponse } from '../../../types/valorantUserData';
 import { getUniqueValorantUser, registerValorantUser, updateValorantUser } from '../../../service/valorantUser.service';
 import { differenceInMinutes } from 'date-fns';
-import { rankInfoMessage } from '../../../events/discord/valorantEmbedMessage';
+import {
+  rankInfoMessage,
+  riotIdErrorMessage,
+  riotIdUnkowunsMessage,
+} from '../../../events/discord/valorantEmbedMessage';
 
 export const registerCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -19,14 +23,16 @@ export const registerCommandMainEvent = async (interaction: ChatInputCommandInte
     if (!userInfoResponse) {
       // RIOTIDが入力されていない
       if (!riotId) {
-        return interaction.editReply('DBにデータないからriotId入れてね');
+        const embed = riotIdUnkowunsMessage();
+        return interaction.editReply(embed);
       }
 
       // riotIdからuserName, tagを抽出
       const { userName, tag } = await parseRiotId(riotId);
 
       if (!userName || !tag) {
-        return interaction.editReply('正しいriot-idを入力してね');
+        const embed = riotIdErrorMessage();
+        return interaction.editReply(embed);
       }
 
       const rank = await getValorantUserMmr(userName, tag);
@@ -82,7 +88,8 @@ export const registerCommandMainEvent = async (interaction: ChatInputCommandInte
       const { userName, tag } = await parseRiotId(riotId);
 
       if (!userName || !tag) {
-        return interaction.editReply('正しいriot-idを入力してね');
+        const embed = riotIdErrorMessage();
+        return interaction.editReply(embed);
       }
       if (userName !== valorantUserInfo.riotId && tag !== valorantUserInfo.riotIdTag) {
         riotIdFlag = false;
@@ -117,8 +124,9 @@ export const registerCommandMainEvent = async (interaction: ChatInputCommandInte
     await interaction.editReply(embed);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    if (error.code === 'ERR_BAD_REQUEST') {
-      return interaction.editReply('正しいriot-idを入力してね');
+    if (error.message === 'riotIdError' || error.code === 'ERR_BAD_REQUEST') {
+      const embed = riotIdErrorMessage();
+      return interaction.editReply(embed);
     }
     Logger.LogError(`【${interaction.guild?.id}】registerCommandMainEventでエラーが発生しました`, error);
     await interaction.editReply('処理中にエラーが発生しました。再度コマンドを入力してください。');
@@ -137,7 +145,7 @@ const shouldFetchRankData = async (updatedAt: Date): Promise<boolean> => {
 const parseRank = async (rank: string) => {
   const match = rank.match(/(\w+)(?:\s+(\d+))?\s+-\s+(\d+)/);
   if (!match) {
-    throw new Error('ランク情報のフォーマットが不正です');
+    throw new Error('riotIdError');
   }
   const [, rankName, rankNumber, rr] = match;
   return { rankName, rankNumber, rr };
@@ -146,10 +154,14 @@ const parseRank = async (rank: string) => {
 // RIOT IDをパースする
 const parseRiotId = async (riotId: string) => {
   const hashIndex = riotId.indexOf('#');
-  if (hashIndex === -1) {
-    throw new Error('riotIdに#が存在しない');
+  const hashIndexZenkaku = riotId.indexOf('＃');
+
+  if (hashIndex === -1 && hashIndexZenkaku === -1) {
+    throw new Error('riotIdError');
   }
-  const userName = riotId.slice(0, hashIndex);
-  const tag = riotId.slice(hashIndex + 1);
+
+  const userName = riotId.slice(0, hashIndex === -1 ? hashIndexZenkaku : hashIndex);
+  const tag = riotId.slice(hashIndex === -1 ? hashIndexZenkaku + 1 : hashIndex + 1);
+
   return { userName, tag };
 };

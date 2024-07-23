@@ -1,6 +1,5 @@
 import { EmbedBuilder, AttachmentBuilder, ButtonBuilder, ActionRowBuilder } from 'discord.js';
 import { AgentData, CompositionData, MapData } from '../../types/valorantData';
-import { TeamData } from '../../types/memberData';
 import { MusicInfo, PlayListInfo } from '../../types/musicData';
 import { SpotifyPlaylistInfo } from '../../types/spotifyData';
 
@@ -145,55 +144,6 @@ export const mapMessage = (map: MapData) => {
   const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
 
   return { embeds: [embedMessage], files: [authorAttachment, fotterAttachment], components: [] };
-};
-
-// teamコマンドのメッセージを作成
-export const teamMessage = (
-  memberAllocation: TeamData,
-  buttonRow: ActionRowBuilder<ButtonBuilder>,
-  attackerChannelId: string,
-  defenderChannelId: string,
-  guildId: string
-) => {
-  const embeds = new EmbedBuilder()
-    .setColor('#fd4556')
-    .setAuthor({ name: '抽選結果', iconURL: 'attachment://surprised_penguin.png' })
-    .setDescription('今回のチームはこちらです')
-    .setThumbnail('https://www.streetfighter.com/6/assets/images/character/jamie/jamie.png')
-    .setFooter({
-      text: 'VALORANT',
-      iconURL: 'attachment://valorant_icon.png',
-    })
-    .setTimestamp();
-
-  if (memberAllocation.attack.length) {
-    const attack = [];
-    for (const member of memberAllocation.attack) {
-      attack.push(`:white_small_square:<@${member.id}>`);
-    }
-    embeds.addFields({
-      name: `【アタッカーサイド】\nVC：https://discord.com/channels/${guildId}/${attackerChannelId}`,
-      value: attack.join(`\n`),
-      inline: true,
-    });
-  }
-
-  if (memberAllocation.defense.length) {
-    const defense = [];
-    for (const member of memberAllocation.defense) {
-      defense.push(`:white_small_square:<@${member.id}>`);
-    }
-    embeds.addFields({
-      name: `【ディフェンダーサイド】 \nVC：https://discord.com/channels/${guildId}/${defenderChannelId}`,
-      value: defense.join(`\n`),
-      inline: true,
-    });
-  }
-
-  const authorAttachment = new AttachmentBuilder('static/img/icon/surprised_penguin.png');
-  const fotterAttachment = new AttachmentBuilder('static/img/icon/valorant_icon.png');
-
-  return { embeds: [embeds], files: [authorAttachment, fotterAttachment], components: [buttonRow] };
 };
 
 // diceコマンドのメッセージを作成

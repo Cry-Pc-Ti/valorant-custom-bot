@@ -38,3 +38,11 @@ export const updateOneValorantUser = async (valorantUser: ValorantUser) => {
     },
   });
 };
+
+export const findManyValorantUser = async (userIds: string[]) => {
+  return await prisma.valorant_User.findMany({
+    where: {
+      id: { in: userIds },
+    },
+  });
+};

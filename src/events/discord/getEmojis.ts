@@ -1,6 +1,5 @@
 import { Client } from 'discord.js';
-
-export let rankEmojis: { [key: string]: string } = {};
+import { rankEmojis } from '../../constants';
 
 export const loadEmojis = (client: Client, guildId: string) => {
   const guild = client.guilds.cache.get(guildId);
@@ -9,7 +8,6 @@ export const loadEmojis = (client: Client, guildId: string) => {
     return;
   }
 
-  rankEmojis = {};
   guild.emojis.cache.forEach((emoji) => {
     if (emoji.name) {
       rankEmojis[emoji.name] = emoji.toString();

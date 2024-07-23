@@ -266,3 +266,21 @@ export const getTotalMusicCommandCount = (): number => {
   });
   return count;
 };
+
+/**
+ * valorantコマンドのパターンを切り替えたいときのフラグ。
+ *
+ * @param guildId - ギルドID
+ * @param commandName - コマンド名
+ * @param patternIndex - 何番目を参照しているか
+ */
+export const setPatternIndexStates = (guildId: string, commandName: string, patternIndex: number) => {
+  if (!guildCommandStates.has(guildId)) {
+    guildCommandStates.set(guildId, new Map<string, CommandInfo>());
+  }
+  const commandMap = guildCommandStates.get(guildId);
+  const commandInfo = commandMap?.get(commandName);
+  if (!commandInfo || !commandInfo.valorantCommandInfo) return;
+
+  commandInfo.valorantCommandInfo.patternIndex = patternIndex;
+};

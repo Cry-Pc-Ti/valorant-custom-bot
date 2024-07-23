@@ -7,14 +7,16 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import { TeamData, MemberData } from '../../../types/memberData';
-import { generateRandomNum } from '../../../events/common/generateRandomNum';
-import { teamMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
 import { setGuildCommandStates } from '../../../store/guildCommandStates';
 import { v4 as uuidv4 } from 'uuid';
 import { COMMAND_NAME_VALORANT } from '../mainValorantCommand';
 import { interactionEditMessages } from '../../../events/discord/interactionMessages';
+import {
+  generateAutoBalanceTeamsPatterns,
+  generateRandomTeamPatterns,
+} from '../../../events/valorant/generateRandomTeamPatterns';
+import { teamAutoBalanceMessage, teamMessage } from '../../../events/discord/valorantEmbedMessage';
 
 export const teamCommandMainEvent = async (interaction: ChatInputCommandInteraction) => {
   try {
@@ -24,6 +26,9 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
     // コマンドで指定されたチャンネルIDを取得
     const attackerChannelId = options.getChannel('attacker')?.id;
     const defenderChannelId = options.getChannel('defender')?.id;
+
+    // autoBalance機能の有無を取得
+    const autoBalanceMode: boolean = options.getString('auto-balance') === 'true';
 
     // チャンネルIDが取得できない場合はエラーを返す
     if (!attackerChannelId || !defenderChannelId) {
@@ -59,10 +64,16 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       .setLabel('Defender VC')
       .setStyle(ButtonStyle.Primary);
 
+    const nextPatternButton = new ButtonBuilder()
+      .setCustomId(`nextPattern_${uniqueId}`)
+      .setLabel('次の組み合わせ')
+      .setStyle(ButtonStyle.Success);
+
     // ボタンをActionRowに追加
     const buttonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
       attackerVCButton,
-      difenderVCButton
+      difenderVCButton,
+      nextPatternButton
     );
 
     const buttonCollector = interaction.channel?.createMessageComponentCollector({
@@ -118,74 +129,59 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
       // メンバーIDを取得
       const memberIds = selectMenuInteraction.values;
 
-      //メンバー情報を作成
-      const memberData: MemberData[] = [];
-
-      for (const userId of memberIds) {
-        // ユーザIDからユーザ情報を取得
-        const user = await guild.members.fetch(userId);
-
-        // ユーザがいない場合はスキップ
-        if (!user) continue;
-
-        // メンバー情報を配列に追加
-        memberData.push({
-          name: user?.user.displayName,
-          id: user?.user.id,
-          avatarImg: user?.user.avatarURL(),
-        });
-      }
-
-      // チーム分け用のオブジェクトを作成
-      const teams: TeamData = {
-        attack: [],
-        defense: [],
-      };
-
-      // メンバーを振り分け
-      // メンバー数が奇数の場合は、攻撃側が1人多くなるように振り分け
-      const totalMembers = memberData.length;
-      const maxAttackMembers = Math.ceil(totalMembers / 2);
-      const maxDefenseMembers = Math.floor(totalMembers / 2);
-
-      let attackCount = 0;
-      let defenseCount = 0;
-
-      for (const member of memberData) {
-        const randomNumber = generateRandomNum(0, 1);
-
-        if (randomNumber === 0 && attackCount < maxAttackMembers) {
-          teams.attack.push(member);
-          attackCount++;
-        } else if (defenseCount < maxDefenseMembers) {
-          teams.defense.push(member);
-          defenseCount++;
-        } else {
-          teams.attack.push(member);
-          attackCount++;
-        }
-      }
-
       const replyMessageId = (await interaction.fetchReply()).id;
 
-      setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
-        buttonCollector: buttonCollector,
-        buttonRowArray: [buttonRow],
-        uniqueId: uniqueId,
-        interaction: interaction,
-        replyMessageId: replyMessageId,
-        valorantCommandInfo: {
-          attackerChannelId: attackerChannelId,
-          defenderChannelId: defenderChannelId,
-          teams: teams,
-        },
-      });
+      if (autoBalanceMode) {
+        // メンバーIDからDBにランク情報を取得
+        const teamPatterns = await generateAutoBalanceTeamsPatterns(memberIds);
 
-      // メッセージを作成
-      const embed = teamMessage(teams, buttonRow, attackerChannelId, defenderChannelId, guildId);
+        // ストアに情報をセット
+        setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
+          buttonCollector: buttonCollector,
+          buttonRowArray: [buttonRow],
+          uniqueId: uniqueId,
+          interaction: interaction,
+          replyMessageId: replyMessageId,
+          valorantCommandInfo: {
+            attackerChannelId: attackerChannelId,
+            defenderChannelId: defenderChannelId,
+            teamPattern: teamPatterns,
+            patternIndex: 0,
+          },
+        });
 
-      // メッセージを送信
-      await interactionEditMessages(interaction, replyMessageId, embed);
+        // メッセージを作成
+        const embed = teamAutoBalanceMessage(teamPatterns, buttonRow, attackerChannelId, defenderChannelId, guildId, 0);
+
+        // メッセージを送信
+        return await interactionEditMessages(interaction, replyMessageId, embed);
+
+        // チーム分け用のオブジェクトを作成
+      } else {
+        // メンバーIDからDBにランク情報を取得
+        const teamPatterns = await generateRandomTeamPatterns(memberIds);
+
+        setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
+          buttonCollector: buttonCollector,
+          buttonRowArray: [buttonRow],
+          uniqueId: uniqueId,
+          interaction: interaction,
+          replyMessageId: replyMessageId,
+          valorantCommandInfo: {
+            attackerChannelId: attackerChannelId,
+            defenderChannelId: defenderChannelId,
+            teamPattern: teamPatterns,
+            patternIndex: 0,
+          },
+        });
+
+        // メッセージを作成
+        const embed = teamMessage(teamPatterns, buttonRow, attackerChannelId, defenderChannelId, guildId, 0);
+
+        // メッセージを送信
+        await interactionEditMessages(interaction, replyMessageId, embed);
+        return;
+      }
     });
     selectMenuCollector.on('end', () => {
       selectMenuCollector.stop();
