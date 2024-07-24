@@ -16,6 +16,7 @@ import { commands } from './modules/commandsModule';
 import { fetchAdminUserId } from './events/notion/fetchAdminUserId';
 import { fetchBannedUserIds, loadBannedUsers } from './events/notion/manageBanUsers';
 import { loadEmojis } from './events/discord/getEmojis';
+import { getLatestGitTag } from './events/common/latestGitTag';
 
 // サーバーにコマンドを登録
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -34,10 +35,21 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 // クライアントオブジェクトが準備完了時に実行
 discord.on('ready', async (client: Client) => {
   console.log(`準備が完了しました ${discord.user?.tag}がログインします`);
-  discord.user?.setPresence({
-    activities: [{ name: 'wingmankun ver2.1.0 /help', type: 0 }],
-    status: 'online',
-  });
+
+  getLatestGitTag()
+    .then((tag) => {
+      discord.user?.setPresence({
+        activities: [{ name: `wingmankun ${tag} /help`, type: 0 }],
+        status: 'online',
+      });
+    })
+    .catch(() => {
+      discord.user?.setPresence({
+        activities: [{ name: `wingmankun /help`, type: 0 }],
+        status: 'online',
+      });
+    });
+
   Logger.initialize();
   await fetchBannedUserIds();
 

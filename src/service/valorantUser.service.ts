@@ -6,17 +6,32 @@ import {
 } from '../repositories/valorantUserRepository';
 import { ValorantUser, ValorantUserResponse } from '../types/valorantUserData';
 
-// ValorantのUser情報をDBに登録
+/**
+ * ValorantのUser情報をDBに登録します。
+ *
+ * @param valorantUser - 登録するValorantユーザーの情報。
+ * @returns 登録結果を返します。
+ */
 export const registerValorantUser = async (valorantUser: ValorantUser) => {
   return await createValorantUser(valorantUser);
 };
 
-// ValorantのUser情報を取得更新
+/**
+ * ValorantのUser情報を更新します。
+ *
+ * @param valorantUser - 更新するValorantユーザーの情報。
+ * @returns 更新結果を返します。
+ */
 export const updateValorantUser = async (valorantUser: ValorantUser) => {
   return await updateOneValorantUser(valorantUser);
 };
 
-// ValorantのUser情報を取得
+/**
+ * 指定されたIDのValorantユーザー情報を取得します。
+ *
+ * @param userID - 取得するユーザーのID。
+ * @returns ユーザー情報を返します。ユーザーが見つからない場合はnullを返します。
+ */
 export const getUniqueValorantUser = async (userID: string): Promise<ValorantUserResponse | null> => {
   const userInfo = await findOneValorantUser(userID);
   if (!userInfo) return null;
@@ -34,6 +49,12 @@ export const getUniqueValorantUser = async (userID: string): Promise<ValorantUse
   };
 };
 
+/**
+ * 複数のユーザーIDに対応するValorantユーザーのランク情報を取得します。
+ *
+ * @param userIds - 取得するユーザーのIDの配列。
+ * @returns ユーザーIDをキーとするユーザーランク情報のマップを返します。
+ */
 export const getValorantUsersRank = async (userIds: string[]) => {
   const fetchedValorantUsersResponse = await findManyValorantUser(userIds);
 

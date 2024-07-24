@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { AgentData } from '../../../types/valorantData';
-import { agentMessage } from '../../../events/discord/embedMessage';
+import { agentMessage } from '../../../events/discord/valorantEmbedMessage';
 import { Logger } from '../../../events/common/log';
 import { fetchAgentsData } from '../../../service/valorant.service';
 

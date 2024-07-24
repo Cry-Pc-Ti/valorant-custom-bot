@@ -161,6 +161,7 @@ export const teamCommandMainEvent = async (interaction: ChatInputCommandInteract
         // メンバーIDからDBにランク情報を取得
         const teamPatterns = await generateRandomTeamPatterns(memberIds);
 
+        // ストアに情報をセット
         setGuildCommandStates(guildId, COMMAND_NAME_VALORANT, {
           buttonCollector: buttonCollector,
           buttonRowArray: [buttonRow],

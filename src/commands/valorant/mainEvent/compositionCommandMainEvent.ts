@@ -10,7 +10,7 @@ import {
 import { AgentData, CompositionData } from '../../../types/valorantData';
 import { selectAgentsByRole } from '../../../events/valorant/selectAgentsByRole';
 import { createConcatImage } from '../../../events/common/createConcatImage';
-import { compositionMessage } from '../../../events/discord/embedMessage';
+import { compositionMessage } from '../../../events/discord/valorantEmbedMessage';
 import { countAgentsByRole, countBanAgentsByRole } from '../../../events/valorant/countAgentsNum';
 import { Logger } from '../../../events/common/log';
 import { fetchAgentsData } from '../../../service/valorant.service';

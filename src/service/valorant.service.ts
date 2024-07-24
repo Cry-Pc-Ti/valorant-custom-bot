@@ -5,30 +5,27 @@ import { Logger } from '../events/common/log';
 const VALORANT_AGENTINFO_URL = 'https://valorant-api.com/v1/agents';
 const VALORANT_MAPINFO_URL = 'https://valorant-api.com/v1/maps';
 
-// Valorant-APIからエージェント情報を取得
-export const fetchAgentsData = async () => {
+/**
+ * Valorant-APIからエージェント情報を取得
+ * @returns {Promise<AgentData[]>} エージェント情報の配列
+ * @throws エラーが発生した場合
+ */
+export const fetchAgentsData = async (): Promise<AgentData[]> => {
   try {
-    // 日本語と英語のエージェント情報をそれぞれ取得
-    const response_jp = await axios.get(VALORANT_AGENTINFO_URL + '?language=ja-JP');
-    const response_en = await axios.get(VALORANT_AGENTINFO_URL + '?language=en-US');
+    const response_jp = await axios.get(`${VALORANT_AGENTINFO_URL}?language=ja-JP`);
+    const response_en = await axios.get(`${VALORANT_AGENTINFO_URL}?language=en-US`);
 
-    // エージェント情報を整形
     const agents_jp: AgentData_JP[] = response_jp.data.data
       .map(
         (agent: {
-          uuid: string;
           displayName: string;
           role: { displayName: string };
+          uuid: string;
           displayIcon: string;
           description: string;
-          abilities: {
-            slot: string;
-            displayName: string;
-            description: string;
-            displayIcon: string;
-          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          abilities: any;
         }) => {
-          // 空のエージェント情報を除外
           if (!agent.displayName || !agent.role || !agent.role.displayName) {
             return null;
           }
@@ -42,11 +39,10 @@ export const fetchAgentsData = async () => {
           };
         }
       )
-      .filter((agent: AgentData_JP): agent is AgentData_JP => agent !== null); // null を除外
+      .filter((agent: AgentData_JP): agent is AgentData_JP => agent !== null);
 
     const agents_en: AgentData_EN[] = response_en.data.data
-      .map((agent: { uuid: string; displayName: string; role: { displayName: string } }) => {
-        // 空のエージェント情報を除外
+      .map((agent: { displayName: string; role: { displayName: string }; uuid: string }) => {
         if (!agent.displayName || !agent.role || !agent.role.displayName) {
           return null;
         }
@@ -56,9 +52,8 @@ export const fetchAgentsData = async () => {
           roleId: agent.role.displayName.toLowerCase(),
         };
       })
-      .filter((agent: AgentData_EN): agent is AgentData_EN => agent !== null); // null を除外
+      .filter((agent: AgentData_EN): agent is AgentData_EN => agent !== null);
 
-    // uuidが一致するエージェントの情報を結合
     const agents: AgentData[] = agents_jp
       .map((agent_jp) => {
         const agent_en = agents_en.find((agent_en) => agent_en.uuid === agent_jp.uuid);
@@ -76,16 +71,10 @@ export const fetchAgentsData = async () => {
         }
         return null;
       })
-      .filter((agent): agent is AgentData => agent !== null); // null を除外
+      .filter((agent): agent is AgentData => agent !== null);
 
-    // エージェント名で昇順に並び替え
-    agents.sort((a, b) => {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
+    agents.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
-    // エージェントのロール順に並び替え
     const roleOrder = ['duelist', 'initiator', 'controller', 'sentinel'];
     const sortedAgents: AgentData[] = [];
     roleOrder.forEach((role) => {
@@ -103,15 +92,19 @@ export const fetchAgentsData = async () => {
   }
 };
 
-// Valorant-APIからマップ情報を取得
-export const fetchMapsData = async () => {
+/**
+ * Valorant-APIからマップ情報を取得
+ * @returns {Promise<MapData[]>} マップ情報の配列
+ * @throws エラーが発生した場合
+ */
+export const fetchMapsData = async (): Promise<MapData[]> => {
   try {
-    const response_jp = await axios.get(VALORANT_MAPINFO_URL + '?language=ja-JP');
+    const response_jp = await axios.get(`${VALORANT_MAPINFO_URL}?language=ja-JP`);
 
     const maps: MapData[] = await response_jp.data.data
       .map(
         (mapDetail: {
-          tacticalDescription: string | null;
+          tacticalDescription: null;
           uuid: string;
           displayName: string;
           displayIcon: string;
@@ -129,12 +122,7 @@ export const fetchMapsData = async () => {
       )
       .filter((map: MapData) => map);
 
-    // マップ名で昇順に並び替え
-    maps.sort((a, b) => {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
+    maps.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
     return maps;
   } catch (error) {
@@ -143,7 +131,14 @@ export const fetchMapsData = async () => {
   }
 };
 
-export const getValorantUserMmr = async (username: string, tag: string) => {
+/**
+ * ユーザーのMMR情報を取得
+ * @param {string} username - ユーザー名
+ * @param {string} tag - タグライン
+ * @returns {Promise<any>} MMR情報
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getValorantUserMmr = async (username: string, tag: string): Promise<any> => {
   const encodedUsername = encodeURIComponent(username);
   const encodedTag = encodeURIComponent(tag);
   const VALORANT_VALORANTRANK_URL = `https://api.kyroskoh.xyz/valorant/v1/mmr/ap/${encodedUsername}/${encodedTag}`;

@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 import { createAudioPlayer, joinVoiceChannel } from '@discordjs/voice';
 import { Logger } from '../common/log';
-import { musicInfoMessage } from '../discord/embedMessage';
+import { musicInfoMessage } from '../discord/musicEmbedMessage';
 import { playMusicStream } from './playBackMusic';
 import { MusicInfo } from '../../types/musicData';
 import { v4 as uuidv4 } from 'uuid';

@@ -3,7 +3,7 @@ import { checkUrlType, getMusicPlayListInfo, getSingleMusicInfo } from '../../..
 import { MusicInfo, PlayListInfo } from '../../../types/musicData';
 import { Logger } from '../../../events/common/log';
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
-import { playListPlayMusicMessage } from '../../../events/discord/embedMessage';
+import { playListPlayMusicMessage } from '../../../events/discord/musicEmbedMessage';
 import { singleMusicMainLogic } from '../../../events/music/singleMusicPlayMainLogic';
 import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';

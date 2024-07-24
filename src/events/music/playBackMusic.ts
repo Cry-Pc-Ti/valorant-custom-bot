@@ -2,7 +2,6 @@ import ytdl from '@distube/ytdl-core';
 import { MusicInfo } from '../../types/musicData';
 import { AudioPlayer, AudioPlayerStatus, StreamType, createAudioResource, entersState } from '@discordjs/voice';
 import {
-  deleteGuildCommandStates,
   getCommandStates,
   getRepeatModeStates,
   setGuildCommandStates,
@@ -12,8 +11,8 @@ import {
   stopPreviousInteraction,
 } from '../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../../commands/music/mainMusicCommand';
-import { musicInfoPlayListMessage } from '../discord/embedMessage';
-import { donePlayerInteractionEditMessages, interactionEditMessages } from '../discord/interactionMessages';
+import { musicInfoPlayListMessage } from '../discord/musicEmbedMessage';
+import { interactionEditMessages } from '../discord/interactionMessages';
 import { Logger } from '../common/log';
 
 /**
@@ -54,7 +53,6 @@ export const playMusicStream = async (player: AudioPlayer, musicInfo: MusicInfo)
 export const deletePlayerInfo = (player: AudioPlayer) => {
   if (player) {
     player.stop();
-    player.removeAllListeners();
   }
 };
 /**

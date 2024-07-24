@@ -1,7 +1,15 @@
 import { AgentData, CompositionData } from '../../types/valorantData';
 import { Logger } from '../common/log';
 
-// 各ロールのエージェントを指定された人数分ランダムに選択 (重複なし)
+/**
+ * 各ロールのエージェントを指定された人数分ランダムに選択 (重複なし)
+ * @param {string} agentRole - エージェントのロール (例: 'duelist', 'initiator', 'controller', 'sentinel')
+ * @param {number} agentNum - 選択するエージェントの人数
+ * @param {CompositionData} composition - 現在のエージェント構成データ
+ * @param {AgentData[]} valorantAgents - 利用可能なすべてのエージェントデータの配列
+ * @returns {CompositionData} 更新されたエージェント構成データ
+ * @throws エラーが発生した場合
+ */
 export const selectAgentsByRole = (
   agentRole: string,
   agentNum: number,

@@ -9,12 +9,12 @@ import { getSpotifyToken, getTopSongs } from '../../../service/spotify.service';
 import { getOneSearchMusicVideo } from '../../../events/music/getMusicInfo';
 import { MusicInfo } from '../../../types/musicData';
 import { playListMusicMainLogic } from '../../../events/music/playListMusicPlayMainLogic';
-import { hitSongsPreparingPlayerMessage } from '../../../events/discord/embedMessage';
 import { Logger } from '../../../events/common/log';
 import { stopPreviousInteraction } from '../../../store/guildCommandStates';
 import { COMMAND_NAME_MUSIC } from '../mainMusicCommand';
 import { getSpotifyPlayList } from '../../../events/notion/fetchSpotifyPlayList';
 import { SpotifyPlaylistInfo } from '../../../types/spotifyData';
+import { hitSongsPreparingPlayerMessage } from '../../../events/discord/musicEmbedMessage';
 
 /**
  * ヒットソング再生コマンドのメインイベント

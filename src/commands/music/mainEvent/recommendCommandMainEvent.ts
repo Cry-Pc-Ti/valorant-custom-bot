@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { preparingPlayerMessage } from '../../../events/discord/embedMessage';
+import { preparingPlayerMessage } from '../../../events/discord/musicEmbedMessage';
 import { MusicInfo } from '../../../types/musicData';
 import { checkUrlType, getMusicPlayListInfo, getSingleMusicInfo } from '../../../events/music/getMusicInfo';
 import { generateRandomNum } from '../../../events/common/generateRandomNum';
